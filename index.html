@@ -3697,7 +3697,7 @@ const PUSH={url:null};
     b.disabled=false;ui()});
   // keep the server in step with your time, days and practice
   PUSH.update=()=>{if(S.push.on&&PUSH.url)navigator.serviceWorker.ready.then(r=>r.pushManager.getSubscription()).then(sub=>sub&&api('/sub',{sub:sub.toJSON(),time:S.rem.time,tz:tz(),days:S.rem.days})).catch(()=>{})};
-  PUSH.done=()=>{if(S.push.on&&S.push.id&&PUSH.url&&GAME.lastGoal===today())api('/done',{id:S.push.id,date:today()}).catch(()=>{})};
+  PUSH.done=()=>{if(S.push.on&&S.push.id&&PUSH.url&&GAME.lastGoal===today()&&S.push.doneSent!==today())api('/done',{id:S.push.id,date:today()}).then(()=>{S.push.doneSent=today();persist()}).catch(()=>{})};
   PUSH.test=()=>S.push.on&&S.push.id&&PUSH.url?api('/test',{id:S.push.id}).then(()=>true).catch(()=>false):Promise.resolve(false);
   $('rem-time').addEventListener('change',()=>{PUSH.update();ui()});$('rem-days').addEventListener('click',()=>setTimeout(PUSH.update,50));
   fetch('push-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(c=>{if(c&&c.url)PUSH.url=c.url.replace(/\/$/,'');ui();PUSH.done()}).catch(()=>ui());
