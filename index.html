@@ -1551,15 +1551,16 @@ function renderPad(){
   const DR=DIATONIC.map(p=>[p,idOfDeg(p)]).sort((a,b)=>a[1]-b[1]),col={};
   DR.forEach(([p,off],i)=>col[p]=2*i+1);
   OUTSIDE.forEach(p=>{const off=idOfDeg(p);let j=0;DR.forEach(([q,o2],i)=>{if(o2<off)j=i});col[p]=2*j+2});col[12]=15;
+  const VC=voxChordNow(),CN=chordNow||VC,inPlay=VC?VC.tones:S.pool;
   padKeys().forEach(({k:o,o:base,r})=>{const b=document.createElement('button');
     const isD=base===12||DIATONIC.includes(base);
     b.className='key '+(isD?'diat':'out')+' r'+r;b.style.gridRow=String(2*r+(isD?2:1));
     if(pc(o)===S.home)b.classList.add('home');
-    if(!S.pool.includes(pc(o)))b.classList.add('off');
+    if(!inPlay.includes(pc(o)))b.classList.add('off');
     if(trail.has(o)&&!marks[o])b.classList.add('trail');
     if(marks[o])b.classList.add(marks[o]);
     if(toneSet().has(pc(o)))b.classList.add('ctone');
-    if(chordNow&&!marks[o]){if(pc(o)===chordNow.root)b.classList.add('croot');else if(chordNow.tones.includes(pc(o)))b.classList.add('cton')}
+    if(CN&&!marks[o]){if(pc(o)===CN.root)b.classList.add('croot');else if(CN.tones.includes(pc(o)))b.classList.add('cton')}
     if(nowKey===o)b.classList.add('now');
     b.style.gridColumn=`${col[base]} / span 2`;
     b.innerHTML=labHTML(o);
@@ -1577,6 +1578,10 @@ function renderPad(){
     c.setAttribute('aria-pressed',S.pool.includes(o));
     c.addEventListener('click',()=>{if(S.pool.includes(o)){if(S.pool.length>2)S.pool=S.pool.filter(x=>x!==o)}else S.pool.push(o);persist();renderPad()});pr.appendChild(c)});
   renderFB();renderCirc();renderLvlBtn()}
+function voxChordNow(){if(S.tab!=='vox'||!gameReady)return null;
+  if(S.voxMode==='explore'){const c=VCH[S.voxChord];return c?{root:c[0],tones:c[2].slice()}:null}
+  if(S.voxMode==='shell'&&typeof SHL!=='undefined'&&SHL.ms&&SHL.ms.length)return {root:SHL.d,tones:SHL.ms.map(offOf)};
+  return null}
 function clearMarks(){marks={};trail=new Set();nowKey=null;cellMarks={};renderPad()}
 function lightAt(ms,o,extra){later(ms,()=>{nowKey=o;if(extra)extra();renderPad()})}
 function unlightAt(ms){later(ms,()=>{nowKey=null;renderPad()})}
@@ -1981,7 +1986,7 @@ function voiceText(ms){const sorted=ms.slice().sort((a,b)=>a-b);return sorted.ma
 function showShapeInfo(){
   const sh=VX.shapes[VX.i],c=VCH[S.voxChord];
   $('vox-info').innerHTML=sh?`<b>${c[1]}</b> chord (${c[2].map(lab).join(' ')}) · shape ${VX.i+1} of ${VX.shapes.length}<br><b>${invOf(sh,c[2]).split(' (')[0][0].toUpperCase()+invOf(sh,c[2]).split(' (')[0].slice(1)}</b>: ${voiceText(sh.ms)} from low to high, on the ${setName(sh)}`
-    :`No three-string shapes for this chord in ${WINDOWS[S.win].name.toLowerCase()}. Pick Whole neck.`;renderFB()}
+    :`No three-string shapes for this chord in ${WINDOWS[S.win].name.toLowerCase()}. Pick Whole neck.`;renderPad()}
 function playShape(ms,delay=0){if(!delay)stopAll();ensure();const t=ctx.currentTime+0.05+delay,sorted=ms.slice().sort((a,b)=>a-b);
   sorted.forEach((m,i)=>pluck(m,t+i*0.22,1,0.45));sorted.forEach((m,i)=>pluck(m,t+0.9+i*0.025,1.8,0.38));}
 function renderVoxChords(){
@@ -3184,7 +3189,7 @@ document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.obser
 
 
 /* drone at hand: the same drone as in Settings, from the game's button row */
-['deg','chord','phr','duel','prog'].forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
+[...['deg','chord','phr','duel','prog'].map(t=>document.querySelector(`#panel-${t} .primary-row`)),$('vox-prev')&&$('vox-prev').parentNode,$('sh-play')&&$('sh-play').parentNode,$('vq-next')&&$('vq-next').parentNode].forEach(row=>{if(!row||row.querySelector('.dronebtn'))return;const t='';;if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
   row.appendChild(b);iconize(b)});
 function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?`Drone on (home, ${lab(S.home)}): tap to stop`:`Drone: hold home (${lab(S.home)}) underneath`})}
 document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
@@ -3364,7 +3369,7 @@ function shRender(){if(S.inst!=='guitar'){$('sh-info').textContent='Shell shapes
   $('sh-info').innerHTML=`<b>${nm}</b> shell · tab <span class="path">${shTab(fr)}</span><br>`+roles.map(([r,m])=>`${r} <b>${lab(offOf(m))}</b>`).join(' · ')+
     (SHL.q!==nat?`<br><span class="hint">Not this key’s own ${DEG[SHL.d].n} chord (that’s ${nat}): try it to hear the colour change.</span>`:'')+
     (SHL.q==='dim'?`<br><span class="hint">The middle note works as a 6 as well as a diminished 7th, so the same shape is also a minor 6 chord (think Summertime).</span>`:'');
-  renderFB()}
+  renderPad()}
 function shPlay(arp){if(!SHL.ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05,ms=SHL.ms.slice().sort((a,b)=>a-b);
   if(arp){ms.forEach((m,i)=>{pluck(m,t+i*0.4,1.1,0.5);later(i*400,()=>{cellNow=SHL.ids[SHL.ms.indexOf(m)];renderFB()})});later(ms.length*400+300,()=>{cellNow=null;renderFB()})}
   else ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}
