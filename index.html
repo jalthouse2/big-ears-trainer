@@ -2761,12 +2761,12 @@ $('kb').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)k
 
 /* ---------- tuner ---------- */
 const TUNINGS={
-  'g-std':['Standard (EADGBE)',[40,45,50,55,59,64]],'g-dropd':['Drop D',[38,45,50,55,59,64]],'g-half':['Half step down',[39,44,49,54,58,63]],
-  'g-dadgad':['DADGAD',[38,45,50,55,57,62]],'g-openg':['Open G',[38,43,50,55,59,62]],
-  'u-std':['Standard (GCEA)',[67,60,64,69]],'u-lowg':['Low G',[55,60,64,69]],'u-bari':['Baritone (DGBE)',[50,55,59,64]],
+  'g-std':['Guitar · Standard',[40,45,50,55,59,64]],'g-dropd':['Guitar · Drop D',[38,45,50,55,59,64]],'g-half':['Guitar · Half step down',[39,44,49,54,58,63]],
+  'g-dadgad':['Guitar · DADGAD',[38,45,50,55,57,62]],'g-openg':['Guitar · Open G',[38,43,50,55,59,62]],
+  'u-std':['Ukulele · Standard',[67,60,64,69]],'u-lowg':['Ukulele · Low G',[55,60,64,69]],'u-bari':['Ukulele · Baritone',[50,55,59,64]],
   'chrom':['Chromatic',[]]};
 const TUNE={sel:0,auto:true,trace:[],ema:null,inSince:0,done:new Set(),ownMic:false,last:0};
-const tuneKey=()=>{S.tunes=S.tunes||{guitar:'g-std',uke:'u-std',piano:'chrom'};return S.tunes[S.inst]||'chrom'};
+const tuneKey=()=>{S.tunes=S.tunes||{guitar:'g-std',uke:'u-std',piano:'g-std'};if(S.tunes.piano==='chrom'&&!S.tunesPianoFix){S.tunes.piano='g-std';S.tunesPianoFix=true}return S.tunes[S.inst]||'g-std'};
 const tuning=()=>TUNINGS[tuneKey()]||TUNINGS['g-std'];
 const noteLbl=m=>`${NAMES[((m%12)+12)%12]}<sup>${Math.floor(m/12)-1}</sup>`;
 function headstockSVG(n){
@@ -2785,9 +2785,10 @@ function headstockSVG(n){
     ${pegs}<g class="shafts">${ys.map(y=>`<line x1="36" y1="${y}" x2="56" y2="${y}"/><line x1="144" y1="${y}" x2="164" y2="${y}"/>`).join('')}</g>${posts}
     <rect x="44" y="${nutY}" width="112" height="6" rx="2" fill="var(--fg)" opacity=".85"/><rect x="46" y="${nutY+6}" width="108" height="40" fill="var(--neck)"/>${strings}</svg>`}
 function tuneSetup(){if(!$('tune-set'))return;
-  const keys=Object.keys(TUNINGS).filter(k=>S.inst==='uke'?k[0]==='u'||k==='chrom':S.inst==='piano'?k==='chrom':k[0]==='g'||k==='chrom');
-  if(!keys.includes(tuneKey()))S.tunes[S.inst]=keys[0];
-  $('tune-set').innerHTML=keys.map(k=>`<option value="${k}">${TUNINGS[k][0]}</option>`).join('');$('tune-set').value=tuneKey();
+  // every tuning is always offered: guitar first, then ukulele, then chromatic; each instrument setting remembers its own pick
+  const grp=(lab,f)=>`<optgroup label="${lab}">`+Object.keys(TUNINGS).filter(f).map(k=>`<option value="${k}">${TUNINGS[k][0]}</option>`).join('')+'</optgroup>';
+  if(!TUNINGS[tuneKey()])S.tunes[S.inst]='g-std';
+  $('tune-set').innerHTML=grp('Guitar',k=>k[0]==='g')+grp('Ukulele',k=>k[0]==='u')+grp('Any instrument',k=>k==='chrom');$('tune-set').value=tuneKey();
   const ms=tuning()[1],n=ms.length,hs=$('hs');TUNE.done=new Set();TUNE.sel=0;
   if(!n){hs.innerHTML='<p class="hint" style="grid-column:1/-1;text-align:center">Play or sing any note: the tuner shows the nearest note and how far off you are.</p>';return}
   const per=n/2,left=[],right=[];for(let i=per-1;i>=0;i--)left.push(i);for(let i=per;i<n;i++)right.push(i);
