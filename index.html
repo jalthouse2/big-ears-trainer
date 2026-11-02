@@ -485,6 +485,8 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 .dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg)}
+.dronebtn.on.sleep{background:var(--home-soft);color:var(--home)}
+#drone.sleep{background:var(--home-soft);color:var(--home)}
 .voxmode{align-self:flex-start}
 .voxmode button{min-height:36px;padding:6px 14px}
 
@@ -1192,7 +1194,9 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <option value="1">Before every question</option><option value="3">Every 3rd question</option><option value="5">Every 5th question</option><option value="10">Every 10th question</option><option value="9999">Only when I press Cadence</option></select></label>
       <label class="check big"><input type="checkbox" id="opt-autopace"> Speed up as I get better (within each game; a miss slows it back down)</label>
       <label class="check big"><input type="checkbox" id="opt-unlock"> Unlock all levels</label>
-      <div class="field"><span>Drone</span><button class="btn toggle" id="drone" aria-pressed="false">Off</button></div>
+      <div class="field"><span>Drone (holds home underneath)</span><button class="btn toggle" id="drone" aria-pressed="false">Off</button></div>
+      <label class="field"><span>Drone rests after</span><select id="drone-idle"><option value="10">10 s without playing</option><option value="20">20 s without playing</option><option value="30">30 s without playing</option><option value="60">1 min without playing</option><option value="0">Never</option></select></label>
+      <label class="check big"><input type="checkbox" id="drone-fifth"> Add the 5th above home (fuller, more like a tanpura)</label>
       <label class="field"><span>Sound</span><select id="voice"></select></label>
       <label class="field"><span>Room</span><select id="room"><option value="off">Dry</option><option value="small">Small room</option><option value="hall">Hall</option><option value="space">Space (long, airy)</option></select></label>
       <button class="btn" id="audition" style="align-self:flex-end">Try it</button>
@@ -1238,7 +1242,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1403,7 +1407,7 @@ function setDrone(on,slow){
   const g=ctx.createGain();g.gain.value=0.0001;g.connect(master);
   const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=900;fl.Q.value=0.6;fl.connect(g);
   const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=0.07;lg.gain.value=350;lfo.connect(lg);lg.connect(fl.frequency);lfo.start();
-  const root=bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.5],[root+12,'sine',0.32],[root+7,'sine',0.1],[root+12.06,'sine',0.12]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
+  const root=bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.5],[root+12,'sine',0.32],...(S.droneFifth?[[root+7,'sine',0.1]]:[]),[root+12.06,'sine',0.12]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
     const gg=ctx.createGain();gg.gain.value=a;x.connect(gg);gg.connect(fl);x.start();return x});o.push(lfo);
   g.gain.setTargetAtTime(0.09,ctx.currentTime,0.6);droneNodes={g,o}}
 
@@ -2256,6 +2260,7 @@ function micFrame(){
   if(S.tab==='tune'){const bz=now<busyUntil+0.1;tunerFeed(!bz&&r.rms>thr*0.5&&r.clarity>0.7&&r.freq>60&&r.freq<1500?r.freq:0);return}
   $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);
   // re-pluck of the same note: a sharp jump in level counts as a new onset
+  if(r.rms>thr&&r.clarity>0.8&&r.freq>60&&!(now<busyUntil+0.15)&&!echoOf(Math.round(69+12*Math.log2(r.freq/440)),now))lastAct=Date.now();   // playing counts as using the app (wakes a resting drone)
   const jump=r.rms>Math.max(thr*2.5,MIC.prevRms*2.2);MIC.prevRms=r.rms*0.6+MIC.prevRms*0.4;
   if(S.micNext&&jump&&r.clarity<0.6&&!busy){MIC.hitAt=now}
   if(MIC.hitAt&&now-MIC.hitAt>0.12&&now-MIC.hitAt<0.2){ // still no pitch shortly after the hit: a muted strum
@@ -2356,7 +2361,7 @@ $('room').addEventListener('change',e=>{S.room=e.target.value;persist();ensure()
 function audition(){stopAll();ensure();const t=ctx.currentTime+0.08;[0,4,7,12].forEach((o,i)=>pluck(T()+o,t+i*0.32,i===3?2:0.9,0.5));chord(0,[0,4,7],t+1.7,2.2,0.22)}
 $('audition').addEventListener('click',audition);
 $('vol').addEventListener('input',e=>{S.vol=Number(e.target.value);if(master)master.gain.value=S.vol;persist()});
-$('drone').addEventListener('click',e=>{const on=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',on);e.currentTarget.textContent=on?'On':'Off';setDrone(on)});
+$('drone').addEventListener('click',e=>{const on=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',on);e.currentTarget.textContent=on?'On':'Off';if(typeof DR!=='undefined'&&DR){DR.sleep=false}setDrone(on);if(typeof droneMark==='function')droneMark()});
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){closeMenu();showTab(b.dataset.t)}});
 $('deg-next').addEventListener('click',nextDeg);$('deg-replay').addEventListener('click',replayDeg);$('deg-cad').addEventListener('click',cadOnly);
 $('deg-compare').addEventListener('click',()=>{if(Q&&Q.guess!==null)compareDeg()});
@@ -2620,8 +2625,18 @@ document.querySelectorAll('.games .stage .btn').forEach(b=>{iconize(b);icObs.obs
 /* drone: fades out after 30 seconds without any use (taps, keys or the mic) */
 let lastAct=Date.now();const touchAct=()=>{lastAct=Date.now()};
 ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,touchAct,{passive:true,capture:true}));
-setInterval(()=>{if(!droneNodes)return;if(SESS2.on&&SESS2.i===0)return;
-  if(Date.now()-lastAct>30000||document.hidden&&Date.now()-lastAct>30000){const b=$('drone');b.setAttribute('aria-pressed','false');b.textContent='Off';setDrone(false,true);toast('Drone faded out')}},2000);
+// the drone rests when you stop playing and comes back as soon as you play or tap again
+const DR={sleep:false,told:false};
+const droneWanted=()=>$('drone').getAttribute('aria-pressed')==='true';
+function droneMark(){document.querySelectorAll('.dronebtn,#drone').forEach(b=>b.classList.toggle('sleep',DR.sleep&&droneWanted()));if(DR.sleep&&droneWanted())$('drone').textContent='Resting';else $('drone').textContent=droneWanted()?'On':'Off'}
+setInterval(()=>{const want=droneWanted(),idle=Date.now()-lastAct,lim=S.droneIdle*1000;
+  if(!want){if(DR.sleep){DR.sleep=false;droneMark()}return}
+  if(droneNodes&&!DR.sleep&&lim>0&&idle>lim&&!(SESS2.on&&SESS2.i===0)){setDrone(false,true);DR.sleep=true;droneMark();if(!DR.told){DR.told=true;toast('Drone resting · play or tap to bring it back')}}
+  else if(DR.sleep&&idle<1500&&!document.hidden&&!(typeof PAUSE!=='undefined'&&PAUSE.on)){DR.sleep=false;setDrone(true);droneMark()}
+  if(document.hidden&&droneNodes&&idle>Math.max(lim,10000)){setDrone(false,true);DR.sleep=true;droneMark()}},500);
+$('drone-idle').value=String(S.droneIdle);$('drone-idle').addEventListener('change',e=>{S.droneIdle=Number(e.target.value);persist()});
+$('drone-fifth').checked=S.droneFifth;$('drone-fifth').addEventListener('change',e=>{S.droneFifth=e.target.checked;persist();if(droneNodes)setDrone(true)});
+
 
 /* chord size pill: triads or 7th chords, for the chord chart, note over chord and progressions */
 const CSIZE_TABS=['cc','chord','prog'];
@@ -3020,7 +3035,7 @@ document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.obser
 /* drone at hand: the same drone as in Settings, from the game's button row */
 ['deg','chord','phr','duel','prog'].forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
   row.appendChild(b);iconize(b)});
-function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?'Drone on: tap to stop':'Drone: hold home underneath'})}
+function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?`Drone on (home, ${lab(S.home)}): tap to stop`:`Drone: hold home (${lab(S.home)}) underneath`})}
 document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
 new MutationObserver(syncDroneBtns).observe($('drone'),{attributes:true,attributeFilter:['aria-pressed']});syncDroneBtns();
 
