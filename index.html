@@ -484,6 +484,16 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.pgsteps{display:flex;gap:4px;flex-wrap:wrap}
+.pgsteps span{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;color:var(--muted);background:var(--sunk)}
+.pgsteps span.on{background:var(--brass);color:var(--on-brass)}
+.slot.cur{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass);color:var(--brass);animation:curpulse 1.4s ease-in-out infinite}
+@keyframes curpulse{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--brass) 35%,transparent)}}
+#pg-answers.ready .chip{border-color:var(--brass)}
+#pg-answers:not(.ready) .chip{opacity:.55}
+.btn.pulse{animation:curpulse 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.slot.cur,.btn.pulse{animation:none}}
+
 #vox-chords,#sh-chords,#vq-answers{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 #vq-answers:has(> :nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr))}
 #vox-chords>*,#sh-chords>*,#vq-answers>*{min-width:0;padding-left:0;padding-right:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip}
@@ -1111,6 +1121,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <p class="eyebrow">Chord to chord</p>
     <div class="howto"><p class="why"><b>Why:</b> most songs move through the same few chords. Hearing 1, 4, 5 and 6m change is how you work out songs by ear.</p><p>The key is set, then a few chords play.</p><p>Tap them in order.</p><p>Start with 1 4 5 6m. Add more chords under the options below.</p></div>
     <p class="prompt" id="pg-prompt">Press Start. After the cadence, a short progression plays. Tap its chords in order.</p>
+    <div class="pgsteps keep" id="pg-steps"><span data-p="key">1 · Key</span><span data-p="listen">2 · Listen</span><span data-p="answer">3 · Your turn</span><span data-p="result">4 · Check</span></div>
     <div class="phrase" id="pg-slots"></div>
     <div class="chordbtns" id="pg-answers"></div>
     <p class="feedback" id="pg-fb"></p>
@@ -2112,10 +2123,10 @@ const pgSet=()=>{const st=pgSet0();return S.cc7&&['basic','all'].includes(S.pgSe
 function renderPgButtons(){$('pg-answers').innerHTML=pgSet().map(c=>`<button class="chip" data-n="${c[1]}">${c[1]}</button>`).join('')}
 function pgSlots(lit=-1,row='answer'){
   if(!PG){$('pg-slots').innerHTML='';return}
-  const you=PG.seq.map((c,i)=>PG.ans[i]!==undefined?[PG.ans[i],PG.done?(PG.ans[i]===c[1]?'ok':'no'):'']:['·','empty']);
-  let h=slotRow('You',you.map(([t,c],i)=>[t,c+(row==='mine'&&i===lit?' lit':'')]));
+  const you=PG.seq.map((c,i)=>PG.ans[i]!==undefined?[PG.ans[i],PG.done?(PG.ans[i]===c[1]?'ok':'no'):'']:['?','empty'+(PG.phase==='answer'&&i===PG.ans.length?' cur':'')]);
+  let h=slotRow(PG.done?'You':'',you.map(([t,c],i)=>[t,c+((row==='mine'||row==='listen')&&i===lit?' lit':'')]));
   if(PG.done)h+=slotRow('Answer',PG.seq.map((c,i)=>[c[1],'ok'+(row==='answer'&&i===lit?' lit':'')]));
-  $('pg-slots').innerHTML=h}
+  $('pg-slots').innerHTML=h;pgPhase()}
 function genProg(){
   if(S.pgSet==='jazz')return pick(JZ_PATTERNS).map(pgFind);
   if(S.pgSet==='outside')return pick(OUT_PATTERNS).map(pgFind);
@@ -2125,25 +2136,29 @@ function genProg(){
   return seq}
 function playProg(seq,start,quiet,row){
   const t=ctx.currentTime+0.05,st=1.15*PACE();
-  seq.forEach((c,i)=>{chord(c[0],c[2],t+start+i*st,1.1*PACE(),0.22,quiet);later((start+i*st)*1000,()=>pgSlots(i,row))});
+  seq.forEach((c,i)=>{chord(c[0],c[2],t+start+i*st,1.1*PACE(),0.22,quiet);later((start+i*st)*1000,()=>pgSlots(i,row==='none'?'listen':row))});
   const end=start+seq.length*st+0.3;later(end*1000,()=>pgSlots());return end}
+const ORD=['1st','2nd','3rd','4th','5th','6th'];
+function pgPhase(){const st=$('pg-steps');if(!st)return;const ph=PG?PG.phase:null;st.hidden=!PG;st.querySelectorAll('span').forEach(x=>x.classList.toggle('on',x.dataset.p===ph));
+  $('pg-answers').classList.toggle('ready',!!PG&&ph==='answer');$('pg-next').classList.toggle('pulse',!!PG&&ph==='result')}
 function nextProg(){
-  stopAll();ensure();clearMarks();PG={seq:genProg(),ans:[],done:false};pgSlots();$('pg-mine').hidden=true;$('pg-fb').textContent='';
-  let d=0;if(sinceCadP>=S.every){d=cadence(ctx.currentTime+0.05);sinceCadP=0}sinceCadP++;
-  $('pg-prompt').textContent=d?'Cadence first (that sets home)…':'Listen…';
-  later(d*1000,()=>$('pg-prompt').textContent=`Listen to the ${PG.seq.length} chords, then tap them in order.`);
-  playProg(PG.seq,d+0.2,true,'none');$('pg-next').textContent='Next'}
+  stopAll();ensure();clearMarks();PG={seq:genProg(),ans:[],done:false,phase:'listen'};$('pg-mine').hidden=true;$('pg-fb').textContent='';
+  let d=0;if(sinceCadP>=S.every){d=cadence(ctx.currentTime+0.05)+0.6*PACE();sinceCadP=0;PG.phase='key'}sinceCadP++;pgSlots();
+  $('pg-prompt').textContent=d?'First, the key. Just let it settle…':`Listen: ${PG.seq.length} chords.`;
+  later(d*1000,()=>{if(!PG)return;PG.phase='listen';pgPhase();$('pg-prompt').textContent=`Listen: ${PG.seq.length} chords.`});
+  const end=playProg(PG.seq,d+0.2,true,'none');
+  later(end*1000,()=>{if(!PG||PG.done)return;PG.phase='answer';pgSlots();$('pg-prompt').textContent=`Your turn: which chord was ${ORD[0]}?`});
+  $('pg-next').textContent='Next'}
 function answerProg(name){
   if(!PG||PG.done)return;PG.ans.push(name);
   stopAll();ensure();const c=pgFind(name);chord(c[0],c[2],ctx.currentTime+0.03,0.9,0.2);
-  if(PG.ans.length<PG.seq.length){pgSlots();$('pg-prompt').textContent=`Chord ${PG.ans.length+1} of ${PG.seq.length}?`;return}
-  $('pg-prompt').textContent='Press Next for a new progression.';
-  PG.done=true;const ok=PG.seq.filter((c,i)=>PG.ans[i]===c[1]).length,all=ok===PG.seq.length;
+  PG.phase='answer';if(PG.ans.length<PG.seq.length){pgSlots();$('pg-prompt').textContent=`Your turn: which chord was ${ORD[PG.ans.length]||PG.ans.length+1}?`;return}
+  PG.done=true;PG.phase='result';const ok=PG.seq.filter((c,i)=>PG.ans[i]===c[1]).length,all=ok===PG.seq.length;
   PS.n++;if(all){PS.c++;PS.streak++}else PS.streak=0;onAnswer('prog',all);$('pg-score').textContent=`This session ${PS.c}/${PS.n} right · streak ${PS.streak}`;
   pgSlots();$('pg-mine').hidden=false;if(S.handsFree)later(3500*PACE(),nextProg);
   const ansTxt=PG.seq.map(c=>c[1]).join(' – ');
-  if(all){$('pg-fb').innerHTML=`<span class="tag ok">${ansTxt}</span> All right. Watch it on the map and neck.`;later(700,()=>playProg(PG.seq,0,false,'answer'))}
-  else{$('pg-fb').innerHTML=`<span class="tag no">${ok} of ${PG.seq.length}</span> <span class="tag ok">${ansTxt}</span> You'll hear yours, then the real one.`;
+  if(all){$('pg-prompt').textContent='All right! Hear it once more, then press → for the next one.';$('pg-fb').innerHTML=`<span class="tag ok">${ansTxt}</span>`;later(700,()=>playProg(PG.seq,0,false,'answer'))}
+  else{$('pg-prompt').textContent=`${ok} of ${PG.seq.length} right. Listen: yours, then the real one. Then press → for the next.`;$('pg-fb').innerHTML=`<span class="tag no">You: ${PG.ans.join(' – ')}</span> <span class="tag ok">It was: ${ansTxt}</span>`;
     const mine=PG.ans.map(pgFind);later(700,()=>{const end=playProg(mine,0,false,'mine');later(end*1000+400,()=>playProg(PG.seq,0,false,'answer'))})}}
 $('pg-answers').addEventListener('click',e=>{const b=e.target.closest('button');if(b)answerProg(b.dataset.n)});
 $('pg-next').addEventListener('click',nextProg);
@@ -3246,8 +3261,8 @@ const LESSONS={
        ['#circ','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
        ['#duel-slots','Each round adds one more. How far can you go?',{}]],
   prog:[['#circ-go','Press play.',{act:1}],
-       ['#pg-answers','Listen to the chords…',{wait:()=>PG&&/Listen to the|Chord/.test($('pg-prompt').textContent)}],
-       ['#pg-answers','Now tap them in order.',{wait:()=>PG&&PG.done}],
+       ['#pg-steps','First the key, then the chords. Just listen…',{wait:()=>PG&&PG.phase==='answer'}],
+       ['#pg-answers','Your turn: tap the chords in order. The gold box shows which one you\u2019re on.',{wait:()=>PG&&PG.done}],
        ['#pg-fb','Green ones you got; red ones you can hear again with ↻.',{}]],
   find:[['#find-next','Press start.',{act:1}],
        ['#find-num','Find this number.',{}],
