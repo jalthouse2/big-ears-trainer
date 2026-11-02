@@ -484,6 +484,21 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.btn.ic.primary.same{width:46px;height:46px}.btn.ic.primary.same svg{width:22px;height:22px}
+.songseg{align-self:flex-start;margin-bottom:4px}
+/* ===== Guided tour: spotlight one thing, blur the rest ===== */
+.tour{position:fixed;inset:0;z-index:70;pointer-events:auto}
+.tour .tb{position:fixed;background:rgba(8,10,16,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:all .35s cubic-bezier(.3,.9,.3,1)}
+.tour .ring{position:fixed;border-radius:14px;box-shadow:0 0 0 3px var(--brass),0 0 24px 4px color-mix(in srgb,var(--brass) 45%,transparent);transition:all .35s cubic-bezier(.3,.9,.3,1);pointer-events:none}
+.tour .tip{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;padding:16px 18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:top .35s cubic-bezier(.3,.9,.3,1)}
+.tour .tip p{margin:0 0 12px;font-size:16px;line-height:1.45}
+.tour .tip .n{font:600 11px var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tour .tip .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour .tip .btn{border-radius:999px;min-height:40px;padding:6px 16px}
+.tour .tip .skip{border:0;background:none;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion: reduce){.tour .tb,.tour .ring,.tour .tip{transition:none}}
+.tourbtn{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;border-radius:999px;min-height:40px;padding:6px 16px}
+
 .dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg)}
 .dronebtn.on.sleep{background:var(--home-soft);color:var(--home)}
 #drone.sleep{background:var(--home-soft);color:var(--home)}
@@ -519,9 +534,10 @@ body[data-screen="game"] .bottomnav{display:none}
 .decin .ic{flex:none}
 #dec-voice.on{background:var(--bad);border-color:var(--bad);color:var(--bg)}
 
-.instpill{position:absolute;left:4px;top:-13px;z-index:3}
+.instpill{display:inline-flex;margin:8px 0 6px}
 .instpill select{min-height:26px;font-size:12px;padding:2px 22px 2px 10px}
-.fbwrap{padding-top:16px}
+.fbwrap{padding-top:0;display:flex;flex-direction:column;align-items:flex-start}
+.fbwrap>.fbscroll,.fbwrap>.kb{align-self:stretch}
 .pausebtn[aria-label="Resume"]{border-color:var(--brass);color:var(--brass)}
 body.paused .circgo{opacity:.5}
 
@@ -775,7 +791,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </header>
   <div class="menu" id="game-menu" hidden><nav id="tabs" role="menu" aria-label="Choose a game"><h4>Practice</h4><button role="menuitem" data-t="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Today</span></button><button role="menuitem" data-t="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span>Name the number</span></button><button role="menuitem" data-t="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span>Note over chord</span></button><button role="menuitem" data-t="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span>Phrases</span></button><button role="menuitem" data-t="duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l8-8M20 20l-8-8"/><path d="M14 4h6v6M10 4H4v6"/><path d="M20 4l-6 6M4 4l6 6"/></svg><span>Duel</span></button><button role="menuitem" data-t="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span>Progressions</span></button>
 <h4>Tools</h4><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span>Rhythm</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button>
-<h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button><button role="menuitem" data-t="anc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 11h8"/></svg><span>Song anchors</span></button></nav></div>
+<h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button></nav></div>
 
   <section class="screen" id="scr-home">
     <div class="hero"><svg class="mark big" viewBox="0 0 96 96" aria-hidden="true"><g transform="translate(4 0)"><path d="M53.4 38.0 C58.2 31.6 58.2 21.2 48.6 18.8 C37.4 16.4 26.2 22.8 24.6 35.6 C23.0 46.8 29.4 54.0 32.6 60.4 C35.8 66.8 32.6 74.8 39.0 79.6 C45.4 83.6 51.8 79.6 51.8 73.2 L51.8 73.2 C50.9 79.0 45.4 82.0 40.2 77.9 C35.1 74.2 38.8 66.8 35.6 58.9 C32.4 51.9 26.8 45.8 28.6 36.1 C29.5 25.0 38.1 20.1 47.8 22.2 C55.9 22.9 56.3 31.0 53.4 38.0 Z" fill="var(--brass)"></path><path d="M52.4 35.3 C46.2 34.0 40.1 37.5 39.2 44.6 C38.3 50.7 41.8 54.7 43.6 58.2 C45.3 61.7 43.6 66.1 47.1 68.8 C50.6 71.0 54.1 68.8 54.1 65.3 L54.1 65.3 C53.5 68.4 50.6 69.7 48.1 67.3 C45.6 65.6 47.6 61.7 45.6 57.2 C43.6 53.4 40.3 50.2 40.9 44.8 C41.2 38.3 46.4 34.8 52.4 35.3 Z" fill="var(--brass)" opacity=".62"></path><path d="M57.6 42.5 C61 45.2 62 47.6 62 50 C62 52.4 61 54.8 57.6 57.5 C59.3 54.8 59.8 52.4 59.8 50 C59.8 47.6 59.3 45.2 57.6 42.5 Z" fill="var(--brass)" opacity=".7"></path><circle cx="52" cy="50" r="4.4" fill="var(--home)"></circle></g></svg>
@@ -797,8 +813,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span><span class="t">Rhythm</span><span class="s">Metronome and backing beats</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span><span class="t">Jam</span><span class="s">Loop a progression and play over it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span><span class="t">Write a melody</span><span class="s">Compose in numbers over chords</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
-  <section class="screen" id="scr-songs" hidden><p class="sechead">Your songs</p><div class="cards"><button class="card" data-open="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span><span class="t">Song log</span><span class="s">Songs you know, written in numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-<button class="card" data-open="anc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 11h8"/></svg><span><span class="t">Song anchors</span><span class="s">A tune for every number and jump</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
+  <section class="screen" id="scr-songs" hidden><p class="sechead">Your songs</p><div class="cards"><button class="card" data-open="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span><span class="t">Songs</span><span class="s">Your song log, and a tune for every number</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
   <section class="screen" id="scr-stats" hidden>
     <div class="cards">
       <div class="panelcard" id="rankcard"></div>
@@ -947,7 +962,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="chordbtns" id="vox-chords"></div>
       <div class="actions keep"><label class="field"><span>On strings</span><select id="vx-strings">
         <option value="all">All string groups</option><option value="0">G B e (top three)</option><option value="1">D G B</option><option value="2">A D G</option><option value="3">E A D (bottom three)</option></select></label></div>
-      <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play it</button></div>
+      <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary same" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play it</button></div>
       <p class="feedback" id="vox-info"></p>
     </div>
     <div id="vox-quiz" class="sub" style="border-top:0;padding-top:0" hidden>
@@ -1066,6 +1081,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
 
   <section class="stage" id="panel-songs" hidden>
+    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Anchors</button></div>
     <p class="eyebrow">Songs you've mapped</p>
     <p class="hint" id="lib-status"></p>
     <details class="more" id="song-form-wrap"><summary id="song-form-sum">Add a song</summary>
@@ -1124,6 +1140,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
 
   <section class="stage" id="panel-anc" hidden>
+    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Anchors</button></div>
     <p class="eyebrow">One tune you know cold for each sound</p>
     <p class="hint">Press play to hear the sound in the current key, then write the song it reminds you of (its opening, a hook, a bass line). When you miss a note in the drills, your anchor for the right answer shows up as a hint. Anchors stay in this browser.</p>
     <div class="anc">
@@ -1236,7 +1253,7 @@ const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
 var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Song log',anc:'Song anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
+const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Songs',anc:'Songs',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
@@ -2327,11 +2344,11 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=t==='anc'||t==='tune'||t==='beat';
-  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=neckGame||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
-  document.querySelector('#dock-show button[data-v="circle"]').disabled=neckGame;
+  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
+  document.querySelector('#dock-show button[data-v="circle"]').hidden=neckGame;document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
   document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?S.showMap:b.dataset.v==='circle'?S.showCircle:S.showNeck));
-  document.querySelector('#dock-show button[data-v="map"]').disabled=['find','vox'].includes(t);}
+  }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.v==='map')S.showMap=!S.showMap;else if(b.dataset.v==='circle')S.showCircle=!S.showCircle;else S.showNeck=!S.showNeck;persist();applyDock();if(S.showNeck)renderFB();renderCirc()});
 function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
@@ -2342,7 +2359,7 @@ function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
   applyDock();
   FQ=null;VQ=null;$('find-next').textContent='Start';$('vq-next').textContent='Start';$('find-reveal').hidden=true;findCount();
-  syncFB();clearMarks();if(t==='vox'){syncVox();refreshShapes()}applyStage();renderRun()}
+  syncFB();clearMarks();if(t==='vox'){syncVox();refreshShapes()}applyStage();renderRun();if(gameReady&&typeof syncSongSeg==='function')syncSongSeg()}
 
 $('lvl-sel').addEventListener('change',e=>{const i=Number(e.target.value);if(i<0)return;S.pool=LEVELS[i].pool();persist();resetQuestions();renderPad()});
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
@@ -2561,7 +2578,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -2586,7 +2603,7 @@ function openOpts(){const st=$('panel-'+S.tab);if(!st)return;const body=$('opt-b
   st.querySelectorAll('.xtra').forEach(x=>{if(x.parentElement.closest('.xtra'))return;const anc=x.parentElement.closest('[hidden]');if(anc&&st.contains(anc))return;
     const ph=document.createComment('opt');x.parentNode.insertBefore(ph,x);OPT.moved.push([x,ph]);body.appendChild(x);x.classList.remove('xtra')});
   if(!OPT.moved.length)body.innerHTML='<p class="hint">No extra options for this game.</p>';
-  body.querySelectorAll('details').forEach(d=>d.open=true);
+  body.querySelectorAll('details').forEach(d=>d.open=true);addTourBtn();
   $('optsheet').hidden=false;document.body.style.overflow='hidden';try{history.pushState({bet:'opt'},'')}catch(e){}}
 function closeOpts(fromPop){if($('optsheet').hidden)return;OPT.moved.forEach(([x,ph])=>{ph.parentNode.insertBefore(x,ph);ph.remove();x.classList.add('xtra')});OPT.moved=[];
   $('optsheet').hidden=true;document.body.style.overflow='';
@@ -2596,7 +2613,7 @@ $('opt-back').addEventListener('click',()=>closeOpts());
 /* play, replay, stop... as symbols. The label stays as the button's name for screen readers and tooltips. */
 const IC={
   play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>',
-  next:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14l10-7z" fill="currentColor"/><path d="M18 5v14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  next:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>',
   replay:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/></svg>',
   both:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/><circle cx="10" cy="12.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
   stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>',
@@ -2877,7 +2894,7 @@ function pauseAll(){if(PAUSE.on)return;PAUSE.on=true;stopAll();jamStop();
 function resumeAll(){if(!PAUSE.on)return;PAUSE.on=false;if(SESS2.on)SESS2.end=Date.now()+PAUSE.left;
   if(PAUSE.drone){setDrone(true)}document.body.classList.remove('paused');syncPause()}
 function syncPause(){document.querySelectorAll('.pausebtn,#sb-pause').forEach(b=>{b.textContent=PAUSE.on?'Resume':'Pause'})}
-FIT_TABS.filter(t=>t!=='vox').forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn pausebtn';b.textContent='Pause';
+FIT_TABS.forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn pausebtn';b.textContent='Pause';
   row.insertBefore(b,row.children[1]||null);iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
 document.addEventListener('click',e=>{const b=e.target.closest('.pausebtn,#sb-pause');if(!b)return;PAUSE.on?resumeAll():pauseAll()});
 // any play/next press ends a pause
@@ -3039,6 +3056,57 @@ function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='tru
 document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
 new MutationObserver(syncDroneBtns).observe($('drone'),{attributes:true,attributeFilter:['aria-pressed']});syncDroneBtns();
 
+
+/* ---------- songs: log and anchors as one place ---------- */
+document.querySelectorAll('.songseg').forEach(sg=>sg.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.dataset.sv!==S.tab)showTab(b.dataset.sv)}));
+function syncSongSeg(){document.querySelectorAll('.songseg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sv===S.tab))}
+
+/* ---------- guided tour: one thing at a time, everything else dimmed and blurred ---------- */
+var TOURS={
+  deg:[['.ctxrow','Your key, your home world and your pace. Home is where every note wants to return.'],
+       ['#circ-go','Press play. You\'ll hear the key, then one note.'],
+       ['#circwrap','Sing the note, then tap its number here on the circle…'],
+       ['#mapwrap','…or on the map. Either works, and so does the neck.'],
+       ['#panel-deg .primary-row .btn:not(.primary)','Hear it again, pause, hear the key again, or hold home underneath with the drone.'],
+       ['#lvl-btn','Your gig: the notes in play. Get 7 of 10 right to earn a ring and book the next gig.'],
+       ['#stage-mode','How it works and more options, any time.']],
+  chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circwrap','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
+  phr:[['#circ-go','Press play for a short phrase.'],['#phrase','Sing it, then reveal it, or tap its numbers in order.'],['#stage-mode','Switch between imagine-first and hear-and-name here.']],
+  find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
+  vox:[['#vox-mode','Learn the shapes, or quiz yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
+  prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
+  duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circwrap','Tap them in order, or play them with the mic on. One more each round.']],
+  dec:[['#dec-in','Type a chord: a tab like x32010, notes like C E G, numbers like 2 4 6, or a name like Am7.'],['#dec-voice','Or say it.'],['#fbwrap','Or tap it on the neck (or the keys).']],
+  tune:[['#tune-set','Pick your tuning.'],['#hs','Tap a string to hear it. With the mic on, Auto follows the string you play.'],['#tune-drone','Drone holds the note so you can tune by ear.'],['.tmeter','The dot moves toward the centre as you get closer. Teal means in tune.']],
+  beat:[['.bpmrow','Set the tempo, or tap it.'],['#beat-play','Start and stop.'],['#beat-style','Pick a beat: a click, or a groove to play over.']],
+  songs:[['.songseg','Your songs, and your anchor tunes for each number.'],['#song-form-wrap','Add a song in numbers, then play it back.']],
+  anc:[['#panel-anc .songseg','Switch between your songs and your anchors.'],['#panel-anc .play','Hear a number in your key, then write the tune it reminds you of.']]};
+const TR={steps:[],i:0,el:null};
+function tourStart(tab,force){const steps=(TOURS[tab]||[]).filter(([sel])=>{const e=document.querySelector(sel);return e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0});
+  if(!steps.length){if(force)toast('Nothing to show here');return}
+  TR.steps=steps;TR.i=0;TR.tab=tab;stopAll();
+  const o=document.createElement('div');o.className='tour';o.innerHTML='<div class="tb t1"></div><div class="tb t2"></div><div class="tb t3"></div><div class="tb t4"></div><div class="ring"></div><div class="tip" role="dialog" aria-live="polite"><div class="n"></div><p></p><div class="row"><button class="skip">Skip</button><span><button class="btn back" hidden>Back</button> <button class="btn primary nx">Next</button></span></div></div>';
+  document.body.appendChild(o);TR.el=o;
+  o.querySelector('.skip').onclick=tourEnd;o.querySelector('.nx').onclick=()=>tourGo(TR.i+1);o.querySelector('.back').onclick=()=>tourGo(TR.i-1);
+  o.addEventListener('click',e=>{if(e.target.classList.contains('tb'))tourGo(TR.i+1)});
+  tourGo(0)}
+function tourGo(i){if(i>=TR.steps.length)return tourEnd();if(i<0)return;TR.i=i;const [sel,txt]=TR.steps[i],e=document.querySelector(sel),o=TR.el;
+  e.scrollIntoView({block:'center',behavior:'instant'});
+  requestAnimationFrame(()=>{const r=e.getBoundingClientRect(),pad=8,W=innerWidth,Hh=innerHeight;
+    const x0=Math.max(0,r.left-pad),y0=Math.max(0,r.top-pad),x1=Math.min(W,r.right+pad),y1=Math.min(Hh,r.bottom+pad);
+    const set=(c,st)=>Object.assign(o.querySelector(c).style,st);
+    set('.t1',{left:0,top:0,width:W+'px',height:y0+'px'});set('.t2',{left:0,top:y1+'px',width:W+'px',height:(Hh-y1)+'px'});
+    set('.t3',{left:0,top:y0+'px',width:x0+'px',height:(y1-y0)+'px'});set('.t4',{left:x1+'px',top:y0+'px',width:(W-x1)+'px',height:(y1-y0)+'px'});
+    set('.ring',{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'});
+    const tip=o.querySelector('.tip');tip.querySelector('.n').textContent=`${i+1} of ${TR.steps.length}`;tip.querySelector('p').textContent=txt;
+    tip.querySelector('.nx').textContent=i===TR.steps.length-1?'Got it':'Next';tip.querySelector('.back').hidden=i===0;
+    const th=tip.offsetHeight||140,below=y1+12+th<Hh-8;tip.style.top=(below?y1+12:Math.max(8,y0-12-th))+'px';tip.querySelector('.nx').focus()})}
+function tourEnd(){if(TR.el){TR.el.remove();TR.el=null}S.toured=S.toured||{};S.toured[TR.tab]=true;persist()}
+document.addEventListener('keydown',e=>{if(!TR.el)return;if(e.key==='Escape'){e.preventDefault();tourEnd()}else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();tourGo(TR.i+1)}else if(e.key==='ArrowLeft'){tourGo(TR.i-1)}},true);
+// "Show me around" sits at the top of every game's How it works page
+function addTourBtn(){const body=$('opt-body');if(!TOURS[S.tab])return;const b=document.createElement('button');b.className='btn primary tourbtn';b.textContent='Show me around';
+  b.onclick=()=>{const t=S.tab;closeOpts();setTimeout(()=>tourStart(t,true),250)};body.insertBefore(b,body.firstChild)}
+
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
@@ -3050,7 +3118,7 @@ function goScreen(sc,fromPop){
   if(sc!=='game'){S.scr=sc;persist()}
   if(sc==='game'&&!fromPop)try{history.pushState({bet:'game'},'')}catch(e){}
   window.scrollTo(0,0)}
-function openGame(t){goScreen('game');showTab(t);renderCirc()}
+function openGame(t){goScreen('game');showTab(t);renderCirc();if(!(S.toured||{})[t])setTimeout(()=>{if(S.tab===t&&document.body.dataset.screen==='game'&&!TR.el)tourStart(t)},500)}
 function closeMenu(){$('game-menu').hidden=true;$('game-title').setAttribute('aria-expanded','false')}
 function openSheet(){$('sheet').hidden=false;$('set-toggle').setAttribute('aria-expanded','true');document.body.style.overflow='hidden';try{history.pushState({bet:'sheet'},'')}catch(e){};$('sheet-back').focus()}
 function closeSheet(fromPop){if($('sheet').hidden)return;$('sheet').hidden=true;$('set-toggle').setAttribute('aria-expanded','false');document.body.style.overflow='';if(!fromPop&&history.state&&history.state.bet==='sheet'){skipPop=true;try{history.back()}catch(e){skipPop=false}}}
