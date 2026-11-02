@@ -488,6 +488,12 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+
+#psteps{gap:4px}
+#psteps li{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--sunk);border:0}
+#psteps li b{display:none}
+#psteps li.on{background:var(--brass);color:var(--on-brass)}
+#psteps li.done{opacity:.6}
 .sheet .appbar.sheetbar{background:var(--bg)!important}
 .sheet .drawer .check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.4;color:var(--fg)}
 .sheet .drawer .check input{flex:none;width:18px;height:18px;margin:2px 0 0}
@@ -1032,16 +1038,16 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="stage" id="panel-phr" hidden>
     <p class="eyebrow">Imagine, sing, play</p>
     <div class="howto"><p class="why"><b>Why:</b> it joins your inner ear to the numbers. You imagine and sing before you hear, which is how you'll one day play the lines in your head.</p><p>Imagine first: read the numbers, sing them, then reveal.</p><p>Hear and name: a short line plays. Tap its numbers in order.</p></div>
+    <div class="seg keep voxmode" id="pmode"><button data-v="imagine">Imagine first</button><button data-v="hear">Hear and name</button></div>
     <div class="actions">
-      <div class="seg" id="pmode"><button data-v="imagine">Imagine first</button><button data-v="hear">Hear and name</button></div>
       <label class="field"><span>Length</span><select id="plen"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
       <label class="field"><span>Ends on</span><select id="pend"></select></label>
     </div>
-    <ol class="steps" id="psteps"></ol>
+    <ol class="steps keep" id="psteps"></ol>
     <div class="phrase" id="phrase"></div>
     <p class="feedback" id="p-fb"></p>
     <div class="actions">
-      <button class="btn primary" id="p-new">New phrase</button>
+      <button class="btn primary" id="p-new">Start</button>
       <button class="btn" id="p-play">Reveal</button>
       <button class="btn" id="p-mine" hidden>Play mine</button>
       <button class="btn" id="p-cad">Cadence</button>
@@ -1702,6 +1708,7 @@ function playQuestion(withCad){
   later(d*1000,()=>setPrompt('Sing it, then tap its number on the map or the neck.'))}
 function nextDeg(){
   if(showPendingResult())return;
+  if(typeof pushHist==='function'&&Q)pushHist('deg');
   if(CHAL.on&&CHAL.i>=CHAL_N)return chalEnd();
   if(CHAL.on){S.pool=chalPool(CHAL.i);renderPad()}
   stopAll();ensure();clearMarks();$('deg-compare').hidden=true;
@@ -1748,6 +1755,7 @@ const toneSet=()=>new Set(S.tab==='chord'&&CQ&&S.tones?CQ.c.t:[]);
 const chPrompt=c=>`The chord is the <b>${c.name}</b>${S.tones?` <span class="inplay" style="font-size:14px">(${c.t.map(lab).join(' ')})</span>`:''}. Which number is the note ringing on top?`;
 function nextChord(){
   if(showPendingResult())return;
+  if(typeof pushHist==='function'&&CQ)pushHist('chord');
   stopAll();ensure();clearMarks();$('ch-compare').hidden=true;
   const [r,c0]=pick(chordSet()),c=add7(c0);const o=adaptivePick(S.pool,null);
   CQ={r,c,o,m:fitPlay(inRange(o,chLo(),chHi())),tries:0,done:false,guess:null};
@@ -1819,8 +1827,8 @@ function renderPhrase(lit=-1,litRow='answer'){
   if(!P.done){el.innerHTML=slotRow('You',P.seq.map((m,i)=>P.ans[i]!==undefined?[labK(P.ans[i]),'']:['·','empty']));return}
   el.innerHTML=slotRow('You',P.seq.map((m,i)=>[labK(P.ans[i]),(isRight(P.ans[i],m)?'ok':'no')+(litRow==='mine'&&i===lit?' lit':'')]))
     +slotRow('Answer',P.seq.map((m,i)=>[labM(m),'ok'+(litRow==='answer'&&i===lit?' lit':'')]))}
-const PSTEPS={imagine:['Hear the key (chords only)','Imagine the numbers silently','Sing them out loud','Check: hear the phrase','Play it on guitar'],
-  hear:['Hear the key (chords only)','Listen to the phrase','Sing it back','Tap the numbers','Play it on guitar']};
+const PSTEPS={imagine:['Key','Imagine','Sing','Check','Play it'],
+  hear:['Key','Listen','Sing back','Tap it','Play it']};
 // stage: which step is current (0-based); several steps can be current at once
 function setStage(on){const done=Math.min(...on);P&&(P.stage=on);
   $('psteps').innerHTML=PSTEPS[S.pmode].map((t,i)=>`<li class="${on.includes(i)?'on':i<done?'done':''}"><b>${i+1}</b>${t}</li>`).join('')}
@@ -1835,23 +1843,25 @@ function playSeq(seq,start,row,colorFn){
 function revealPhrase(){
   stopAll();ensure();marks={};trail=new Set();P.revealed=true;P.shownTo=-1;setStage([3]);
   const sung=P.sung||[],okN=P.seq.filter((m,i)=>sung[i]!==undefined&&pc(sung[i])===offOf(m)).length;
-  $('p-fb').innerHTML=sung.length?(okN===P.seq.length?`<span class="tag ok">You sang all ${okN}</span> Here it is.`:`<span class="tag no">${okN} of ${P.seq.length}</span> Here is the phrase; compare with your row.`):'Here is the phrase. Did it match what you sang?';
+  $('p-fb').innerHTML=sung.length?(okN===P.seq.length?`<span class="tag ok">You sang all ${okN}</span> Here it is. Now play it on your guitar, then press → for the next one.`:`<span class="tag no">${okN} of ${P.seq.length}</span> Here is the phrase; compare with your row, then press → for the next one.`):'Here is the phrase. <b>Did it match what you sang?</b> Now play it on your guitar, then press → for the next one.';
   const end=playSeq(P.seq,0,'answer',(i,m)=>{marks[keyFor(m)]='ok'});
   later(end*1000,()=>{setStage([4]);$('p-fb').textContent='Green keys show the phrase on the map and the neck. Play it on the guitar, singing the numbers. "Check" plays it again.'})}
 function playMine(){stopAll();ensure();const mine=P.ans.map((o,i)=>pitchOfKey(o,P.seq[i]));playSeq(mine,0,'mine')}
 function playAnswer(withCad){stopAll();ensure();let d=0;if(withCad)d=cadence(ctx.currentTime+0.05);playSeq(P.seq,d,'answer')}
 function newPhrase(){
+  if(typeof pushHist==='function'&&P)pushHist('phr');
   stopAll();P={seq:genPhrase(),ans:[],done:false,revealed:false,shownTo:-1};clearMarks();renderPhrase();$('p-mine').hidden=true;
   const e=lab(endOff());
   ensure();setStage([0]);
-  if(S.pmode==='imagine'){$('p-fb').textContent='These chords set the key. They are not the phrase.';
+  $('p-new').textContent='Next';
+  if(S.pmode==='imagine'){$('p-fb').textContent='First the key (just chords, not the phrase). Let it settle…';
     const d=cadence(ctx.currentTime+0.05);
-    later(d*1000,()=>{setStage([1,2]);$('p-fb').textContent=`Read the numbers above and hear them in your head, ending on ${e}. Then sing them out loud. No sound until you press "Check".`})}
-  else{$('p-fb').textContent='These chords set the key. The phrase comes next.';
+    later(d*1000,()=>{setStage([1,2]);$('p-fb').innerHTML=`<b>Your turn.</b> Read the numbers above. Hear them in your head, then sing them out loud (it ends on ${e}). When you've sung it, press <b>Check: hear the phrase</b>.`})}
+  else{$('p-fb').textContent='First the key (just chords, not the phrase). Let it settle…';
     const d=cadence(ctx.currentTime+0.05);
-    later(d*1000,()=>{setStage([1]);$('p-fb').textContent=`Listen. It ends on ${e}.`});
+    later(d*1000,()=>{setStage([1]);$('p-fb').innerHTML=`<b>Listen</b> to the phrase. It ends on ${e}.`});
     const end=playSeq(P.seq,d,'answer');
-    later(end*1000,()=>{setStage([2,3]);$('p-fb').textContent='Sing it back, then tap its numbers on the map.'})}}
+    later(end*1000,()=>{setStage([2,3]);$('p-fb').innerHTML=`<b>Your turn.</b> Sing it back, then tap its ${P.seq.length} numbers in order on the circle or map. ↻ plays it again.`})}}
 function enterPhrase(o){
   stopAll();ensure();P.ans.push(o);pluck(pitchOfKey(o,P.seq[P.ans.length-1]),ctx.currentTime+0.02,0.6,0.4);lightAt(0,o);unlightAt(350);
   if(P.ans.length===P.seq.length){P.done=true;const ok=P.seq.filter((m,i)=>isRight(P.ans[i],m)).length;
@@ -2160,6 +2170,7 @@ const ORD=['1st','2nd','3rd','4th','5th','6th'];
 function pgPhase(){const st=$('pg-steps');if(!st)return;const ph=PG?PG.phase:null;st.hidden=!PG;st.querySelectorAll('span').forEach(x=>x.classList.toggle('on',x.dataset.p===ph));
   $('pg-answers').classList.toggle('ready',!!PG&&ph==='answer');$('pg-next').classList.toggle('pulse',!!PG&&ph==='result')}
 function nextProg(){
+  if(typeof pushHist==='function'&&PG)pushHist('prog');
   stopAll();ensure();clearMarks();PG={seq:genProg(),ans:[],done:false,phase:'listen'};$('pg-mine').hidden=true;$('pg-fb').textContent='';
   let d=0;if(sinceCadP>=S.every){d=cadence(ctx.currentTime+0.05)+0.6*PACE();sinceCadP=0;PG.phase='key'}sinceCadP++;pgSlots();
   $('pg-prompt').textContent=d?'First, the key. Just let it settle…':`Listen: ${PG.seq.length} chords.`;
@@ -2516,7 +2527,7 @@ function syncSettings(){
   const lowName=NAMES[(S.key+S.home)%12];
   $('keyline').innerHTML=`<b>${homeName()}</b> · ${NAMES[S.key]} = 1 · ${S.range==='one'?`one octave, ${lab(S.home)} up to ${lab(S.home)}′ (${lowName} to ${lowName})`:`two octaves, ${lab(S.home)} to ${lab(S.home)}″`}`;
   if(!Q)setPrompt(`Press Start. You'll hear a cadence in ${homeName()}, then one note. Name its number.`)}
-function resetQuestions(){stopAll();Q=null;CQ=null;P=null;$('deg-next').textContent='Start';$('ch-next').textContent='Start';
+function resetQuestions(){stopAll();Q=null;CQ=null;P=null;$('deg-next').textContent='Start';$('ch-next').textContent='Start';$('p-new').textContent='Start';try{for(const k in HIST)HIST[k].length=0;syncPrev()}catch(e){}
   $('deg-compare').hidden=true;$('ch-compare').hidden=true;$('p-mine').hidden=true;marks={};trail=new Set();renderPhrase()}
 function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeout(decRender,0);sinceCad=Infinity;sinceCadC=Infinity;
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
@@ -2567,7 +2578,7 @@ $('opt-adapt').checked=S.adapt;$('opt-adapt').addEventListener('change',e=>{S.ad
 $('ch-next').addEventListener('click',nextChord);$('ch-replay').addEventListener('click',replayChord);$('ch-cad').addEventListener('click',cadOnly);
 $('ch-compare').addEventListener('click',()=>{if(CQ&&CQ.guess!==null)compareChord()});
 $('hold-deg').addEventListener('change',e=>{S.hold=Number(e.target.value);persist();renderLoop()});$('hold-play').addEventListener('click',playLoop);
-$('pmode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.pmode=b.dataset.v;persist();syncSettings();renderPSteps();P=null;renderPhrase();clearMarks();$('p-fb').textContent='Press New phrase.'});
+$('pmode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.pmode=b.dataset.v;persist();syncSettings();renderPSteps();P=null;$('p-new').textContent='Start';renderPhrase();clearMarks();$('p-fb').textContent='Press ▶ to start. You\'ll hear the key, then get a short phrase of numbers to sing.'});
 $('plen').addEventListener('change',e=>{S.plen=Number(e.target.value);persist()});
 $('pend').addEventListener('change',e=>{S.pend=e.target.value;persist()});
 $('p-new').addEventListener('click',newPhrase);
@@ -2590,7 +2601,7 @@ document.addEventListener('keydown',e=>{
 syncSettings();renderPSteps();renderPad();renderScore();renderLoop();renderAnchors();showTab(S.tab);libInit();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()})}).catch(()=>{});
 {let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()})}
-$('p-fb').textContent='Press New phrase.';
+$('p-fb').textContent='Press ▶ to start. You\'ll hear the key, then get a short phrase of numbers to sing.';
 
 
 /* ---------- game layer: paths and gems, XP, ranks, badges, weekly challenge ---------- */
@@ -3461,6 +3472,22 @@ function syncFindMode(){$('iq-back').hidden=S.findMode!=='home'||!IQH.length;doc
 $('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;IQH=[];FQ=null;cellMarks={};syncFindMode();
   $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears; find a number above it, then the same jump from every string.':'Press start, then tap every place that number lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
 syncFindMode();
+
+
+/* Previous: go back to the last question and try it again, in every ear game */
+const HIST={deg:[],chord:[],phr:[],prog:[]};
+const snap={deg:()=>Q&&{o:Q.o,m:Q.m},chord:()=>CQ&&{r:CQ.r,c:CQ.c,o:CQ.o,m:CQ.m},phr:()=>P&&{seq:P.seq.slice()},prog:()=>PG&&{seq:PG.seq.slice()}};
+function pushHist(t){const x=snap[t]();if(x){HIST[t].push(x);if(HIST[t].length>30)HIST[t].shift()}syncPrev()}
+function syncPrev(){document.querySelectorAll('.prevq').forEach(b=>{const t=b.dataset.t;b.hidden=!HIST[t].length})}
+function goPrev(t){const x=HIST[t].pop();syncPrev();if(!x)return;stopAll();ensure();clearMarks();const tt=ctx.currentTime+0.05;
+  if(t==='deg'){Q={o:x.o,m:x.m,tries:0,done:false,guess:null};$('deg-compare').hidden=true;$('deg-fb').textContent='Again: the previous note.';playQuestion(true)}
+  else if(t==='chord'){CQ={r:x.r,c:x.c,o:x.o,m:x.m,tries:0,done:false,guess:null};$('ch-compare').hidden=true;$('ch-fb').textContent='Again: the previous one.';const d=cadence(tt);playChordQ(tt+d);later(d*1000,()=>{$('ch-prompt').innerHTML=chPrompt(CQ.c);renderPad()})}
+  else if(t==='phr'){P={seq:x.seq,ans:[],done:false,revealed:false,shownTo:-1};renderPhrase();$('p-mine').hidden=true;
+    if(S.pmode==='imagine'){setStage([1,2]);$('p-fb').innerHTML='<b>Again:</b> read it, sing it, then press <b>Check: hear the phrase</b>.'}else{setStage([1]);const end=playSeq(P.seq,0.1,'answer');later(end*1000,()=>{setStage([2,3]);$('p-fb').innerHTML='<b>Your turn.</b> Tap its numbers in order.'})}}
+  else if(t==='prog'){PG={seq:x.seq,ans:[],done:false,phase:'listen'};$('pg-mine').hidden=true;$('pg-fb').textContent='';pgSlots();$('pg-prompt').textContent=`Again: listen to the ${PG.seq.length} chords.`;
+    const end=playProg(PG.seq,0.2,true,'none');later(end*1000,()=>{if(!PG||PG.done)return;PG.phase='answer';pgSlots();$('pg-prompt').textContent=`Your turn: which chord was ${ORD[0]}?`})}}
+[['deg','#panel-deg'],['chord','#panel-chord'],['phr','#panel-phr'],['prog','#panel-prog']].forEach(([t,sel])=>{const row=document.querySelector(sel+' .primary-row');if(!row)return;
+  const b=document.createElement('button');b.className='btn prevq';b.dataset.t=t;b.textContent='Previous';b.hidden=true;row.insertBefore(b,row.firstChild);iconize(b);b.addEventListener('click',()=>goPrev(t))});
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
