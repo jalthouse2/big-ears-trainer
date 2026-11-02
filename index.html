@@ -490,6 +490,8 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+.prompt.mirrored{display:none!important}
+
 .pglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .pglist li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.35;color:var(--muted)}
 .pglist li b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--sunk);border:1px solid var(--line);color:var(--muted)}
@@ -547,11 +549,6 @@ body[data-screen="game"] .bottomnav{display:none}
 .remdays{display:flex}.remdays button{flex:1;min-width:0;padding:6px 0}
 .remgo{display:flex;flex-wrap:wrap;gap:8px}.remgo .btn{flex:1 1 auto}
 
-#psteps{gap:4px}
-#psteps li{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--sunk);border:0}
-#psteps li b{display:none}
-#psteps li.on{background:var(--brass);color:var(--on-brass)}
-#psteps li.done{opacity:.6}
 .sheet .appbar.sheetbar{background:var(--bg)!important}
 .sheet .drawer .check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.4;color:var(--fg)}
 .sheet .drawer .check input{flex:none;width:18px;height:18px;margin:2px 0 0}
@@ -1101,7 +1098,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <label class="field"><span>Length</span><select id="plen"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
       <label class="field"><span>Ends on</span><select id="pend"></select></label>
     </div>
-    <ol class="steps keep" id="psteps"></ol>
+    <ol class="pglist keep" id="psteps"></ol>
     <div class="phrase" id="phrase"></div>
     <p class="feedback" id="p-fb"></p>
     <div class="actions">
@@ -1903,12 +1900,12 @@ function renderPhrase(lit=-1,litRow='answer'){
   if(!P.done){el.innerHTML=slotRow('You',P.seq.map((m,i)=>P.ans[i]!==undefined?[labK(P.ans[i]),'']:['·','empty']));return}
   el.innerHTML=slotRow('You',P.seq.map((m,i)=>[labK(P.ans[i]),(isRight(P.ans[i],m)?'ok':'no')+(litRow==='mine'&&i===lit?' lit':'')]))
     +slotRow('Answer',P.seq.map((m,i)=>[labM(m),'ok'+(litRow==='answer'&&i===lit?' lit':'')]))}
-const PSTEPS={imagine:['Key','Imagine','Sing','Check','Play it'],
-  hear:['Key','Listen','Sing back','Tap it','Play it']};
+const PSTEPS={imagine:['Press ▶, then listen to the key (chords only).','Read the numbers and hear them in your head.','Sing them out loud.','Press Check to hear the real phrase.','Play it on your instrument, then press → for the next one.'],
+  hear:['Press ▶, then listen to the key (chords only).','Listen to the phrase.','Sing it back.','Tap its numbers in order.','Play it on your instrument, then press → for the next one.']};
 // stage: which step is current (0-based); several steps can be current at once
 function setStage(on){const done=Math.min(...on);P&&(P.stage=on);
-  $('psteps').innerHTML=PSTEPS[S.pmode].map((t,i)=>`<li class="${on.includes(i)?'on':i<done?'done':''}"><b>${i+1}</b>${t}</li>`).join('')}
-function renderPSteps(){setStage([-1]);
+  $('psteps').innerHTML=PSTEPS[S.pmode].map((t,i)=>`<li class="${on.includes(i)?'on':i<done?'done':''}"><b>${i+1}</b><span>${t}<small></small></span></li>`).join('')}
+function renderPSteps(){setStage([0]);
   $('p-play').textContent=S.pmode==='imagine'?'Check: hear the phrase':'Replay phrase';$('p-clear').hidden=S.pmode!=='hear';$('p-mine').hidden=true;$('p-cad').textContent='Hear the key again'}
 // play a list of pitches from offset `start`, lighting keys; mark: 'ok' marks keys green as they sound
 function playSeq(seq,start,row,colorFn){
@@ -2417,22 +2414,22 @@ $('sf-tonic').innerHTML=NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).j
 
 /* ---------- today: the day's 15-minute session for the program week ---------- */
 const PLAN={
- 1:{t:'Mobility and the core four',home:0,notes:0,every:1,win:0,ear:'deg',voice:'Sing 1-3-5-3-1, 1-6-5-3-1, 1-5-6-5-1 over the drone.',map:'Find every 1, 3 and 5 on the neck.',earTxt:'Name the number: home chord only.',jam:'1 4 5 1',play:'Use only 1 3 5 6; end every phrase on 1.'},
- 2:{t:'Two strings, add 2 and 6',home:0,notes:1,every:1,win:0,ear:'deg',voice:'Add 2: 1-2-3-2-1, 3-2-1, 5-6-5-3-2-1.',map:'Find each note in play, same number up the neck.',earTxt:'Name the number with 6 added.',jam:'1 5 6m 4',play:'Pentatonic 1 2 3 5 6; land on 1, then try landing on 6.'},
- 3:{t:'Seven numbers, one position',home:0,notes:3,every:3,win:2,ear:'deg',voice:'Half steps: 3-4-3, 7-1-7, 5-4-3-2-1, 1-7-6-5.',map:'Find it in frets 2–5.',earTxt:'All seven numbers; cadence every 3rd question.',jam:'1 4 5 1',play:'All seven numbers; end phrases on 1, 3 or 5.'},
+ 1:{t:'Home and the core three',home:0,notes:0,every:1,win:0,ear:'deg',voice:'Tune up first. Then sing 1-3-5-3-1, 1-5-3-1, 1-3-5-1\' over the drone.',map:'Find it, every place: each 1, 3 and 5 on the neck.',earTxt:'Name the number: 1, 3 and 5 only.',jam:'1 4 5 1',play:'Use only 1 3 5; end every phrase on 1.'},
+ 2:{t:'Add 6 and 2: the pentatonic',home:0,notes:1,every:1,win:0,findMode:'home',ear:'deg',voice:'Add 6 and 2: 1-6-5-3-1, 1-2-3-2-1, 5-6-5-3-2-1.',map:'Find it, from home: the jump from 1 to each note, string by string.',earTxt:'Name the number with 6 added.',jam:'1 5 6m 4',play:'Pentatonic 1 2 3 5 6; land on 1, then try landing on 6.'},
+ 3:{t:'Seven numbers, one position',home:0,notes:3,every:3,win:2,findMode:'home',ear:'deg',voice:'Half steps: 3-4-3, 7-1-7, 5-4-3-2-1, 1-7-6-5.',map:'Find it, from home, in frets 2–5. Name each jump\'s song in Interval anchors.',earTxt:'All seven numbers. Try answering by playing: turn on the mic and play the note instead of tapping.',jam:'1 4 5 1',play:'All seven numbers; end phrases on 1, 3 or 5.'},
  4:{t:'Minor around 6, finding home',home:9,notes:3,every:3,win:2,ear:'phr',pmode:'hear',voice:'Drone on 6: 6-1-3-1-6, 6-5-3-5-6, 6-7-1-7-6.',map:'Find it in frets 2–5, minor home.',earTxt:'Phrases: hear and name, ending on 6.',jam:'6m 4 1 5',play:'Same notes, land on 6.'},
- 5:{t:'Voice leads, hands follow',home:0,notes:3,every:5,win:4,ear:'phr',pmode:'imagine',voice:'Sing short phrases on "la", then again in numbers: 5-6-5, 3-2-1, 1-7-6.',map:'Second position: find it in frets 7–10.',earTxt:'Phrases: imagine first, then check.',jam:'1 6m 4 5',play:'Call and response: sing 3–4 notes, play them back.'},
- 6:{t:'The seven worlds',home:0,notes:3,every:5,win:4,ear:'phr',pmode:'imagine',voice:'Sing the scale from today\'s world (2, 5, 4, 3 or 7) to its octave.',map:'Find it, ask by sound.',findAsk:'sound',earTxt:'Phrases: imagine first, ending on today\'s world.',jam:'2m 5 2m 5',play:'Start and end phrases on 2 over this loop.'},
- 7:{t:'Chords as numbers',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'vox',voxMode:'quiz',vqAsk:'chord',voice:'Sing each chord: 1-3-5, 4-6-1, 5-7-2, 6-1-3.',map:'Chord chart: play each chord and say its quality.',earTxt:'Chords on the neck: which chord is this?',jam:'1 4 5 1',play:'On each change, play one note of the new chord, naming it.'},
- 8:{t:'Hearing 1–4–5–6',home:0,notes:3,every:3,win:0,ear:'prog',pgSet:'basic',voice:'Sing the bass of loops: 1-5-6-4, 6-4-1-5, 1-6-4-5.',map:'Find it: the roots 1, 4, 5, 6.',earTxt:'Progressions with 1 4 5 6m.',jam:'1 5 6m 4',play:'Land on a chord tone at every change.'},
- 9:{t:'Landing on chord tones',home:0,notes:3,every:5,win:0,range:'two',ear:'chord',voice:'One chord tone per change: 3 on 1, 4 on 4, 5 on 5, 6 on 6m.',map:'Find it across two octaves.',earTxt:'Note over chord, chord tones shown.',jam:'1 5 6m 4',play:'Every phrase ends on a note of the chord playing.'},
- 10:{t:'Triads, inversions, fills',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMode:'explore',ear:'vox',voxQuiz:true,vqAsk:'top',voice:'Sing the 2–5–3–6 arpeggios: 2-4-6-1, 5-7-2-4, 3-5-7-2, 6-1-3-5.',map:'Chords on the neck: walk each chord up the G B e strings.',earTxt:'Which number is on top?',jam:'2m 5 3m 6m',play:'Fills of 3–5 notes between chords, from triad shapes.'},
+ 5:{t:'Voice leads, hands follow',home:0,notes:3,every:5,win:4,ear:'phr',pmode:'imagine',playTab:'duel',voice:'Sing short phrases on "la", then again in numbers: 5-6-5, 3-2-1, 1-7-6.',map:'Second position: find it in frets 7–10.',earTxt:'Phrases: imagine first, then check.',jam:'1 6m 4 5',play:'Duel: play back the growing line, by ear. Then call and response on your own.'},
+ 6:{t:'Chords as numbers',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'vox',voxMode:'quiz',vqAsk:'chord',voice:'Sing each chord: 1-3-5, 4-6-1, 5-7-2, 6-1-3.',map:'Chord chart: play each chord and say its quality.',earTxt:'Chords on the neck, quiz: which chord is this?',jam:'1 4 5 1',play:'On each change, play one note of the new chord, naming it.'},
+ 7:{t:'Hearing 1–4–5–6',home:0,notes:3,every:3,win:0,ear:'prog',pgSet:'basic',voice:'Sing the bass of loops: 1-5-6-4, 6-4-1-5, 1-6-4-5.',map:'Find it: the roots 1, 4, 5, 6.',earTxt:'Progressions with 1 4 5 6m.',jam:'1 5 6m 4',play:'Land on a chord tone at every change.'},
+ 8:{t:'Landing on chord tones',home:0,notes:3,every:5,win:0,range:'two',ear:'chord',voice:'One chord tone per change: 3 on 1, 4 on 4, 5 on 5, 6 on 6m.',map:'Find it across two octaves.',earTxt:'Note over chord, chord tones shown.',jam:'1 5 6m 4',play:'Every phrase ends on a note of the chord playing.'},
+ 9:{t:'Triads and inversions',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'explore',ear:'vox',voxMode:'quiz',vqAsk:'chord',voice:'Sing the arpeggios: 1-3-5, 4-6-1, 5-7-2, 6-1-3, from each note of the chord.',map:'Chords on the neck, triads: walk each chord up the G B e strings.',earTxt:'Chords on the neck, quiz: which chord is this shape?',jam:'1 6m 4 5',play:'Fills of 3–5 notes between chords, from triad shapes.'},
+ 10:{t:'The seven worlds',home:0,notes:3,every:5,win:4,ear:'phr',pmode:'imagine',voice:'Sing the scale from today\'s world (2, 5, 4, 3 or 7) up to its octave. The map stays the same.',map:'Find it, ask by sound.',findAsk:'sound',earTxt:'Phrases: imagine first, ending on today\'s world.',jam:'2m 5 2m 5',play:'Start and end phrases on 2 over this loop.'},
  11:{t:'Outside notes',home:0,notes:4,every:10,win:0,ear:'prog',pgSet:'outside',voice:'Outside notes with neighbours: 6-♯5-6, 1-♭7-6, 5-♯4-5, ♭3-3-1.',map:'Find it, including outside notes.',earTxt:'Progressions with outside chords.',jam:'1 3 6m 4',play:'Over the 3 chord use ♯5; elsewhere use 5.'},
- 12:{t:'Real songs',home:0,notes:4,every:10,win:0,ear:'prog',pgSet:'all',voice:'Sing along with a song in numbers.',map:'Find it, ask by sound.',findAsk:'sound',earTxt:'Progressions, all seven chords.',jam:'1 ♭7 4 1',play:'Jam on a song from your Song log.'},
- 13:{t:'Seventh chords',home:0,notes:3,every:5,win:0,mapTab:'cc',cc7:true,ear:'prog',pgSet:'jazz',voice:'Sing 7th arpeggios: 1-3-5-7, 2-4-6-1, 5-7-2-4.',map:'Chord chart with 7ths on.',earTxt:'Progressions: Jazz 7ths.',jam:'2m7 5(7) 1maj7 1maj7',play:'Land on 3rds and 7ths of each chord.'},
- 14:{t:'2–5–1',home:0,notes:3,every:5,win:0,ear:'prog',pgSet:'jazz',voice:'Sing the roots and 3rds of 2m7–5(7)–1maj7.',map:'Find it: 2, 5 and 1 everywhere.',earTxt:'Progressions: Jazz 7ths.',jam:'1maj7 6m7 2m7 5(7)',play:'Phrases that resolve 7 → 1 on the 1maj7.'},
+ 12:{t:'Real songs',home:0,notes:4,every:10,win:0,mapTab:'songs',ear:'prog',pgSet:'all',voice:'Sing along with a song in numbers.',map:'My songs: add a song you know and tap its chords by section. The Chord decoder helps check shapes.',earTxt:'Progressions, all seven chords.',jam:'1 ♭7 4 1',play:'Jam on a song from My songs.'},
+ 13:{t:'Seventh chords and shells',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'shell',cc7:true,ear:'prog',pgSet:'jazz',voice:'Sing 7th arpeggios: 1-3-5-7, 2-4-6-1, 5-7-2-4.',map:'Chords on the neck, shells: 1, 3, 7 with the root on string 6, then 5.',earTxt:'Progressions: Jazz 7ths.',jam:'2m7 5(7) 1maj7 1maj7',play:'Land on 3rds and 7ths of each chord.'},
+ 14:{t:'2–5–1',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'shell',ear:'prog',pgSet:'jazz',voice:'Sing the roots and 3rds of 2m7–5(7)–1maj7.',map:'Shells: play 2m7–5(7)–1maj7 with the smallest moves.',earTxt:'Progressions: Jazz 7ths.',jam:'1maj7 6m7 2m7 5(7)',play:'Phrases that resolve 7 → 1 on the 1maj7.'},
  15:{t:'Guide tones',home:0,notes:3,every:5,win:0,ear:'chord',voice:'Guide-tone line: 1 (on 2m7) → 7 (on 5) → 7 (on 1maj7); then 4 → 4 → 3.',map:'Find it: 3rds and 7ths.',earTxt:'Note over chord.',jam:'2m7 5(7) 1maj7 6m7',play:'Play only 3rds and 7ths, moving by step.'},
- 16:{t:'Outside chords',home:0,notes:4,every:5,win:0,mapTab:'cc',ear:'prog',pgSet:'outside',voice:'Sing ♯5 → 6 and ♯4 → 5.',map:'Chord chart: outside chords.',earTxt:'Progressions with outside chords.',jam:'1 3 6m 4',play:'Use ♯5 over the 3 chord, ♯4 over the 2 chord.'}};
+ 16:{t:'Outside chords',home:0,notes:4,every:5,win:0,mapTab:'cc',ear:'vox',voxMode:'quiz',vqAsk:'top',voice:'Sing ♯5 → 6 and ♯4 → 5.',map:'Chord chart: outside chords.',earTxt:'Chords on the neck, quiz: which number is on top?',jam:'1 3 6m 4',play:'Use ♯5 over the 3 chord, ♯4 over the 2 chord.'}};
 const BLOCKS=()=>{const base=[['Voice',2],['Map',4],['Ear',5],['Play',4]],k=S.daily/15;let m=base.map(b=>Math.max(1,Math.round(b[1]*k)));const diff=S.daily-m.reduce((a,b)=>a+b,0);m[2]=Math.max(1,m[2]+diff);return base.map((b,i)=>[b[0],m[i]])};
 function planFor(w){return PLAN[w]||PLAN[1]}
 function blockTips(w){const P=planFor(w),useMel=w>=5&&(TD.done%2===1);return [P.voice,P.map,P.earTxt,useMel?'Write a 4-bar melody over today\'s loop, then play it on guitar.':P.play]}
@@ -2447,12 +2444,13 @@ const TD=load('tmt-today',{done:0,days:[]});
 const SESS2={on:false,i:0,end:0,timer:null};
 function setupBlock(i){const w=S.week,P=planFor(w);
   jamStop();S.home=P.home;S.pool=LEVELS[P.notes].pool();S.every=P.every;S.win=P.win;S.range=P.range||'one';
-  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;if(P.cc7!==undefined)S.cc7=P.cc7;if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';
+  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;if(P.cc7!==undefined)S.cc7=P.cc7;if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.findMode=P.findMode||'all';
   persist();resetKeyContext();
   const drone=$('drone'),wantDrone=i===0;if((drone.getAttribute('aria-pressed')==='true')!==wantDrone)drone.click();
   if(i===0){showTab('today');ensure();cadence(ctx.currentTime+0.1)}
-  else if(i===1){if(P.mapTab==='vox'){S.voxMode='explore';S.vxStr='0';persist()}showTab(P.mapTab||'find')}
+  else if(i===1){if(P.mapTab==='vox'){S.voxMode=P.voxMap||'explore';S.vxStr='0';persist()}if(!P.mapTab){const b=document.querySelector(`#find-mode button[data-v="${S.findMode}"]`);b&&b.click()}showTab(P.mapTab||'find')}
   else if(i===2){if(P.ear==='vox'){S.voxMode='quiz';persist()}showTab(P.ear)}
+  else if(P.playTab&&TD.done%2===0){showTab(P.playTab)}
   else{const useMel=w>=5&&(TD.done%2===1);S.jamProg=P.jam;if(useMel){S.melProg=P.jam;MEL.prog=P.jam}persist();showTab(useMel?'mel':'jam')}}
 function sessTick(){if(!SESS2.on||PAUSE.on)return;const left=Math.max(0,SESS2.end-Date.now());const m=Math.floor(left/60000),sec=Math.floor(left/1000)%60;$('sb-time').textContent=`${m}:${String(sec).padStart(2,'0')} left`;
   if(left<=0){chime();sessGo(SESS2.i+1)}}
@@ -3646,7 +3644,7 @@ const ONB_STEPS=[
   {id:'mins',q:'How much time can you give it a day?',sub:'Short and daily beats long and rare.',opts:[['⏱️','5 minutes',5],['☕','10 minutes',10],['🎯','15 minutes',15],['🔥','20 minutes',20]]},
   {id:'when',render:()=>`<h2>When should we nudge you?</h2><p class="lead">One reminder a day, at a time you'll actually play. None on days you've already practised.</p><input type="time" id="onb-time" value="${(S.rem&&S.rem.time)||'18:00'}">`,btn:'Set reminder'},
   {id:'plan',render:()=>{const a=ONB.a,m=a.mins||15,g=a.goals.length?a.goals:['Play what I hear in my head'];
-    return `<h2>Your plan is ready</h2><p class="lead">${m} minutes a day. Here's what that builds.</p><div class="onbplan"><div><b>Week 1</b><span>Hear home, then name the 1, 3 and 5 in any key.</span></div><div><b>Weeks 2–4</b><span>All seven numbers, and how they feel over each chord.</span></div><div><b>Weeks 5–8</b><span>Phrases: sing a line, then find it on the ${a.inst==='piano'?'keys':'neck'} first try.</span></div><div><b>Weeks 9–12</b><span>Progressions and songs by ear. Toward: <b>${g[0].toLowerCase()}</b>.</span></div></div>`},btn:'Continue'},
+    return `<h2>Your plan is ready</h2><p class="lead">${m} minutes a day. Here's what that builds.</p><div class="onbplan"><div><b>Week 1</b><span>Hear home, then name the 1, 3 and 5 in any key.</span></div><div><b>Weeks 2–5</b><span>All seven numbers, minor keys, and phrases you sing, then find on the ${a.inst==='piano'?'keys':'neck'}.</span></div><div><b>Weeks 6–9</b><span>Chords: hear the changes, land on chord tones, learn the shapes.</span></div><div><b>Weeks 10–12</b><span>The seven worlds, outside notes, real songs by ear. Toward: <b>${g[0].toLowerCase()}</b>.</span></div></div>`},btn:'Continue'},
   {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and tour</li><li>Phrases, progressions and songs by ear</li><li>Chord shapes on the neck: triads and shells</li><li>Daily plan, streaks and reminders</li></ul><p class="lead" style="font-size:14px">Tuner, metronome and chord decoder stay free.</p><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
     btn:()=>`Start ${PAYWALL.trial}-day free trial`,fine:()=>`Yearly: free for ${PAYWALL.trial} days, then €9.99 a year. Cancel any time in your store settings. Lifetime is a one-time purchase. Restore purchases in Settings.`},
   {id:'go',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>You're in.</h2><p class="lead">${PAYWALL.on?'':'Big Ears is free while it\'s in early access. '}Your first gig is waiting: name the 1, 3 and 5.</p>`,btn:'Start my first gig'}];
@@ -3721,6 +3719,32 @@ const PUSH={url:null};
   fetch('push-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(c=>{if(c&&c.url)PUSH.url=c.url.replace(/\/$/,'');ui();PUSH.done()}).catch(()=>ui());
   ui();
 })();
+
+
+/* the same simple guide in every game: numbered lines, the current one lit, what's happening right now underneath */
+const GUIDE={
+  deg:{prompt:'deg-prompt',lines:['Press ▶ to start.','Listen: the key, then one note.','Tap the number you heard.','Hear it walk home, then press → for the next one.'],
+    cur:()=>!Q?[0]:Q.done?[3]:[1,2]},
+  chord:{prompt:'ch-prompt',lines:['Press ▶ to start.','Listen: a chord, then one note on top.','Tap the number of that note.','Press → for the next one.'],
+    cur:()=>!CQ?[0]:CQ.done?[3]:[1,2]},
+  find:{prompt:'find-prompt',lines:['Press ▶ to start.','Hear home, then the number to find.','Tap where it lives on the neck.','Press → for the next one (or wait, it moves on).'],
+    cur:()=>{const q=S.findMode==='home'?IQ:FQ;return !q?[0]:q.done?[3]:[1,2]}},
+  vox:{prompt:'vq-prompt',only:()=>S.voxMode==='quiz',lines:['Press ▶ to start.','Listen: the key, then a shape lights up and plays.','Name it with the buttons below.','Press → for the next one.'],
+    cur:()=>!VQ?[0]:VQ.done?[3]:[1,2]},
+  duel:{prompt:'duel-prompt',lines:['Press ▶ to start.','Listen: home, then the notes so far plus one new one.','Play them all back, in order.','One slip ends the duel. Press ▶ to go again.'],
+    cur:()=>typeof DUEL==='undefined'||!DUEL||!DUEL.seq||!DUEL.seq.length?[0]:DUEL.over?[3]:DUEL.listen?[1]:[2]}};
+function guideBuild(t){const g=GUIDE[t],pr=$(g.prompt);if(!pr||g.el)return;
+  const ol=document.createElement('ol');ol.className='pglist keep';ol.id=t+'-guide';
+  ol.innerHTML=g.lines.map((l,i)=>`<li data-i="${i}"><b>${i+1}</b><span>${l}<small></small></span></li>`).join('');
+  const host=pr.closest('.actions')||pr;host.after(ol);pr.classList.add('mirrored');g.el=ol;
+  new MutationObserver(()=>guideSync(t)).observe(pr,{childList:true,characterData:true,subtree:true});guideSync(t)}
+function guideSync(t){const g=GUIDE[t];if(!g||!g.el)return;const show=!g.only||g.only();g.el.hidden=!show;$(g.prompt).classList.toggle('mirrored',show);if(!show)return;
+  let on=[0];try{on=g.cur()}catch(e){}const first=Math.min(...on),txt=$(g.prompt).textContent.trim();
+  g.el.querySelectorAll('li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('on',on.includes(i));li.classList.toggle('done',i<first);
+    li.querySelector('small').textContent=i===Math.max(...on)&&first>0?txt:''})}
+Object.keys(GUIDE).forEach(guideBuild);
+document.addEventListener('click',()=>setTimeout(()=>{const t=S.tab;if(GUIDE[t])guideSync(t)},80));
+setInterval(()=>{const t=S.tab;if(GUIDE[t]&&document.body.dataset.screen==='game')guideSync(t)},700);
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
