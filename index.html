@@ -1333,6 +1333,14 @@ const upper=o=>T()-5+((o+5)%12);
 function bass(o){let b=T()-12+o;if(b>T()-12+6)b-=12;return b}
 function inRange(o,lo,hi){const c=[];for(let k=-3;k<=3;k++){const m=T()+o+12*k;if(m>=lo&&m<=hi)c.push(m)}return c.length?c[Math.floor(Math.random()*c.length)]:T()+o}
 const melLo=()=>H(), melHi=()=>two()?H()+24:H()+12;
+// keep every note you're asked to play inside what your instrument can play, and inside the frets shown when possible
+function playRange(whole){if(S.inst==='piano')return null;const W=whole?{lo:0,hi:FRETS}:WINDOWS[S.win]||WINDOWS[0];
+  return [Math.min(...OPEN)+Math.min(W.lo,FRETS),Math.max(...OPEN)+Math.min(W.hi,FRETS)]}
+function fitPlay(m){const R1=playRange(false),R2=playRange(true);if(!R2)return m;
+  const ok=(x,R)=>x>=R[0]&&x<=R[1]&&(!two()||(x>=H()&&x<=H()+24));
+  const cands=[];for(let k=-3;k<=3;k++)cands.push(m+12*k);
+  const pickNear=R=>cands.filter(x=>ok(x,R)).sort((a,b)=>Math.abs(a-m)-Math.abs(b-m))[0];
+  return pickNear(R1)??pickNear(R2)??m}
 const keyFor=m=>{const d=m-H();if(two()&&d>=0&&d<=24)return d;const o=((d%12)+12)%12;return (o===0&&d>=12)?12:o};
 const isRight=(k,m)=>two()?k===keyFor(m):pc(k)===offOf(m);
 function pitchOfKey(k,ref){if(two())return H()+k;if(k===12){const c=[H()+12,H()+24];return Math.abs(c[0]-ref)<=Math.abs(c[1]-ref)?c[0]:c[1]}
@@ -1591,7 +1599,7 @@ function nextDeg(){
   if(CHAL.on){S.pool=chalPool(CHAL.i);renderPad()}
   stopAll();ensure();clearMarks();$('deg-compare').hidden=true;
   let o=CHAL.on?(()=>{const pl=S.pool.filter(x=>x!==lastOff);return pl[Math.floor(CHAL.rng()*pl.length)]})():adaptivePick(S.pool,lastOff);lastOff=o;
-  Q={o,m:inRange(o,melLo(),melHi()),tries:0,done:false,guess:null};
+  Q={o,m:fitPlay(inRange(o,melLo(),melHi())),tries:0,done:false,guess:null};
   const withCad=sinceCad>=S.every;if(withCad)sinceCad=0;sinceCad++;
   playQuestion(withCad);$('deg-fb').textContent='';$('deg-next').textContent='Next'}
 function compareDeg(){
@@ -1634,7 +1642,7 @@ function nextChord(){
   if(showPendingResult())return;
   stopAll();ensure();clearMarks();$('ch-compare').hidden=true;
   const [r,c0]=pick(chordSet()),c=add7(c0);const o=adaptivePick(S.pool,null);
-  CQ={r,c,o,m:inRange(o,chLo(),chHi()),tries:0,done:false,guess:null};
+  CQ={r,c,o,m:fitPlay(inRange(o,chLo(),chHi())),tries:0,done:false,guess:null};
   const t=ctx.currentTime+0.05;let d=0;
   if(sinceCadC>=S.every){d=cadence(t);sinceCadC=0}
   sinceCadC++;playChordQ(t+d);
@@ -1690,7 +1698,7 @@ function genPhrase(){
   for(let k=1;k<n-1;k++){const r=Math.random(),mag=r<0.65?1:r<0.9?2:3;i+=Math.random()<0.5?-mag:mag;i=Math.max(0,Math.min(list.length-1,i));seq.push(list[i])}
   const e=endOff(),prev=seq[seq.length-1];let best=null;
   for(let m=lo;m<=hi;m++)if(offOf(m)===e&&(best===null||Math.abs(m-prev)<Math.abs(best-prev)))best=m;
-  seq.push(best);return seq}
+  seq.push(best);{const R=playRange(true);if(R&&!two()){let k=0;while(Math.max(...seq)+k>R[1]&&Math.min(...seq)+k-12>=R[0])k-=12;while(Math.min(...seq)+k<R[0]&&Math.max(...seq)+k+12<=R[1])k+=12;if(k)for(let q=0;q<seq.length;q++)seq[q]+=k}}return seq}
 function slotRow(who,items){return `<div class="prow">${who?`<span class="who">${who}</span>`:''}${items.map(([txt,cls])=>`<div class="slot ${cls}">${txt}</div>`).join('')}</div>`}
 function renderPhrase(lit=-1,litRow='answer'){
   const el=$('phrase');if(!P){el.innerHTML='';return}
@@ -2956,8 +2964,8 @@ function duelSlots(lit=-1){const el=$('duel-slots');if(!DUEL.seq.length){el.inne
   el.innerHTML=DUEL.seq.map((x,j)=>{const txt=S.duelMode==='chords'?x[1]:lab(x.o),wide=S.duelMode==='chords'&&txt.length>1?' wide':'';
     let c='';if(j<DUEL.i)c='ok';else if(DUEL.over&&j===DUEL.i)c='no';else if(DUEL.listen&&j===DUEL.i)c='cur';if(j===lit)c='lit';
     const show=j===0||j<DUEL.i||DUEL.over||(j===lit&&S.duelShow);return `<i class="${c}${wide}">${show?txt:''}</i>`}).join('')}
-function duelAdd(){S.duelMode='notes';if(!DUEL.seq.length){DUEL.seq.push({o:S.home,m:inRange(S.home,melLo(),melHi())});return}if(S.duelMode==='chords'){const set=duelChordSet();let c;do{c=pick(set)}while(DUEL.seq.length&&c===DUEL.seq[DUEL.seq.length-1]&&set.length>1);DUEL.seq.push(c)}
-  else{const last=DUEL.seq.length?DUEL.seq[DUEL.seq.length-1].o:null,pl=S.pool.length>1?S.pool.filter(o=>o!==last):S.pool;const o=pick(pl);DUEL.seq.push({o,m:inRange(o,melLo(),melHi())})}}
+function duelAdd(){S.duelMode='notes';if(!DUEL.seq.length){DUEL.seq.push({o:S.home,m:fitPlay(inRange(S.home,melLo(),melHi()))});return}if(S.duelMode==='chords'){const set=duelChordSet();let c;do{c=pick(set)}while(DUEL.seq.length&&c===DUEL.seq[DUEL.seq.length-1]&&set.length>1);DUEL.seq.push(c)}
+  else{const last=DUEL.seq.length?DUEL.seq[DUEL.seq.length-1].o:null,pl=S.pool.length>1?S.pool.filter(o=>o!==last):S.pool;const o=pick(pl);DUEL.seq.push({o,m:fitPlay(inRange(o,melLo(),melHi()))})}}
 function duelPlay(withCad){stopAll();ensure();DUEL.listen=false;DUEL.i=0;duelSlots();const t=ctx.currentTime+0.05;let d=withCad?cadence(t)+0.2:0.1;
   const st=(S.duelMode==='chords'?1.1:0.62)*PACE();
   $('duel-prompt').textContent=`Round ${DUEL.seq.length-1}: listen…`;
