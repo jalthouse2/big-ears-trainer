@@ -1055,7 +1055,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="actions">
       <button class="btn primary" id="find-next">Start</button>
       <button class="btn" id="find-hear">Hear it</button>
-      <button class="btn" id="find-reveal" hidden>Show the rest</button>
+      <button class="btn" id="iq-back" hidden>Previous</button><button class="btn" id="find-reveal" hidden>Show the rest</button>
       <span class="score" id="find-score"></span>
     </div>
   </section>
@@ -2794,7 +2794,7 @@ const IC={
   clear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-5 6M12 9l5 6"/></svg>'};
 function iconFor(t){t=t.toLowerCase();
   if(/^(start|play|play loop|play shape|play it|new phrase|start loop)$/.test(t))return 'play';
-  if(/^next$/.test(t))return 'next';if(/^next shape$/.test(t))return 'fwd';if(/^previous shape$/.test(t))return 'prev';
+  if(/^next$/.test(t))return 'next';if(/^next shape$/.test(t))return 'fwd';if(/^previous( shape)?$/.test(t))return 'prev';
   if(/both again/.test(t))return 'both';
   if(/^(replay|replay note|replay chord|hear it|hear again|play again)$/.test(t))return 'replay';
   if(/^(stop|stop loop|end)$/.test(t))return 'stop';if(/^pause/.test(t))return 'pause';if(/^resume$/.test(t))return 'play';
@@ -3421,11 +3421,16 @@ function nextIQ(){stopAll();ensure();marks={};trail=new Set();cellMarks={};
   if(IQ&&IQ.lap<n-1&&IQ.done){o=IQ.o;lap=IQ.lap+1;st=(IQ.st-1+n)%n}       // same jump, next string up
   else{const pl=S.pool.filter(x=>x!==S.home);o=pick(pl.length?pl:S.pool);lap=0;st=n-1}
   const hf=iqHomeOn(st),hm=OPEN[st]+hf,up=((o-S.home)%12+12)%12||12,tm=hm+up;
-  IQ={st,hf,hm,o,tm,lap,done:false,tries:0};cellMarks[st+'-'+hf]='vox';cellNow=null;
+  if(IQ)IQH.push({st:IQ.st,o:IQ.o,lap:IQ.lap});if(IQH.length>30)IQH.shift();
+  showIQ({st,hf,hm,o,tm,lap})}
+var IQH=[];
+function showIQ(q){stopAll();ensure();marks={};trail=new Set();cellMarks={};const n=OPEN.length,{st,hf,o,lap}=q;
+  IQ=Object.assign(q,{done:false,tries:0});cellMarks[st+'-'+hf]='vox';cellNow=null;$('iq-back').hidden=!IQH.length;
   $('find-num').textContent=lab(o);
   $('find-prompt').innerHTML=`From the gold <b>${lab(S.home)}</b>, find the <b>${lab(o)}</b> above it, within ${REACH} frets.`;
   $('find-fb').textContent=`String ${lap+1} of ${n}: same jump, starting from home on the ${STR[st]} string.`;
   $('find-reveal').hidden=false;$('find-next').textContent='Skip';renderFB();hearIQ(true)}
+function backIQ(){if(!IQH.length)return;const p=IQH.pop(),hf=iqHomeOn(p.st),hm=OPEN[p.st]+hf,tm=hm+(((p.o-S.home)%12+12)%12||12);showIQ({st:p.st,hf,hm,o:p.o,tm,lap:p.lap})}
 function hearIQ(first){if(!IQ)return;stopAll();ensure();const t=ctx.currentTime+0.05;pluck(IQ.hm,t,1.2,0.55);if(!first||IQ.done)pluck(IQ.tm,t+0.7,1.4,0.55)}
 function iqCells(){const out=[];for(let s2=0;s2<OPEN.length;s2++){const f=IQ.tm-OPEN[s2];if(f>=0&&f<=FRETS&&Math.abs(f-IQ.hf)<=REACH)out.push([s2,f])}return out}
 function answerIQ(s2,f){const m=OPEN[s2]+f,id=s2+'-'+f;IQ.tries++;stopAll();ensure();const t=ctx.currentTime+0.03;
@@ -3433,13 +3438,15 @@ function answerIQ(s2,f){const m=OPEN[s2]+f,id=s2+'-'+f;IQ.tries++;stopAll();ensu
     const others=iqCells().filter(([a,b])=>a!==s2||b!==f);others.forEach(([a,b])=>{cellMarks[a+'-'+b]='tone'});
     const fd=f-IQ.hf,sd=IQ.st-s2;
     $('find-fb').innerHTML=`<span class="tag ok">${lab(IQ.o)}</span> ${sd===0?'Same string':sd===1?'One string up':`${sd} strings up`}, ${fd===0?'same fret':fd>0?fd+' fret'+(fd>1?'s':'')+' higher':(-fd)+' fret'+(fd<-1?'s':'')+' lower'}.`+(others.length?` Also here: ${others.map(([a,b])=>`${STR[a]} string fret ${b}`).join(', ')}.`:'');
-    record('find',IQ.o,IQ.tries===1);$('find-next').textContent=IQ.lap<OPEN.length-1?'Next string':'Next';renderFB();return}
+    record('find',IQ.o,IQ.tries===1);$('find-next').textContent=IQ.lap<OPEN.length-1?'Next string':'Next';renderFB();
+    $('find-fb').insertAdjacentHTML('beforeend',' <span class="hint">Next in 3 s · pause to stay.</span>');const me=IQ;later(3000,()=>{if(IQ===me&&me.done&&!(typeof PAUSE!=='undefined'&&PAUSE.on))nextIQ()});return}
   cellMarks[id]='no';pluck(IQ.hm,t,0.7,0.45);pluck(m,t+0.55,0.9,0.45);
   $('find-fb').innerHTML=m%12===IQ.tm%12?`<span class="tag no">Other octave</span> Right number, but stay within ${REACH} frets of home, going up.`:`<span class="tag no">That's ${lab(offOf(m))}</span> Not ${lab(IQ.o)}. Listen to home, then try again.`;
   renderFB();setTimeout(()=>{if(cellMarks[id]==='no'&&IQ&&!IQ.done){delete cellMarks[id];renderFB()}},1200)}
 $('find-reveal').addEventListener('click',()=>{if(S.findMode!=='home'||!IQ||IQ.done)return;IQ.done=true;iqCells().forEach(([a,b])=>{cellMarks[a+'-'+b]='ok'});renderFB();hearIQ();$('find-fb').textContent='Here it is. Play it from home a few times.';$('find-next').textContent=IQ.lap<OPEN.length-1?'Next string':'Next'},true);
-function syncFindMode(){document.querySelectorAll('#find-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findMode))}
-$('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;FQ=null;cellMarks={};syncFindMode();
+$('iq-back').addEventListener('click',backIQ);
+function syncFindMode(){$('iq-back').hidden=S.findMode!=='home'||!IQH.length;document.querySelectorAll('#find-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findMode))}
+$('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;IQH=[];FQ=null;cellMarks={};syncFindMode();
   $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears; find a number above it, then the same jump from every string.':'Press start, then tap every place that number lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
 syncFindMode();
 
