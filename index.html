@@ -1360,6 +1360,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <div class="seg remdays" id="rem-days"><button data-d="MO">M</button><button data-d="TU">T</button><button data-d="WE">W</button><button data-d="TH">T</button><button data-d="FR">F</button><button data-d="SA">S</button><button data-d="SU">S</button></div>
         <div class="remgo" id="rem-web"><button class="btn" id="rem-ics">Add to Apple / Outlook calendar</button><button class="btn" id="rem-gcal">Add to Google Calendar</button></div>
         <div class="remgo" id="rem-native" hidden><button class="btn toggle" id="rem-on" aria-pressed="false">Off</button></div>
+        <button class="btn" id="rem-try">Show me a nudge</button>
         <p class="hint" id="rem-hint">Your calendar sends the reminder at that time, even when the app is closed. Tap it to open Big Ears.</p>
       </div>
       <div class="field"><span>Range</span>
@@ -2648,7 +2649,7 @@ function addXP(x,why){
   const ks=Object.keys(GAME.days).sort();if(ks.length>90)ks.slice(0,ks.length-90).forEach(k=>delete GAME.days[k]);
   toast(`+${x} XP${why?' · '+why:''}`,'xp');
   if(had<GOAL()&&had+x>=GOAL()){GAME.streak=GAME.lastGoal===dayOff(-1)?GAME.streak+1:GAME.lastGoal===d?GAME.streak:1;GAME.lastGoal=d;
-    setTimeout(()=>toast(`Daily goal reached · ${GAME.streak}-day streak`,'big'),700);badge('goal');
+    setTimeout(()=>toast(`Daily goal reached · ${GAME.streak}-day streak`,'big'),700);badge('goal');window.remRefresh&&window.remRefresh();
     if(GAME.streak>=3)badge('streak3');if(GAME.streak>=7)badge('streak7');if(GAME.streak>=30)badge('streak30')}
   const r1=rankOf(GAME.xp);if(r1>r0){setTimeout(()=>toast(`New rank: ${RANKS[r1][1]}${r1===CLUB?' · welcome to the Big Ears Club':''}`,'big'),1100);if(r1>=CLUB)badge('club')}
   saveGame();renderHomeStats()}
@@ -3506,6 +3507,20 @@ function goPrev(t){const x=HIST[t].pop();syncPrev();if(!x)return;stopAll();ensur
   const b=document.createElement('button');b.className='btn prevq';b.dataset.t=t;b.textContent='Previous';b.hidden=true;row.insertBefore(b,row.firstChild);iconize(b);b.addEventListener('click',()=>goPrev(t))});
 
 
+
+/* daily nudges: one a day, never on a day you've already hit your goal; the tone follows your streak */
+const NUDGE={
+  keep:["Your {n}-day streak is getting nervous. {d} minutes keeps it calm.","Day {n1} is waiting. Don't leave your streak hanging.","{n} days in a row. Your ears are getting bigger. Keep going.","Streak: {n} days. Today makes it {n1}.","Your {n}-day streak called. It wants a sequel."],
+  any:["Your ears getting smaller? {d} minutes fixes that.","Your 1 misses you. So does your 5.","Big ears aren't born. They're trained. {d} minutes today?","Somewhere a 6 is waiting to be named.","Quick: hum a 3. Now open Big Ears and check.","Ears go soft fast. Keep yours big.","The drone's warmed up. Are you?","Today's gig is booked. Show up for {d} minutes.","Hear it, sing it, play it. {d} minutes.","Your guitar has been staring at you."],
+  lost:["Your streak took a nap. Wake it up with one gig.","Your ears called. They want their workout back.","Day 1 is the best day to start again.","No guilt. Just {d} minutes and a fresh streak."]};
+function nudgeText(off=0,seed){const g=typeof GAME!=='undefined'?GAME:{streak:0,lastGoal:null};const d=S.daily,n=g.streak||0;
+  const r=seed!==undefined?seed:Math.floor(Math.random()*1e6);
+  // on that day, is the streak still alive? only if the last goal was the day before it
+  const live=n>=1&&g.lastGoal===dayOff(off-1);
+  const pool=live?(r%5<3?NUDGE.keep:NUDGE.any):n>=2?(r%5<3?NUDGE.lost:NUDGE.any):NUDGE.any;
+  const t=pool[Math.floor(r/5)%pool.length];
+  return t.replace(/\{n\}/g,n).replace(/\{n1\}/g,n+1).replace(/\{d\}/g,d)}
+
 /* practice reminder: calendar event on the web; real notifications inside the store app */
 (function(){
   if(!S.rem)S.rem={time:'18:00',days:['MO','TU','WE','TH','FR','SA','SU'],on:false};
@@ -3535,13 +3550,21 @@ function goPrev(t){const x=HIST[t].pop();syncPrev();if(!x)return;stopAll();ensur
   async function native(){const L=LN();if(!L)return;try{
     const pend=await L.getPending();if(pend.notifications.length)await L.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
     if(!S.rem.on)return;const perm=await L.requestPermissions();if(perm.display!=='granted'){S.rem.on=false;persist();sync();return toast('Notifications are off for Big Ears in your phone settings')}
-    const [h,m]=S.rem.time.split(':').map(Number);
-    await L.schedule({notifications:S.rem.days.map(d=>({id:100+ORDER.indexOf(d),title:'Big Ears',body:body(),schedule:{on:{weekday:(ORDER.indexOf(d)+1)%7+1,hour:h,minute:m},allowWhileIdle:true}}))})
+    const [h,m]=S.rem.time.split(':').map(Number),JS=['SU','MO','TU','WE','TH','FR','SA'],list=[];
+    const done=typeof GAME!=='undefined'&&GAME.lastGoal===today();
+    for(let k=0;k<14;k++){const at=new Date();at.setDate(at.getDate()+k);at.setHours(h,m,0,0);if(at<=new Date()||(k===0&&done))continue;
+      if(!S.rem.days.includes(JS[at.getDay()]))continue;list.push({id:200+k,title:'Big Ears',body:nudgeText(k,Math.floor(Math.random()*1e6)),schedule:{at,allowWhileIdle:true}})}
+    if(list.length)await L.schedule({notifications:list})
   }catch(e){toast('Could not set the reminder')}}
   $('rem-time').addEventListener('change',e=>{S.rem.time=e.target.value||'18:00';persist();sync();native()});
   $('rem-days').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset.d,i=S.rem.days.indexOf(d);i<0?S.rem.days.push(d):S.rem.days.splice(i,1);persist();sync();native()});
   $('rem-ics').addEventListener('click',ics);$('rem-gcal').addEventListener('click',gcal);
   $('rem-on').addEventListener('click',()=>{S.rem.on=!S.rem.on;persist();sync();native()});
+  $('rem-try').addEventListener('click',async()=>{const t=nudgeText(GAME.lastGoal===today()?1:0);toast(t,'big');
+    try{if('Notification' in window&&navigator.serviceWorker&&Notification.permission==='granted'){const r=await navigator.serviceWorker.ready;r.showNotification('Big Ears',{body:t,icon:'icon-192.png'})}}catch(e){}});
+  // keep the store app's queue fresh, and leave a note for the service worker (used by web push)
+  window.remRefresh=()=>{native();try{caches.open('be-state').then(c=>c.put('state',new Response(JSON.stringify({streak:GAME.streak,lastGoal:GAME.lastGoal,daily:S.daily,today:today()}))))}catch(e){}};
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)window.remRefresh()});setTimeout(window.remRefresh,1500);
   $('td-min').addEventListener('change',()=>{sync();native()});
   sync();
 })();
