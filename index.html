@@ -484,6 +484,25 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.secttabs{display:flex;flex-wrap:wrap;gap:6px}
+.secttabs button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px}
+.secttabs button[aria-pressed="true"]{background:var(--brass-soft);border-color:var(--brass)}
+.secttabs button.has::after{content:"•";color:var(--brass);margin-left:4px}
+.chordrow{display:flex;flex-wrap:wrap;gap:6px;min-height:44px;padding:6px;border-radius:12px;background:var(--sunk);border:1px dashed var(--line);align-items:center}
+.chordrow:empty::before{content:attr(data-empty);color:var(--muted);font-size:13px;padding:0 6px}
+.chordrow .scc{border:1px solid var(--brass);background:var(--brass-soft);border-radius:10px;padding:4px 10px;font:800 18px var(--font-display);color:var(--fg)}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
+.palette button{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:800 19px var(--font-display);color:var(--fg)}
+.palette button.out{border-style:dashed;color:var(--muted)}
+.palette button.hm{border-color:var(--home);color:var(--home)}
+.paltools{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sf7{white-space:nowrap;flex-direction:row!important;gap:6px!important}.sf7 input{width:18px!important;height:18px!important;min-height:0!important;flex:none}
+.secline{display:block;margin-top:2px}
+.secline b{font:600 11px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.secline button{border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.secline button:hover{color:var(--brass)}
+.patt{display:inline-block;margin-top:4px;font:600 12px var(--font-body);color:var(--home)}
+
 .tour.still .tb,.tour.still .ring,.tour.still .tip{transition:none!important}
 .tour .tb{transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
 .tour .tring{transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
@@ -1090,6 +1109,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="stage" id="panel-songs" hidden>
     <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Anchors</button></div>
     <p class="eyebrow">Songs you've mapped</p>
+    <div class="howto songwhy"><p>Map a song you love into numbers: its key, then its chords.</p><p>You'll start hearing the same few moves everywhere (1 5 6m 4 is in hundreds of songs).</p><p>Then play it back in any key, or jam over it.</p></div>
     <p class="hint" id="lib-status"></p>
     <details class="more" id="song-form-wrap"><summary id="song-form-sum">Add a song</summary>
       <form class="songform" id="song-form">
@@ -1097,8 +1117,18 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <label class="field"><span>Artist</span><input id="sf-artist"></label>
         <label class="field"><span>Key</span><select id="sf-tonic"></select></label>
         <div class="field"><span>Mode</span><div class="seg" id="sf-mode"><button type="button" data-v="major">Major (home 1)</button><button type="button" data-v="minor">Minor (home 6)</button></div></div>
-        <label class="field wide"><span>Chords as numbers</span><input id="sf-prog" placeholder="1 5 6m 4"></label>
-        <label class="field wide"><span>Melody opening as numbers</span><input id="sf-mel" placeholder="3 2 1 2 3 3 3"></label>
+        <input id="sf-prog" type="hidden"><input id="sf-mel" type="hidden">
+        <div class="field wide"><span>Chords: tap them in order</span>
+          <div class="secttabs" id="sf-secs"><button type="button" data-s="intro">Intro</button><button type="button" data-s="verse">Verse</button><button type="button" data-s="pre">Pre-chorus</button><button type="button" data-s="chorus">Chorus</button><button type="button" data-s="bridge">Bridge</button></div>
+          <div class="chordrow" id="sf-row"></div>
+          <div class="palette" id="sf-pal"></div>
+          <div class="paltools"><label class="check sf7"><input type="checkbox" id="sf-7"> Add the 7th</label><button type="button" class="btn" id="sf-back">Undo</button><button type="button" class="btn" id="sf-playsec">Play section</button></div>
+        </div>
+        <div class="field wide"><span>Melody (optional): tap its first notes</span>
+          <div class="chordrow" id="sf-melrow"></div>
+          <div class="palette mel" id="sf-melpal"></div>
+          <div class="paltools"><button type="button" class="btn" id="sf-melback">Undo</button><button type="button" class="btn" id="sf-melplay">Play melody</button></div>
+        </div>
         <label class="field wide"><span>Notes</span><input id="sf-notes" placeholder="Bridge goes to 4, chorus uses ♭7"></label>
         <div class="actions wide"><button class="btn primary" type="submit" id="sf-save">Save song</button><button class="btn" type="button" id="sf-cancel" hidden>Cancel edit</button></div>
       </form>
@@ -1979,7 +2009,8 @@ const OUTCH=[[4,'3',[4,8,11]],[2,'2',[2,6,9]],[10,'♭7',[10,2,5]]];
 const OUT_PATTERNS=[['1','3','6m','4'],['1','2','5','1'],['1','♭7','4','1'],['4','5','3','6m'],['1','3','4','1'],['6m','4','3','6m'],['1','2','4','1'],['1','6m','2','5'],['4','♭7','1','1']];
 const SEV=[[0,'1maj7',[0,4,7,11]],[2,'2m7',[2,5,9,0]],[4,'3m7',[4,7,11,2]],[5,'4maj7',[5,9,0,4]],[7,'5(7)',[7,11,2,5]],[9,'6m7',[9,0,4,7]],[11,'7ø',[11,2,5,9]]];
 const to7=c=>SEV.find(x=>x[0]===c[0])||c;
-const pgFind=n=>VCH.find(x=>x[1]===n)||JZ.find(x=>x[1]===n)||SEV.find(x=>x[1]===n)||OUTCH.find(x=>x[1]===n);
+const BORROW=[[3,'♭3',[3,7,10]],[8,'♭6',[8,0,3]],[5,'4m',[5,8,0]]];
+const pgFind=n=>VCH.find(x=>x[1]===n)||JZ.find(x=>x[1]===n)||SEV.find(x=>x[1]===n)||OUTCH.find(x=>x[1]===n)||BORROW.find(x=>x[1]===n);
 const pgSet0=()=>S.pgSet==='basic'?VCH.filter(c=>[0,5,7,S.home===0?9:S.home].includes(c[0])||c[0]===S.home):S.pgSet==='jazz'?JZ:S.pgSet==='outside'?[...VCH.filter(c=>['1','2m','4','5','6m'].includes(c[1])),...OUTCH]:VCH;
 const pgSet=()=>{const st=pgSet0();return S.cc7&&['basic','all'].includes(S.pgSet)?st.map(to7):st};
 function renderPgButtons(){$('pg-answers').innerHTML=pgSet().map(c=>`<button class="chip" data-n="${c[1]}">${c[1]}</button>`).join('')}
@@ -2141,7 +2172,7 @@ function alertLib(e){const st=$('lib-status');const msg=e&&e.code==='quota_excee
 let SF={id:null,mode:'major'};
 function renderSongs(){const L=LIB.cache.songs.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)),el=$('song-list');if(!el)return;
   el.innerHTML=L.length?`<p class="hint">${L.length} song${L.length>1?'s':''} mapped.</p>`+L.map(sg=>{const kn=NAMES[sg.tonic]+(sg.mode==='minor'?' minor':' major');
-    return `<div class="libitem"><span class="t">${esc(sg.title)}${sg.artist?` <span class="m">· ${esc(sg.artist)}</span>`:''}</span><span class="m">${kn}${sg.notes?' · '+esc(sg.notes):''}</span><span class="p">${esc(sg.prog||'')}${sg.mel?` &nbsp;|&nbsp; melody ${esc(sg.mel)}`:''}</span>
+    return `<div class="libitem"><span class="t">${esc(sg.title)}${sg.artist?` <span class="m">· ${esc(sg.artist)}</span>`:''}</span><span class="m">${kn}${sg.notes?' · '+esc(sg.notes):''}</span><span class="p">${songSecHTML(sg)}${sg.mel?`<span class="secline"><b>Melody</b> ${esc(sg.mel)}</span>`:''}${songPattern(sg)}</span>
       <span class="acts"><button class="btn" data-a="hear" data-id="${sg.id}">Hear chords</button>${sg.mel?`<button class="btn" data-a="mel" data-id="${sg.id}">Hear melody</button>`:''}<button class="btn" data-a="jam" data-id="${sg.id}">Jam on it</button><button class="btn" data-a="edit" data-id="${sg.id}">Edit</button><button class="btn" data-a="del" data-id="${sg.id}">Delete</button></span></div>`}).join('')
     :(LIB.mode==='loading'?'':'<p class="hint">No songs yet. Map one you know well: find home, then write its chords as numbers.</p>')}
 function songKey(sg){S.home=sg.mode==='minor'?9:0;S.key=sg.mode==='minor'?(sg.tonic+3)%12:sg.tonic;resetKeyContext()}
@@ -2152,14 +2183,16 @@ $('song-list').addEventListener('click',e=>{const b=e.target.closest('button');i
   if(a==='hear'){songKey(sg);playChordList(parseProg(sg.prog).chords)}
   else if(a==='mel'){songKey(sg);playNumbers(sg.mel)}
   else if(a==='jam'){songKey(sg);S.jamProg=sg.prog||'';persist();showTab('jam')}
-  else if(a==='edit'){SF={id:sg.id,mode:sg.mode};$('sf-title').value=sg.title||'';$('sf-artist').value=sg.artist||'';$('sf-tonic').value=sg.tonic;$('sf-prog').value=sg.prog||'';$('sf-mel').value=sg.mel||'';$('sf-notes').value=sg.notes||'';syncSF();$('song-form-wrap').open=true;$('sf-cancel').hidden=false;$('sf-save').textContent='Save changes';$('song-form-sum').textContent='Edit song'}
+  else if(a==='sec'){songKey(sg);playChordList(parseProg((sg.sections||{})[b.dataset.s]||'').chords)}
+  else if(a==='edit'){SF={id:sg.id,mode:sg.mode,cur:'verse',secs:songSecs(sg),mel:String(sg.mel||'').split(/\s+/).filter(Boolean)};sfRender();$('sf-title').value=sg.title||'';$('sf-artist').value=sg.artist||'';$('sf-tonic').value=sg.tonic;$('sf-notes').value=sg.notes||'';syncSF();$('song-form-wrap').open=true;$('sf-cancel').hidden=false;$('sf-save').textContent='Save changes';$('song-form-sum').textContent='Edit song'}
   else if(a==='del')confirmDel(b,()=>libDelete('songs',sg.id))});
 function syncSF(){document.querySelectorAll('#sf-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SF.mode))}
-function resetSF(){SF={id:null,mode:'major'};$('song-form').reset();$('sf-tonic').value=String(S.key);syncSF();$('sf-cancel').hidden=true;$('sf-save').textContent='Save song';$('song-form-sum').textContent='Add a song'}
+function resetSF(){SF={id:null,mode:'major',cur:'verse',secs:{intro:[],verse:[],pre:[],chorus:[],bridge:[]},mel:[]};if(gameReady)sfRender();$('song-form').reset();$('sf-tonic').value=String(S.key);syncSF();$('sf-cancel').hidden=true;$('sf-save').textContent='Save song';$('song-form-sum').textContent='Add a song'}
 $('sf-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SF.mode=b.dataset.v;syncSF()});
 $('sf-cancel').addEventListener('click',resetSF);
 $('song-form').addEventListener('submit',async e=>{e.preventDefault();const title=$('sf-title').value.trim();if(!title)return;
-  const doc={kind:'song',title,artist:$('sf-artist').value.trim(),tonic:Number($('sf-tonic').value),mode:SF.mode,prog:$('sf-prog').value.trim(),mel:$('sf-mel').value.trim(),notes:$('sf-notes').value.trim(),updated:Date.now()};
+  const secs={};SECS.forEach(k=>{if(SF.secs[k]&&SF.secs[k].length)secs[k]=SF.secs[k].join(' ')});
+  const doc={kind:'song',title,artist:$('sf-artist').value.trim(),tonic:Number($('sf-tonic').value),mode:SF.mode,sections:secs,prog:SECS.filter(k=>secs[k]).map(k=>secs[k]).join(' '),mel:SF.mel.join(' '),notes:$('sf-notes').value.trim(),updated:Date.now()};
   const bad=parseProg(doc.prog).bad;const id=await libSave('songs',SF.id,doc);
   if(id){resetSF();$('song-form-wrap').open=false;$('lib-status').innerHTML=`<span class="tag ok">Saved</span> ${esc(title)}`+(bad.length?` (chords I couldn't read: ${esc(bad.join(' '))}; write minors with m, like 6m)`:'')}});
 $('sf-tonic').innerHTML=NAMES.map((n,i)=>`<option value="${i}">${n}</option>`).join('');
@@ -3161,6 +3194,39 @@ function addTourBtn(){const body=$('opt-body'),t=S.tab;const wrap=document.creat
   if(LESSONS[t]){const b=document.createElement('button');b.className='btn primary tourbtn';b.textContent='Learn this game: play a guided round';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true,true),250)};wrap.appendChild(b)}
   if(TOURS[t]){const b=document.createElement('button');b.className='btn tourbtn';b.textContent='Quick look around';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true),250)};wrap.appendChild(b)}
   if(wrap.children.length)body.insertBefore(wrap,body.firstChild)}
+
+
+/* ---------- song editor: tap chords into sections; tap numbers for the melody ---------- */
+const SECS=['intro','verse','pre','chorus','bridge'],SECNAME={intro:'Intro',verse:'Verse',pre:'Pre-chorus',chorus:'Chorus',bridge:'Bridge'};
+function songSecs(sg){const out={intro:[],verse:[],pre:[],chorus:[],bridge:[]};if(sg.sections&&Object.keys(sg.sections).length)SECS.forEach(k=>{out[k]=String(sg.sections[k]||'').split(/\s+/).filter(Boolean)});else out.verse=String(sg.prog||'').split(/\s+/).filter(Boolean);return out}
+function songSecHTML(sg){const se=songSecs(sg);const rows=SECS.filter(k=>se[k].length).map(k=>`<span class="secline"><b>${SECNAME[k]}</b><button data-a="sec" data-s="${k}" data-id="${sg.id}" title="Hear the ${SECNAME[k].toLowerCase()}">${esc(se[k].join(' '))}</button></span>`);
+  if(!sg.sections||!Object.keys(sg.sections).length)return sg.prog?`<span class="secline">${esc(sg.prog)}</span>`:'';return rows.join('')}
+// spot the famous progressions inside a song
+function songPattern(sg){const all=' '+SECS.map(k=>songSecs(sg)[k].join(' ')).join(' | ')+' ';const hits=PRESETS.filter(([n,p])=>p.split(' ').length>=3&&all.includes(' '+p+' ')).map(x=>x[0]);
+  return hits.length?`<span class="patt">Uses the ${hits.slice(0,2).join(' and ')} progression${hits.length>1?'s':''}</span>`:''}
+const PAL_D=['1','2m','3m','4','5','6m','7°'],PAL_O=['2','3','♭3','4m','♭6','♭7'],TO7={'1':'1maj7','2m':'2m7','3m':'3m7','4':'4maj7','5':'5(7)','6m':'6m7','7°':'7ø'};
+const PAL_M=['1','2','3','4','5','6','7','♭3','♯4','♭7'];
+function sfRender(){if(!SF.secs)SF.secs={intro:[],verse:[],pre:[],chorus:[],bridge:[]};if(!SF.cur)SF.cur='verse';if(!SF.mel)SF.mel=[];
+  document.querySelectorAll('#sf-secs button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.s===SF.cur);b.classList.toggle('has',(SF.secs[b.dataset.s]||[]).length>0)});
+  const row=$('sf-row');row.dataset.empty=`Tap chords below to build the ${SECNAME[SF.cur].toLowerCase()}`;row.innerHTML=SF.secs[SF.cur].map((c,i)=>`<button type="button" class="scc" data-i="${i}" title="Tap to remove">${esc(c)}</button>`).join('');
+  const home=SF.mode==='minor'?'6m':'1';
+  $('sf-pal').innerHTML=PAL_D.map(c=>`<button type="button" data-c="${c}" class="${c===home?'hm':''}">${c}</button>`).join('')+PAL_O.map(c=>`<button type="button" data-c="${c}" class="out" title="Outside the key">${c}</button>`).join('');
+  const mr=$('sf-melrow');mr.dataset.empty='Tap numbers to add the tune’s first notes';mr.innerHTML=SF.mel.map((n,i)=>`<button type="button" class="scc" data-i="${i}">${esc(n)}</button>`).join('');
+  $('sf-melpal').innerHTML=PAL_M.map(n=>`<button type="button" data-n="${n}" class="${n.length>1?'out':''}">${n}</button>`).join('');
+  $('sf-prog').value=SECS.map(k=>SF.secs[k].join(' ')).filter(Boolean).join(' ');$('sf-mel').value=SF.mel.join(' ')}
+function sfKeyNow(){const sg={tonic:Number($('sf-tonic').value),mode:SF.mode};songKey(sg)}
+$('sf-secs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SF.cur=b.dataset.s;sfRender()});
+$('sf-pal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;let c=b.dataset.c;if($('sf-7').checked&&TO7[c])c=TO7[c];
+  SF.secs[SF.cur].push(c);sfRender();const ch=pgFind(c);if(ch){if(S.key!==(SF.mode==='minor'?(Number($('sf-tonic').value)+3)%12:Number($('sf-tonic').value)))sfKeyNow();stopAll();ensure();chord(ch[0],ch[2],ctx.currentTime+0.03,1.2,0.22)}});
+$('sf-row').addEventListener('click',e=>{const b=e.target.closest('.scc');if(!b)return;SF.secs[SF.cur].splice(Number(b.dataset.i),1);sfRender()});
+$('sf-back').addEventListener('click',()=>{SF.secs[SF.cur].pop();sfRender()});
+$('sf-playsec').addEventListener('click',()=>{sfKeyNow();playChordList(parseProg(SF.secs[SF.cur].join(' ')).chords)});
+$('sf-melpal').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SF.mel.push(b.dataset.n);sfRender();const o=noteTok(b.dataset.n);if(o!==null){stopAll();ensure();pluck(near(o,H()+6),ctx.currentTime+0.02,0.8,0.5)}});
+$('sf-melrow').addEventListener('click',e=>{const b=e.target.closest('.scc');if(!b)return;SF.mel.splice(Number(b.dataset.i),1);sfRender()});
+$('sf-melback').addEventListener('click',()=>{SF.mel.pop();sfRender()});
+$('sf-melplay').addEventListener('click',()=>{sfKeyNow();playNumbers(SF.mel.join(' '))});
+$('sf-mode').addEventListener('click',()=>setTimeout(sfRender,0));
+if(!SF.secs){SF.cur='verse';SF.secs={intro:[],verse:[],pre:[],chorus:[],bridge:[]};SF.mel=[]}sfRender();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
