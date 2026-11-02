@@ -484,6 +484,16 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.hfbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:6px 10px;border-radius:12px;background:var(--home-soft);border:1px solid color-mix(in srgb,var(--home) 40%,transparent);font-size:12.5px}
+.hfmic{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--home)}
+.hfmic i{width:8px;height:8px;border-radius:50%;background:var(--bad);animation:micpulse 1.2s infinite}
+.hfbar.busy .hfmic i{background:var(--muted);animation:none}
+.hfg{display:inline-flex;align-items:center;gap:6px;color:var(--muted);margin-left:auto}
+.strums{display:inline-flex;gap:3px}
+.strums b{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted)}
+.strums b.on{background:var(--brass);border-color:var(--brass)}
+.hfbar.flash{box-shadow:0 0 0 2px var(--brass)}
+
 .worldrows{list-style:none;margin:8px 0 10px;padding:0;display:flex;flex-direction:column;gap:12px}
 .worldrows .wname{font-size:14px;margin-bottom:2px}
 .worldrows .wname b{font:800 18px var(--font-display);color:var(--brass);margin-right:4px}
@@ -927,6 +937,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <label class="pill" id="csize-pill"><span class="sr">Chords</span><select id="csize" aria-label="Chord size"><option value="3">Triads</option><option value="4">7ths</option></select></label>
     <button class="stagebtn" id="stage-mode" aria-label="How it works and options"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="16.9" r=".6" fill="currentColor"/></svg><span id="stage-lab">How to</span></button>
   </div>
+  <div class="hfbar" id="hfbar" hidden><span class="hfmic"><i></i><span id="hf-heard">Listening</span></span><span class="hftxt" id="hf-txt">Play or sing your answer</span><span class="hfg"><span class="strums" id="hf-strums"><b></b><b></b><b></b></span><span id="hf-g">2 muted strums: next · 3: replay</span></span></div>
   <div class="sessbar" id="sessbar" hidden>
     <span class="sb-block" id="sb-block"></span><span class="sb-time" id="sb-time"></span>
     <span class="sb-tip" id="sb-tip"></span>
@@ -1305,6 +1316,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="field" id="fb-nums-f"><span>Neck shows</span><div class="seg" id="fb-nums"><button data-v="all">Notes in play</button><button data-v="home">Home only</button><button data-v="none">Only what lights up</button></div></div>
       <div class="micopts">
         <span class="micopts-h">Microphone</span>
+        <label class="check big"><input type="checkbox" id="hands-free"> <b>Hands-free mode</b>: answer by playing or singing, two muted strums for the next question, three to hear it again, and games move on by themselves after an answer.</label>
         <label class="check big"><input type="checkbox" id="mic-auto"> Listen with the microphone in the games and the tuner. You allow it once; it only listens while a game or the tuner is open.</label>
         <label class="field"><span>Sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"></label>
         <label class="check big"><input type="checkbox" id="mic-phones"> I use headphones (turns off the phone's echo cancelling for the cleanest pitch). Leave this off when the app plays through the speaker.</label>
@@ -1344,7 +1356,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1714,7 +1726,7 @@ function answerChord(o){
   if(isRight(o,CQ.m)){stopAll();ensure();CQ.done=true;record('chord',CQ.o,CQ.tries===1);marks={};marks[keyFor(CQ.m)]='ok';trail=new Set();renderPad();
     const rel=resolveOverChord(0);
     $('ch-fb').innerHTML=`<span class="tag ok">${labK(o)}</span> Right. Over the ${CQ.c.name} chord it is ${rel.txt}.${rel.rest?'':' You heard it lean there.'}`;
-    $('ch-prompt').textContent='Press Next when ready.';return}
+    $('ch-prompt').textContent='Press Next when ready.';if(S.handsFree)later(3200*PACE(),nextChord);return}
   CQ.guess=o;
   if(S.retry&&CQ.tries<2){stopAll();ensure();marks={};marks[o]='no';renderPad();const t=ctx.currentTime+0.05;
     chord(CQ.r,CQ.c.t,t,1.4,0.2);pluck(pitchOfKey(o,CQ.m),t+0.08,1.4,0.5);lightAt(0,o);unlightAt(1400);
@@ -2104,7 +2116,7 @@ function answerProg(name){
   $('pg-prompt').textContent='Press Next for a new progression.';
   PG.done=true;const ok=PG.seq.filter((c,i)=>PG.ans[i]===c[1]).length,all=ok===PG.seq.length;
   PS.n++;if(all){PS.c++;PS.streak++}else PS.streak=0;onAnswer('prog',all);$('pg-score').textContent=`This session ${PS.c}/${PS.n} right · streak ${PS.streak}`;
-  pgSlots();$('pg-mine').hidden=false;
+  pgSlots();$('pg-mine').hidden=false;if(S.handsFree)later(3500*PACE(),nextProg);
   const ansTxt=PG.seq.map(c=>c[1]).join(' – ');
   if(all){$('pg-fb').innerHTML=`<span class="tag ok">${ansTxt}</span> All right. Watch it on the map and neck.`;later(700,()=>playProg(PG.seq,0,false,'answer'))}
   else{$('pg-fb').innerHTML=`<span class="tag no">${ok} of ${PG.seq.length}</span> <span class="tag ok">${ansTxt}</span> You'll hear yours, then the real one.`;
@@ -2350,8 +2362,10 @@ function micKey(m,ref){
   return keyFor(m)}
 function micHeard(m,cents){const el=$('mic-heard');if(!el)return;
   const c=S.micSing?` <span class="c ${Math.abs(cents)<=15?'ok':Math.abs(cents)>30?'off':''}">${cents>=0?'+':''}${Math.round(cents)}¢</span>`:'';
-  el.innerHTML=`Heard ${lab(offOf(m))}${c}`}
-function micNext(){const t=S.tab;
+  el.innerHTML=`Heard ${lab(offOf(m))}${c}`;const h2=$('hf-heard');if(h2)h2.innerHTML=`Heard ${lab(offOf(m))}${c}`}
+function strumShow(n){const el=$('hf-strums');if(!el)return;[...el.children].forEach((d,i)=>d.classList.toggle('on',i<n));$('hfbar').classList.toggle('flash',n>0)}
+function micReplay(){const t=S.tab;toast('Replay');if(t==='deg')replayDeg();else if(t==='chord')replayChord();else if(t==='phr'&&P)playAnswer(false);else if(t==='prog')$('pg-replay').click();else if(t==='duel')$('duel-replay').click();else if(t==='find')$('find-hear').click();else if(t==='vox'&&S.voxMode==='quiz')$('vq-replay').click()}
+function micNext(){const t=S.tab;toast('Next');
   if(t==='deg'&&(!Q||Q.done))nextDeg();else if(t==='chord'&&(!CQ||CQ.done))nextChord();else if(t==='phr'&&(!P||P.done||P.revealed))newPhrase();
   else if(t==='find'&&(!FQ||FQ.done))nextFind();else if(t==='prog'&&(!PG||PG.done))nextProg();else if(t==='vox'&&S.voxMode==='quiz'&&(!VQ||VQ.done))nextVQ()}
 function rootChord(m,set){const r=offOf(m);return set.find(c=>c[0]===r&&VCH.includes(c))||set.find(c=>c[0]===r)||null}
@@ -2375,14 +2389,14 @@ function micFrame(){
   const now=ctx.currentTime,busy=now<busyUntil+0.15;if(busy){MIC.gate=busyUntil+0.15;MIC.gRms=null}
   const r=detectPitch(MIC.buf,ctx.sampleRate),thr=micThr(),loud=r.rms>thr;
   if(S.tab==='tune'){const bz=now<busyUntil+0.1;tunerFeed(!bz&&r.rms>thr*0.5&&r.clarity>0.7&&r.freq>60&&r.freq<1500?r.freq:0);return}
-  $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);
+  $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);{const hf=$('hfbar');if(hf)hf.classList.toggle('busy',now<busyUntil+0.15)}
   // re-pluck of the same note: a sharp jump in level counts as a new onset
   if(r.rms>thr&&r.clarity>0.8&&r.freq>60&&!(now<busyUntil+0.15)&&!echoOf(Math.round(69+12*Math.log2(r.freq/440)),now))lastAct=Date.now();   // playing counts as using the app (wakes a resting drone)
   if(r.rms<thr*0.5)MIC.quietAt=now;
   const jump=r.rms>Math.max(thr*2.5,MIC.prevRms*2.2);MIC.prevRms=r.rms*0.6+MIC.prevRms*0.4;
   if(S.micNext&&jump&&r.clarity<0.6&&!busy){MIC.hitAt=now}
   if(MIC.hitAt&&now-MIC.hitAt>0.12&&now-MIC.hitAt<0.2){ // still no pitch shortly after the hit: a muted strum
-    if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<0.8);MIC.hits.push(now);MIC.hitAt=0;if(MIC.hits.length>=2){MIC.hits=[];micNext()}}else MIC.hitAt=0}
+    if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<1.0);MIC.hits.push(now);MIC.hitAt=0;strumShow(MIC.hits.length);clearTimeout(MIC.hitT);MIC.hitT=setTimeout(()=>{const n=MIC.hits.length;MIC.hits=[];if(n>=3)micReplay();else if(n===2)micNext();strumShow(0)},650)}else MIC.hitAt=0}
   if(!loud||r.clarity<0.72||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
   const mf=69+12*Math.log2(r.freq/440),strong=r.clarity>=0.88;
   if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=jump||(MIC.cur===null&&MIC.quietAt!=null&&now-MIC.quietAt<0.25&&now-MIC.quietAt>=0&&MIC.quietAt>busyUntil+0.15);MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
@@ -2397,7 +2411,9 @@ function micFrame(){
 const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec'];
 function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone: tap to allow':MIC.muted?'Microphone muted: tap to listen':on?'Listening: tap to mute':'Microphone ready';
   b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
-  $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn()}
+  $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn();
+  const hf=$('hfbar');if(hf){hf.hidden=!(on&&!['tune','dec'].includes(S.tab));if(!hf.hidden)$('mic-pill').hidden=true;$('hf-g').textContent=S.micNext?'2 muted strums: next · 3: replay':'';$('hf-strums').hidden=!S.micNext;
+    $('hf-txt').textContent={deg:'Play or sing the note',chord:'Play or sing the top note',phr:'Play or sing the notes in order',prog:'Play each chord\u2019s root',find:'Play each spot on the neck',duel:'Play the notes back',mel:'Play notes to write them',vox:'Play the chord\u2019s root'}[S.tab]||'Play or sing your answer'}}
 async function micStart(){ensure();
   const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
   if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:!S.micPhones,noiseSuppression:false,autoGainControl:false}})}
@@ -2413,13 +2429,14 @@ function micStop(){micPause()}
 const micWanted=()=>S.micAuto&&!MIC.muted&&!document.hidden&&document.body.dataset.screen==='game'&&LISTEN_TABS.includes(S.tab)&&(typeof PAUSE==='undefined'||!PAUSE.on);
 function micSync(){if(micWanted()){if(!MIC.on)micStart()}else if(MIC.on)micPause();else micLabel()}
 function micEnable(){S.micAuto=true;MIC.muted=false;persist();$('mic-auto').checked=true;micSync()}
-$('mic-toggle').addEventListener('click',()=>{if(!S.micAuto)return micEnable();MIC.muted=!MIC.muted;micSync()});
+$('mic-toggle').addEventListener('click',()=>{if(!S.micAuto){micEnable();toast('Mic on: play or sing to answer · 2 muted strums = next');return}MIC.muted=!MIC.muted;micSync()});
 $('mic-auto').checked=S.micAuto;$('mic-auto').addEventListener('change',e=>{if(e.target.checked)micEnable();else{S.micAuto=false;persist();micPause();micRelease()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause();micRelease()}else micSync()});
 {const _st=showTab;showTab=function(t){_st(t);micSync()};const _gs=goScreen;goScreen=function(a,b){_gs(a,b);micSync()};
  const _pa=pauseAll,_ra=resumeAll;pauseAll=function(){_pa();micSync()};resumeAll=function(){_ra();micSync()}}
 setTimeout(micLabel,0);
 $('mic-sens').value=S.micSens;$('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist()});
+$('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{persist();micLabel()}});
 $('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
 [['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
 
