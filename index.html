@@ -611,7 +611,7 @@ body.paused .circgo{opacity:.5}
 
 .tuner{gap:14px}
 .tunetop{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.tauto{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.tauto{white-space:nowrap;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:600;color:var(--muted)}
 .tauto[aria-pressed="true"]{background:var(--home);border-color:var(--home);color:var(--bg)}
 .tmeter{position:relative;height:190px;border-radius:16px;background:var(--sunk);overflow:hidden;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:22px 22px;background-position:center}
@@ -1186,7 +1186,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage tuner" id="panel-tune" hidden>
     <div class="tunetop"><label class="pill"><span class="sr">Tuning</span><select id="tune-set" aria-label="Tuning"></select></label>
-      <span class="tbtns"><button class="tauto" id="tune-drone" aria-pressed="false" title="Hold the string's note so you can tune by ear">Drone</button><button class="tauto" id="tune-auto" aria-pressed="true">Auto</button></span></div>
+      <span class="tbtns"><button class="tauto" id="tune-drone" aria-pressed="false" title="Hold the string's note so you can tune by ear">Drone</button><button class="tauto" id="tune-auto" aria-pressed="true" title="Auto: the tuner works out which string you're playing. Off: it stays on the string you tapped.">Auto</button></span></div>
     <div class="tmeter">
       <div class="tscale"><span>♭</span><span>♯</span></div>
       <svg class="ttrace" id="tune-trace" aria-hidden="true"><line class="tmid" id="tune-mid"/><g id="tune-dots"></g></svg>
@@ -2926,13 +2926,14 @@ function tuneSetup(){if(!$('tune-set'))return;
   const btn=i=>`<button class="sbtn" data-i="${i}" aria-label="String ${n-i}: ${NAMES[ms[i]%12]}">${NAMES[ms[i]%12].replace('♭','b')}</button>`;
   hs.innerHTML=`<div class="hscol">${left.map(btn).join('')}</div>${headstockSVG(n)}<div class="hscol">${right.map(btn).join('')}</div>`;
   tuneMark()}
-function tuneMark(){document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=Number(b.dataset.i);b.classList.toggle('act',i===TUNE.sel);b.classList.toggle('ok',TUNE.done.has(i))});
+function tuneMark(){if(typeof tuneExplain==='function'&&$('tune-msg'))setTimeout(tuneExplain,0);document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=Number(b.dataset.i);b.classList.toggle('act',i===TUNE.sel);b.classList.toggle('ok',TUNE.done.has(i))});
   document.querySelectorAll('#hs .str').forEach(l=>{const k=Number(l.dataset.k);l.classList.toggle('act',k===TUNE.sel)})}
 $('hs').addEventListener('click',e=>{const b=e.target.closest('.sbtn');if(!b)return;TUNE.sel=Number(b.dataset.i);TUNE.auto=false;$('tune-auto').setAttribute('aria-pressed','false');tuneMark();
   const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);
   if(TUNE.droneOn){tuneDrone(m);return}
-  stopAll();ensure();pluck(m,ctx.currentTime+0.03,2.6,0.6)});
-$('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto)});
+  stopAll();ensure();const t0=ctx.currentTime+0.03;pluck(m,t0,4,0.7);if(m<60)pluck(m+12,t0,4,0.35)});
+$('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto);tuneExplain()});
+function tuneExplain(){const ms=tuning()[1],nm=ms.length?NAMES[ms[TUNE.sel]%12]:'';$('tune-msg').textContent=TUNE.droneOn?'Drone: play the string along with it and turn the peg until the wobble slows down and stops.':TUNE.auto?'Auto: play any string and the tuner finds which one it is. Tap a string to hear its note.':`Locked on the ${nm} string: the tuner only measures against ${nm}. Tap another string to switch, or turn Auto back on.`}
 $('tune-set').addEventListener('change',e=>{tuneKey();S.tunes[S.inst]=e.target.value;persist();tuneSetup()});
 function tunerFeed(f){
   if(TUNE.droneOn){return}
@@ -3080,12 +3081,13 @@ function pluckAs(v,m,t,dur,vel){const keep=S.voice;S.voice=v;try{pluck(m,t,dur,v
 let tdNodes=null;
 function tuneDrone(m){ensure();tuneDroneOff();if(m==null)return;
   const g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(4000,hz(m)*6);fl.Q.value=0.7;fl.connect(g);g.connect(voiceIn);
-  const os=[['sawtooth',1,0.32],['triangle',1,0.6],['sine',2,0.18]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
-  g.gain.value=0.0001;g.gain.setTargetAtTime(0.11,ctx.currentTime,0.15);tdNodes={g,os};
+  fl.frequency.value=Math.min(6000,hz(m)*12);
+  const os=[['sawtooth',1,0.22],['triangle',1,0.45],['triangle',2,0.55],['sine',4,0.12]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
+  g.gain.value=0.0001;g.gain.setTargetAtTime(0.26,ctx.currentTime,0.15);tdNodes={g,os};
   $('tune-hint').textContent='Tune by ear';$('tune-msg').textContent='Play the string with the drone. Turn the peg until the wobble between them slows down and stops.';document.querySelector('.tmeter').classList.remove('in')}
 function tuneDroneOff(){if(!tdNodes)return;const n=tdNodes;tdNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.12);setTimeout(()=>n.os.forEach(o=>{try{o.stop()}catch(e){}}),600)}
 $('tune-drone').addEventListener('click',e=>{TUNE.droneOn=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.droneOn);
-  if(TUNE.droneOn){const ms=tuning()[1];tuneDrone(ms.length?ms[TUNE.sel]:57)}else{tuneDroneOff();$('tune-hint').textContent='Pluck a string'}});
+  if(TUNE.droneOn){const ms=tuning()[1];tuneDrone(ms.length?ms[TUNE.sel]:57)}else{tuneDroneOff();$('tune-hint').textContent='Pluck a string'}tuneExplain()});
 
 /* ---------- Rhythm: metronome and backing beats, synthesized drums on a look-ahead clock ---------- */
 // patterns on a step grid; k kick, s snare, h hi-hat, r rim/ride, steps per beat in 'div'
