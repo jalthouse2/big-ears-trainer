@@ -3614,7 +3614,7 @@ function nudgeText(off=0,seed){const g=typeof GAME!=='undefined'?GAME:{streak:0,
 
 
 /* ---------- first-run intro: a short story, a 20-second ear test, set-up, the plan, then (when paid) the offer ---------- */
-const PAYWALL={on:false,trial:7,plans:[['year','Yearly','€24.99 / year','€2.08 a month · best value'],['life','Lifetime','€39.99 once','Pay once, keep it forever']]};
+const PAYWALL={on:false,trial:7,plans:[['year','Yearly','€9.99 / year','Less than €1 a month'],['life','Lifetime','€25.99 once','Pay once. Everything, for as long as Big Ears is offered, updates included']]};
 const ONB={i:0,a:{goals:[]}};
 const ONB_STEPS=[
   {id:'hi',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>Hear it. Sing it. Play it.</h2><p class="lead">Big Ears trains the skill behind playing by ear: knowing what you hear, and where it lives on your instrument.</p>`,btn:'Get started'},
@@ -3629,8 +3629,8 @@ const ONB_STEPS=[
   {id:'when',render:()=>`<h2>When should we nudge you?</h2><p class="lead">One reminder a day, at a time you'll actually play. None on days you've already practised.</p><input type="time" id="onb-time" value="${(S.rem&&S.rem.time)||'18:00'}">`,btn:'Set reminder'},
   {id:'plan',render:()=>{const a=ONB.a,m=a.mins||15,g=a.goals.length?a.goals:['Play what I hear in my head'];
     return `<h2>Your plan is ready</h2><p class="lead">${m} minutes a day. Here's what that builds.</p><div class="onbplan"><div><b>Week 1</b><span>Hear home, then name the 1, 3 and 5 in any key.</span></div><div><b>Weeks 2–4</b><span>All seven numbers, and how they feel over each chord.</span></div><div><b>Weeks 5–8</b><span>Phrases: sing a line, then find it on the ${a.inst==='piano'?'keys':'neck'} first try.</span></div><div><b>Weeks 9–12</b><span>Progressions and songs by ear. Toward: <b>${g[0].toLowerCase()}</b>.</span></div></div>`},btn:'Continue'},
-  {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and tour</li><li>Phrases, progressions and songs by ear</li><li>The chord decoder and shapes on the neck</li><li>Daily plan, streaks and reminders</li></ul><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
-    btn:()=>`Start ${PAYWALL.trial}-day free trial`,fine:()=>`Free for ${PAYWALL.trial} days, then the price shown. Cancel any time in your store settings. Restore purchases in Settings.`},
+  {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and tour</li><li>Phrases, progressions and songs by ear</li><li>Chord shapes on the neck: triads and shells</li><li>Daily plan, streaks and reminders</li></ul><p class="lead" style="font-size:14px">Tuner, metronome and chord decoder stay free.</p><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
+    btn:()=>`Start ${PAYWALL.trial}-day free trial`,fine:()=>`Yearly: free for ${PAYWALL.trial} days, then €9.99 a year. Cancel any time in your store settings. Lifetime is a one-time purchase. Restore purchases in Settings.`},
   {id:'go',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>You're in.</h2><p class="lead">${PAYWALL.on?'':'Big Ears is free while it\'s in early access. '}Your first gig is waiting: name the 1, 3 and 5.</p>`,btn:'Start my first gig'}];
 function onbOpen(){ONB.i=0;ONB.a={goals:[]};ONB.steps=ONB_STEPS.filter(x=>!x.show||x.show());$('onb').hidden=false;onbRender()}
 function onbClose(start){$('onb').hidden=true;S.onboarded=true;persist();if(start&&typeof openGame==='function')openGame('deg')}
@@ -3655,7 +3655,7 @@ $('onb').addEventListener('click',e=>{const st=ONB.steps[ONB.i];
     if(st.id==='inst'){const b=document.querySelector(`#inst button[data-v="${o[2]}"]`);b&&b.click()}
     if(st.id==='mins'){$('td-min').value=String(o[2]);$('td-min').dispatchEvent(new Event('change'))}
     return setTimeout(onbNext,220)}
-  const pb=e.target.closest('#onb-price button');if(pb){document.querySelectorAll('#onb-price button').forEach(b=>b.setAttribute('aria-pressed',b===pb));ONB.a.plan=pb.dataset.p;return}
+  const pb=e.target.closest('#onb-price button');if(pb){document.querySelectorAll('#onb-price button').forEach(b=>b.setAttribute('aria-pressed',b===pb));ONB.a.plan=pb.dataset.p;$('onb-next').textContent=pb.dataset.p==='life'?'Buy lifetime: €25.99':`Start ${PAYWALL.trial}-day free trial`;return}
   const tb=e.target.closest('#onb-test button');
   if(tb){if(!ONB.t)return onbTest();if(ONB.t.done)return;const o=+tb.dataset.o;ONB.t.done=o===ONB.t.o;
     if(ONB.t.done){tb.classList.add('ok');$('onb-tfb').innerHTML=`<b>Yes, the ${lab(o)}.</b> You just named a note by ear. That's the whole skill, and it grows fast.`;$('onb-next').textContent='Continue';walkHome(resolution(ONB.t.m),0.2)}
