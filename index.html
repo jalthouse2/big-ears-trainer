@@ -484,6 +484,16 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.worldrows{list-style:none;margin:8px 0 10px;padding:0;display:flex;flex-direction:column;gap:12px}
+.worldrows .wname{font-size:14px;margin-bottom:2px}
+.worldrows .wname b{font:800 18px var(--font-display);color:var(--brass);margin-right:4px}
+.worldrows .wname span{color:var(--muted)}
+.mapdemo.sm{margin:0;gap:1px 3px}
+.mapdemo.sm b{font-size:17px;min-width:16px;color:var(--fg)}
+.mapdemo.sm b:first-child,.mapdemo.sm b:last-child{color:var(--fg)}
+.mapdemo.sm b.hm{color:var(--home)}
+.mapdemo.sm i{font-size:10px;padding:0 3px}
+
 .mapdemo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;margin:4px 0 10px;font-family:var(--font-display)}
 .mapdemo b{font-weight:800;font-size:21px;min-width:20px;text-align:center}
 .mapdemo b:first-child,.mapdemo b:last-child{color:var(--home)}
@@ -878,16 +888,15 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <p>Change the key and the letters change, but the numbers, the steps and the feelings stay the same. Learn them once, use them in every key.</p>
         <p>The five notes between the seven (♭3, ♯4, ♭7…) are <b>outside notes</b>: colour and tension.</p></div>
       <div class="panelcard"><h3>The seven worlds</h3>
-        <p>The map never moves. A world is simply <b>which number feels like home</b>. Same seven notes, measured from the same 1; only the resting place changes, and with it the mood.</p>
-        <ul class="worldlist">
-          <li><b>1</b><span><b>Major</b> · home on 1 · 1 2 3 4 5 6 7 1′ · bright, settled</span></li>
-          <li><b>6</b><span><b>Minor</b> · home on 6 · 6 7 1 2 3 4 5 6 · darker; the same notes as major</span></li>
-          <li><b>2</b><span><b>Dorian</b> · home on 2 · minor, but with a hopeful 7 (the 1)</span></li>
-          <li><b>5</b><span><b>Mixolydian</b> · home on 5 · major with a bluesy flat 7 (the 4); rock and folk</span></li>
-          <li><b>4</b><span><b>Lydian</b> · home on 4 · major with a floating, raised 4 (the 7)</span></li>
-          <li><b>3</b><span><b>Phrygian</b> · home on 3 · dark, with a half step right above home (the 4)</span></li>
-          <li><b>7</b><span><b>Locrian</b> · home on 7 · unstable; rarely home for long</span></li></ul>
-        <p>So in minor you still call the notes 6, 7, 1… not 1, 2, ♭3. One map for everything; you just hear a different home.</p></div>
+        <p>The map is fixed, like a ruler. The distances never change: <b>3–4 and 7–1 are always half steps</b>, every other neighbour is a whole step. In every key, in every world.</p>
+        <p>A world only changes <b>which number is home</b>. Start the same ruler from a different number and the pattern of steps <i>from home</i> changes, and with it the mood. Look where the gold H's fall in each row: always 3–4 and 7–1, but at different distances from home.</p>
+        <ul class="worldrows"><li><div class="wname"><b>1</b> Major <span>· bright, settled</span></div><div class="mapdemo sm"><b class="hm">1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b class="hm">1′</b></div></li><li><div class="wname"><b>6</b> Minor <span>· darker, the same notes as major</span></div><div class="mapdemo sm"><b class="hm">6</b><i>W</i><b>7</b><i class="h">H</i><b>1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b class="hm">6′</b></div></li><li><div class="wname"><b>2</b> Dorian <span>· minor with a hopeful raised 6th (the 7)</span></div><div class="mapdemo sm"><b class="hm">2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b>1</b><i>W</i><b class="hm">2′</b></div></li><li><div class="wname"><b>5</b> Mixolydian <span>· major with a bluesy flat 7th (the 4)</span></div><div class="mapdemo sm"><b class="hm">5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b>1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b class="hm">5′</b></div></li><li><div class="wname"><b>4</b> Lydian <span>· major with a floating raised 4th (the 7)</span></div><div class="mapdemo sm"><b class="hm">4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b>1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b class="hm">4′</b></div></li><li><div class="wname"><b>3</b> Phrygian <span>· dark, a half step just above home</span></div><div class="mapdemo sm"><b class="hm">3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b>1</b><i>W</i><b>2</b><i>W</i><b class="hm">3′</b></div></li><li><div class="wname"><b>7</b> Locrian <span>· unstable; rarely home for long</span></div><div class="mapdemo sm"><b class="hm">7</b><i class="h">H</i><b>1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b class="hm">7′</b></div></li></ul>
+        <p>So in minor you keep calling the notes 6, 7, 1, 2…, not 1, 2, ♭3. One map, one set of distances; you just hear a different home.</p></div>
+      <div class="panelcard"><h3>Where the map comes from</h3>
+        <p>About a thousand years ago, the monk Guido of Arezzo gave the notes singable names (ut re mi fa sol la) so choirs could learn chants by ear. Later "do re mi" became <b>movable</b>: <i>do</i> is simply home, in any key. Numbers 1–7 are the same idea.</p>
+        <p>The seven worlds are the old church <b>modes</b> (Ionian, Dorian, Phrygian, Lydian, Mixolydian, Aeolian, Locrian): the same seven notes, each with a different resting note.</p>
+        <p>Session players in Nashville in the 1950s wrote whole songs as numbers so they could switch keys on the spot. Jazz and pop musicians think the same way: "it's a 2–5–1", "go to the 6 minor".</p>
+        <p>The point of all of it: learn the relationships once, and every key is the same.</p></div>
       <div class="panelcard"><h3>How to use it</h3>
         <p><b>1. Start with Today.</b> It runs a short session (5–45 minutes, your choice) and switches games for you.</p>
         <p><b>2. In every game, sing before you answer.</b> The singing is the training; the tap just checks it.</p>
