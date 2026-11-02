@@ -484,6 +484,25 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.tbtns{display:inline-flex;gap:6px}
+#tune-drone[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--on-brass)}
+.beatp{align-items:stretch;gap:16px}
+.bpmrow{display:flex;align-items:center;justify-content:center;gap:22px}
+.bpmbig{text-align:center}
+.bpmbig b{display:block;font:800 76px/1 var(--font-display);letter-spacing:.02em}
+.bpmbig span{font-size:12px;letter-spacing:.2em;color:var(--muted)}
+#bpm-slider{width:100%}
+.beatdots{display:flex;justify-content:center;gap:12px}
+.beatdots i{width:18px;height:18px;border-radius:50%;background:var(--line);transition:background .06s,transform .06s}
+.beatdots i.one{box-shadow:0 0 0 2px var(--brass-soft)}
+.beatdots i.on{background:var(--brass);transform:scale(1.25)}
+.beatdots i.one.on{background:var(--home)}
+.beatplay{display:flex;justify-content:center;align-items:center;gap:12px}
+.beatplay .btn:not(.ic){min-height:44px;border-radius:999px;padding:8px 18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .chip[aria-pressed="true"]{background:var(--brass-soft);border-color:var(--brass)}
+.beatopts{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+
 .duelslots{display:flex;flex-wrap:wrap;gap:6px}
 .duelslots i{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font:800 15px var(--font-display);font-style:normal;color:var(--fg)}
 .duelslots i.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
@@ -749,7 +768,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
   </header>
   <div class="menu" id="game-menu" hidden><nav id="tabs" role="menu" aria-label="Choose a game"><h4>Practice</h4><button role="menuitem" data-t="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Today</span></button><button role="menuitem" data-t="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span>Name the number</span></button><button role="menuitem" data-t="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span>Note over chord</span></button><button role="menuitem" data-t="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span>Phrases</span></button><button role="menuitem" data-t="duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l8-8M20 20l-8-8"/><path d="M14 4h6v6M10 4H4v6"/><path d="M20 4l-6 6M4 4l6 6"/></svg><span>Duel</span></button><button role="menuitem" data-t="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span>Progressions</span></button>
-<h4>Tools</h4><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button>
+<h4>Tools</h4><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span>Rhythm</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button>
 <h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button><button role="menuitem" data-t="anc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 11h8"/></svg><span>Song anchors</span></button></nav></div>
 
   <section class="screen" id="scr-home">
@@ -769,6 +788,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span><span class="t">Chord decoder</span><span class="s">Tab, notes, numbers or a name: what chord is it?</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="tune" id="tune-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span><span class="t">Tuner</span><span class="s">Guitar and ukulele, by ear or by mic</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span><span class="t">Chord chart</span><span class="s">Every chord in the key and its numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+<button class="card" data-open="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span><span class="t">Rhythm</span><span class="s">Metronome and backing beats</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span><span class="t">Jam</span><span class="s">Loop a progression and play over it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span><span class="t">Write a melody</span><span class="s">Compose in numbers over chords</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
   <section class="screen" id="scr-songs" hidden><p class="sechead">Your songs</p><div class="cards"><button class="card" data-open="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span><span class="t">Song log</span><span class="s">Songs you know, written in numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -1069,7 +1089,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage tuner" id="panel-tune" hidden>
     <div class="tunetop"><label class="pill"><span class="sr">Tuning</span><select id="tune-set" aria-label="Tuning"></select></label>
-      <button class="tauto" id="tune-auto" aria-pressed="true">Auto</button></div>
+      <span class="tbtns"><button class="tauto" id="tune-drone" aria-pressed="false" title="Hold the string's note so you can tune by ear">Drone</button><button class="tauto" id="tune-auto" aria-pressed="true">Auto</button></span></div>
     <div class="tmeter">
       <div class="tscale"><span>♭</span><span>♯</span></div>
       <svg class="ttrace" id="tune-trace" aria-hidden="true"><line class="tmid" id="tune-mid"/><g id="tune-dots"></g></svg>
@@ -1078,6 +1098,23 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
     <div class="hs" id="hs"></div>
     <div class="tacts"><button class="btn primary" id="tune-mic">Start listening</button><p class="hint" id="tune-msg">Tap a string to hear its note. Turn on listening to tune by microphone.</p></div>
+  </section>
+
+  <section class="stage beatp" id="panel-beat" hidden>
+    <div class="bpmrow"><button class="btn ic" id="bpm-down" aria-label="Slower"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+      <div class="bpmbig"><b id="bpm-num">90</b><span>BPM</span></div>
+      <button class="btn ic" id="bpm-up" aria-label="Faster"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+    <input type="range" id="bpm-slider" min="40" max="220" step="1" aria-label="Tempo">
+    <div class="beatdots" id="beat-dots"></div>
+    <div class="beatplay"><button class="btn primary" id="beat-play">Play</button><button class="btn" id="beat-tap">Tap tempo</button></div>
+    <div class="field"><span>Beat</span><div class="chips" id="beat-style"></div></div>
+    <div class="beatopts">
+      <label class="field" id="beat-meter-f"><span>Beats per bar</span><select id="beat-meter"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></label>
+      <label class="field" id="beat-sub-f"><span>Clicks</span><select id="beat-sub"><option value="1">Quarter notes</option><option value="2">Eighths</option><option value="3">Triplets</option><option value="4">Sixteenths</option></select></label>
+      <label class="field"><span>Volume</span><input type="range" id="beat-vol" min="0" max="1" step="0.05"></label>
+      <label class="check"><input type="checkbox" id="beat-accent"> Accent beat 1</label>
+      <label class="check"><input type="checkbox" id="beat-climb"> Speed trainer: +2 BPM every 4 bars</label>
+    </div>
   </section>
 
   <section class="stage" id="panel-anc" hidden>
@@ -1191,13 +1228,13 @@ const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
 var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Song log',anc:'Song anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel'};
+const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Song log',anc:'Song anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -2279,7 +2316,7 @@ function resetQuestions(){stopAll();Q=null;CQ=null;P=null;$('deg-next').textCont
 function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeout(decRender,0);sinceCad=Infinity;sinceCadC=Infinity;
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
-  $('dock').hidden=t==='anc'||t==='tune';
+  $('dock').hidden=t==='anc'||t==='tune'||t==='beat';
   const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=neckGame||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
   document.querySelector('#dock-show button[data-v="circle"]').disabled=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
@@ -2290,7 +2327,7 @@ $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');i
 function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','tune','duel'].forEach(k=>$('panel-'+k).hidden=k!==t);if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','tune','duel','beat'].forEach(k=>$('panel-'+k).hidden=k!==t);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
   applyDock();
@@ -2514,7 +2551,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -2724,10 +2761,10 @@ $('kb').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)k
 
 /* ---------- tuner ---------- */
 const TUNINGS={
-  'g-std':['Guitar · Standard (E A D G B E)',[40,45,50,55,59,64]],'g-dropd':['Guitar · Drop D',[38,45,50,55,59,64]],'g-half':['Guitar · Half step down',[39,44,49,54,58,63]],
-  'g-dadgad':['Guitar · DADGAD',[38,45,50,55,57,62]],'g-openg':['Guitar · Open G',[38,43,50,55,59,62]],
-  'u-std':['Ukulele · Standard (G C E A)',[67,60,64,69]],'u-lowg':['Ukulele · Low G',[55,60,64,69]],'u-bari':['Ukulele · Baritone (D G B E)',[50,55,59,64]],
-  'chrom':['Chromatic (any note)',[]]};
+  'g-std':['Standard (EADGBE)',[40,45,50,55,59,64]],'g-dropd':['Drop D',[38,45,50,55,59,64]],'g-half':['Half step down',[39,44,49,54,58,63]],
+  'g-dadgad':['DADGAD',[38,45,50,55,57,62]],'g-openg':['Open G',[38,43,50,55,59,62]],
+  'u-std':['Standard (GCEA)',[67,60,64,69]],'u-lowg':['Low G',[55,60,64,69]],'u-bari':['Baritone (DGBE)',[50,55,59,64]],
+  'chrom':['Chromatic',[]]};
 const TUNE={sel:0,auto:true,trace:[],ema:null,inSince:0,done:new Set(),ownMic:false,last:0};
 const tuneKey=()=>{S.tunes=S.tunes||{guitar:'g-std',uke:'u-std',piano:'chrom'};return S.tunes[S.inst]||'chrom'};
 const tuning=()=>TUNINGS[tuneKey()]||TUNINGS['g-std'];
@@ -2760,10 +2797,13 @@ function tuneSetup(){if(!$('tune-set'))return;
 function tuneMark(){document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=Number(b.dataset.i);b.classList.toggle('act',i===TUNE.sel);b.classList.toggle('ok',TUNE.done.has(i))});
   document.querySelectorAll('#hs .str').forEach(l=>{const k=Number(l.dataset.k);l.classList.toggle('act',k===TUNE.sel)})}
 $('hs').addEventListener('click',e=>{const b=e.target.closest('.sbtn');if(!b)return;TUNE.sel=Number(b.dataset.i);TUNE.auto=false;$('tune-auto').setAttribute('aria-pressed','false');tuneMark();
-  const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);stopAll();ensure();pluck(m,ctx.currentTime+0.03,2.4,0.55)});
+  const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);
+  if(TUNE.droneOn){tuneDrone(m);return}
+  stopAll();ensure();pluckAs(tuneKey()[0]==='u'?'nylon':'steel',m,ctx.currentTime+0.03,2.6,0.6)});
 $('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto)});
 $('tune-set').addEventListener('change',e=>{tuneKey();S.tunes[S.inst]=e.target.value;persist();tuneSetup()});
 function tunerFeed(f){
+  if(TUNE.droneOn){return}
   const now=performance.now(),ms=tuning()[1];
   if(f>0){const mf=69+12*Math.log2(f/440);let target;
     if(!ms.length)target=Math.round(mf);
@@ -2900,6 +2940,74 @@ function decVoice(){if(!SR)return;if(rec){rec.stop();return}
   rec.onend=()=>{rec=null;$('dec-voice').classList.remove('on')};rec.start()}
 if(SR){const b=document.createElement('button');b.className='btn ic';b.id='dec-voice';b.setAttribute('aria-label','Say the chord');b.title='Say the chord';b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
   $('dec-go').parentNode.insertBefore(b,$('dec-go'));b.addEventListener('click',decVoice)}
+
+
+/* the reference always sounds like a real string, whatever the app's sound is set to */
+function pluckAs(v,m,t,dur,vel){const keep=S.voice;S.voice=v;try{pluck(m,t,dur,vel)}finally{S.voice=keep}}
+/* drone: hold the string's note (a bowed-string tone) so you can tune by ear until the beating stops */
+let tdNodes=null;
+function tuneDrone(m){ensure();tuneDroneOff();if(m==null)return;
+  const g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(4000,hz(m)*6);fl.Q.value=0.7;fl.connect(g);g.connect(voiceIn);
+  const os=[['sawtooth',1,0.32],['triangle',1,0.6],['sine',2,0.18]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
+  g.gain.value=0.0001;g.gain.setTargetAtTime(0.11,ctx.currentTime,0.15);tdNodes={g,os};
+  $('tune-hint').textContent='Tune by ear';$('tune-msg').textContent='Play the string with the drone. Turn the peg until the wobble between them slows down and stops.';document.querySelector('.tmeter').classList.remove('in')}
+function tuneDroneOff(){if(!tdNodes)return;const n=tdNodes;tdNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.12);setTimeout(()=>n.os.forEach(o=>{try{o.stop()}catch(e){}}),600)}
+$('tune-drone').addEventListener('click',e=>{TUNE.droneOn=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.droneOn);
+  if(TUNE.droneOn){const ms=tuning()[1];tuneDrone(ms.length?ms[TUNE.sel]:57)}else{tuneDroneOff();$('tune-hint').textContent='Pluck a string'}});
+
+/* ---------- Rhythm: metronome and backing beats, synthesized drums on a look-ahead clock ---------- */
+// patterns on a step grid; k kick, s snare, h hi-hat, r rim/ride, steps per beat in 'div'
+const BEATS={
+  click:{name:'Click'},
+  rock:{name:'Rock',div:4,beats:4,k:'x.......x.x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+  pop:{name:'Pop',div:4,beats:4,k:'x.....x.x.......',s:'....x.......x...',h:'x.x.x.x.x.x.x.x.'},
+  funk:{name:'Funk',div:4,beats:4,k:'x..x..x...x..x..',s:'....x..o.o..x..o',h:'xxxxxxxxxxxxxxxx'},
+  shuffle:{name:'Shuffle',div:3,beats:4,k:'x.....x.....',s:'...x.....x..',h:'x.xx.xx.xx.x'},
+  swing:{name:'Jazz swing',div:3,beats:4,k:'o..o..o..o..',s:'...x.....x..',r:'x..x.xx..x.x',hp:true},
+  bossa:{name:'Bossa nova',div:4,beats:4,k:'x..xx..xx..xx..x',r:'x..x..x...x..x..',h:'x.x.x.x.x.x.x.x.'},
+  reggae:{name:'Reggae',div:4,beats:4,k:'........x.......',r:'........x.......',h:'..x...x...x...x.'},
+  waltz:{name:'Waltz',div:4,beats:3,k:'x...........',s:'....x...x...',h:'x.x.x.x.x.x.'}};
+const BT={on:false,timer:null,next:0,step:0,bar:0,taps:[]};
+let beatOut=null;
+function beatBus(){ensure();if(!beatOut){beatOut=ctx.createGain();beatOut.connect(master)}beatOut.gain.value=S.beatVol;return beatOut}
+function noiseBuf(){if(BT.nb)return BT.nb;const n=ctx.sampleRate*0.5,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;return BT.nb=b}
+function hit(kind,t,vel=1){const out=beatBus();
+  if(kind==='k'){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+0.12);g.gain.setValueAtTime(0.9*vel,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.35);o.connect(g);g.connect(out);o.start(t);o.stop(t+0.4);return}
+  if(kind==='s'){const n=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();n.buffer=noiseBuf();f.type='bandpass';f.frequency.value=1800;f.Q.value=0.7;g.gain.setValueAtTime(0.55*vel,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.18);n.connect(f);f.connect(g);g.connect(out);n.start(t);n.stop(t+0.2);
+    const o=ctx.createOscillator(),g2=ctx.createGain();o.frequency.value=190;g2.gain.setValueAtTime(0.25*vel,t);g2.gain.exponentialRampToValueAtTime(0.001,t+0.1);o.connect(g2);g2.connect(out);o.start(t);o.stop(t+0.12);return}
+  if(kind==='h'||kind==='hp'){const n=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();n.buffer=noiseBuf();f.type='highpass';f.frequency.value=kind==='hp'?6000:7500;const len=kind==='hp'?0.06:0.045;g.gain.setValueAtTime(0.22*vel,t);g.gain.exponentialRampToValueAtTime(0.001,t+len);n.connect(f);f.connect(g);g.connect(out);n.start(t);n.stop(t+len+0.02);return}
+  if(kind==='r'){const o=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='square';o.frequency.value=S.beatStyle==='swing'?3200:1700;f.type='bandpass';f.frequency.value=S.beatStyle==='swing'?5200:2500;g.gain.setValueAtTime(0.12*vel,t);g.gain.exponentialRampToValueAtTime(0.001,t+(S.beatStyle==='swing'?0.25:0.06));o.connect(f);f.connect(g);g.connect(out);o.start(t);o.stop(t+0.3);return}
+  if(kind==='c'||kind==='C'){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=kind==='C'?1650:1100;g.gain.setValueAtTime((kind==='C'?0.5:0.32)*vel,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.05);o.connect(g);g.connect(out);o.start(t);o.stop(t+0.06)}}
+function beatGrid(){const B=BEATS[S.beatStyle];if(S.beatStyle==='click')return {div:Number(S.beatSub),beats:Number(S.beatMeter)};return {div:B.div,beats:B.beats}}
+function beatTick(){const G=beatGrid(),B=BEATS[S.beatStyle],spb=60/S.beatBpm,dt=spb/G.div,n=G.div*G.beats;
+  while(BT.next<ctx.currentTime+0.12){const st=BT.step%n,beat=Math.floor(st/G.div),onBeat=st%G.div===0,t=BT.next;
+    if(S.beatStyle==='click'){if(onBeat)hit(beat===0&&S.beatAccent?'C':'c',t);else hit('c',t,0.45)}
+    else{const ch=(lane,kind)=>{const c=(B[lane]||'')[st];if(c==='x')hit(kind,t,1);else if(c==='o')hit(kind,t,0.35)};ch('k','k');ch('s','s');ch('h','h');ch('r','r');
+      if(B.hp&&st%G.div===0&&(beat===1||beat===3))hit('hp',t,0.8);if(S.beatAccent&&st===0)hit('c',t,0.25)}
+    if(onBeat){const b=beat;setTimeout(()=>beatLight(b),Math.max(0,(t-ctx.currentTime)*1000))}
+    BT.step++;BT.next+=dt;
+    if(BT.step%n===0){BT.bar++;if(S.beatClimb&&BT.bar%4===0&&S.beatBpm<220){S.beatBpm+=2;persist();beatShowBpm()}}}}
+function beatLight(b){document.querySelectorAll('#beat-dots i').forEach((d,i)=>d.classList.toggle('on',i===b))}
+function beatStart(){ensure();BT.on=true;BT.step=0;BT.bar=0;BT.next=ctx.currentTime+0.08;clearInterval(BT.timer);BT.timer=setInterval(beatTick,25);beatTick();$('beat-play').textContent='Stop'}
+function beatStop(){if(!BT.on)return;BT.on=false;clearInterval(BT.timer);$('beat-play').textContent='Play';beatLight(-1)}
+function beatShowBpm(){$('bpm-num').textContent=S.beatBpm;$('bpm-slider').value=S.beatBpm}
+function beatDots(){const G=beatGrid();$('beat-dots').innerHTML=Array.from({length:G.beats},(_,i)=>`<i class="${i===0?'one':''}"></i>`).join('')}
+function beatSync(){beatShowBpm();$('beat-style').innerHTML=Object.entries(BEATS).map(([k,v])=>`<button class="chip" data-v="${k}" aria-pressed="${k===S.beatStyle}">${v.name}</button>`).join('');
+  $('beat-meter').value=String(S.beatMeter);$('beat-sub').value=String(S.beatSub);$('beat-vol').value=S.beatVol;$('beat-accent').checked=S.beatAccent;$('beat-climb').checked=S.beatClimb;
+  $('beat-meter-f').hidden=$('beat-sub-f').hidden=S.beatStyle!=='click';beatDots()}
+const setBpm=v=>{S.beatBpm=Math.max(40,Math.min(220,Math.round(v)));persist();beatShowBpm()};
+$('bpm-down').addEventListener('click',()=>setBpm(S.beatBpm-1));$('bpm-up').addEventListener('click',()=>setBpm(S.beatBpm+1));
+$('bpm-slider').addEventListener('input',e=>setBpm(Number(e.target.value)));
+$('beat-play').addEventListener('click',()=>BT.on?beatStop():beatStart());
+$('beat-tap').addEventListener('click',()=>{const now=performance.now();BT.taps=BT.taps.filter(x=>now-x<2500);BT.taps.push(now);
+  if(BT.taps.length>=2){const d=(BT.taps[BT.taps.length-1]-BT.taps[0])/(BT.taps.length-1);setBpm(60000/d)}});
+$('beat-style').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;S.beatStyle=b.dataset.v;persist();beatSync();if(BT.on){BT.step=0}});
+$('beat-meter').addEventListener('change',e=>{S.beatMeter=Number(e.target.value);persist();beatDots();BT.step=0});
+$('beat-sub').addEventListener('change',e=>{S.beatSub=Number(e.target.value);persist();BT.step=0});
+$('beat-vol').addEventListener('input',e=>{S.beatVol=Number(e.target.value);persist();if(beatOut)beatOut.gain.value=S.beatVol});
+$('beat-accent').addEventListener('change',e=>{S.beatAccent=e.target.checked;persist()});
+$('beat-climb').addEventListener('change',e=>{S.beatClimb=e.target.checked;persist()});
+document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
