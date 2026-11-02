@@ -483,6 +483,8 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+.prompt b.gold,.bignum{color:var(--brass)}
+.homedot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brass);color:var(--on-brass);font:700 12px var(--font-mono);vertical-align:middle}
 .badge .bi{overflow:hidden;line-height:1}
 .badge .bi.sm{font-size:13px;letter-spacing:-.02em}
 .badge .bi svg.rings{width:14px;height:22px;margin-left:4px}
@@ -1884,7 +1886,7 @@ let OPEN=[64,59,55,50,45,40],FRETS=15;        // high string on top, as in tab
 const INST={guitar:{open:[64,59,55,50,45,40],frets:15,str:['e','B','G','D','A','E']},uke:{open:[69,64,60,67],frets:12,str:['A','E','C','G']}};
 const WINDOWS=[{lo:0,hi:15,name:'Whole neck'},{lo:0,hi:4,name:'Frets 0–4'},{lo:2,hi:5,name:'Frets 2–5'},{lo:4,hi:8,name:'Frets 4–8'},{lo:7,hi:10,name:'Frets 7–10'},{lo:9,hi:13,name:'Frets 9–13'},{lo:12,hi:15,name:'Frets 12–15'}];
 let cellMarks={},cellNow=null,FRETLIST=[];
-const curWin=()=>WINDOWS[(S.tab==='find'&&FQ)?FQ.w:S.win];
+const curWin=()=>{if(S.tab==='find'&&S.findMode==='home'&&typeof IQ!=='undefined'&&IQ){const lo=Math.max(0,IQ.hf-2),hi=Math.min(FRETS,Math.max(lo+6,IQ.hf+5));return {lo,hi,name:'around home'}}return WINDOWS[(S.tab==='find'&&FQ)?FQ.w:S.win]};
 const inWin=(f,W)=>f>=W.lo&&f<=W.hi;
 function renderFB(){
   if(S.inst==='piano')return renderKB();
@@ -1946,7 +1948,8 @@ function nextFind(){
   const all=findAll(o,w),[ss,ff]=pick(all).split('-').map(Number);
   FQ={o,w,k,done:false,ref:OPEN[ss]+ff,all,found:new Set(),miss:0};renderPad();
   const W=WINDOWS[w];
-  if(S.findAsk==='number'){$('find-num').textContent=lab(o);$('find-prompt').textContent=`Find every ${lab(o)} in ${W.name.toLowerCase()}.`}
+  if(S.findAsk==='number'){$('find-num').textContent=lab(o);$('find-prompt').innerHTML=`Find every <b class="gold">${lab(o)}</b> in ${W.name.toLowerCase()}. You'll hear home (${lab(S.home)}), then the ${lab(o)}.`;
+    const t=ctx.currentTime+0.05;pluck(H(),t,1.1,0.5);pluck(FQ.ref,t+0.9,1.4,0.55)}
   else{$('find-num').textContent='?';$('find-prompt').textContent=`Find every place the note you hear lives, in ${W.name.toLowerCase()}.`;
     const t=ctx.currentTime+0.05;const d=cadence(t);pluck(FQ.ref,t+d,1.6,0.55)}
   $('find-fb').textContent=S.findSeq==='seq'&&L.length>1?`Position ${k+1} of ${L.length} for this number. Say the number out loud with each one you find.`:'Say the number out loud with each one you find.';
@@ -3219,7 +3222,7 @@ document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.obser
 
 
 /* drone at hand: the same drone as in Settings, from the game's button row */
-[...['deg','chord','phr','duel','prog'].map(t=>document.querySelector(`#panel-${t} .primary-row`)),$('vox-prev')&&$('vox-prev').parentNode,$('sh-play')&&$('sh-play').parentNode,$('vq-next')&&$('vq-next').parentNode].forEach(row=>{if(!row||row.querySelector('.dronebtn'))return;const t='';;if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
+[...['deg','chord','phr','duel','prog','find'].map(t=>document.querySelector(`#panel-${t} .primary-row`)),$('vox-prev')&&$('vox-prev').parentNode,$('sh-play')&&$('sh-play').parentNode,$('vq-next')&&$('vq-next').parentNode].forEach(row=>{if(!row||row.querySelector('.dronebtn'))return;const t='';;if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
   row.appendChild(b);iconize(b)});
 function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?`Drone on (home, ${lab(S.home)}): tap to stop`:`Drone: hold home (${lab(S.home)}) underneath`})}
 document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
@@ -3427,7 +3430,7 @@ var IQH=[];
 function showIQ(q){stopAll();ensure();marks={};trail=new Set();cellMarks={};const n=OPEN.length,{st,hf,o,lap}=q;
   IQ=Object.assign(q,{done:false,tries:0});cellMarks[st+'-'+hf]='vox';cellNow=null;$('iq-back').hidden=!IQH.length;
   $('find-num').textContent=lab(o);
-  $('find-prompt').innerHTML=`From the gold <b>${lab(S.home)}</b>, find the <b>${lab(o)}</b> above it, within ${REACH} frets.`;
+  $('find-prompt').innerHTML=`Find the <b class="gold">${lab(o)}</b> above home. Home is the gold <span class="homedot">${lab(S.home)}</span> on the ${STR[st]} string (fret ${hf}). Stay within ${REACH} frets.`;
   $('find-fb').textContent=`String ${lap+1} of ${n}: same jump, starting from home on the ${STR[st]} string.`;
   $('find-reveal').hidden=false;$('find-next').textContent='Skip';renderFB();hearIQ(true)}
 function backIQ(){if(!IQH.length)return;const p=IQH.pop(),hf=iqHomeOn(p.st),hm=OPEN[p.st]+hf,tm=hm+(((p.o-S.home)%12+12)%12||12);showIQ({st:p.st,hf,hm,o:p.o,tm,lap:p.lap})}
