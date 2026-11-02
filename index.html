@@ -113,6 +113,7 @@ input[type=range]{accent-color:var(--brass);width:90px}
 .micopts{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;padding-top:10px;border-top:1px dashed var(--line)}
 .micopts-h{flex-basis:100%;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 #mic-toggle[aria-pressed="true"]{background:var(--bad);color:var(--bg)}
+#mic-toggle.muted{opacity:.45}
 body:not([data-screen="game"]) #mic-toggle{display:none}
 .micpill{align-self:center;display:inline-flex;align-items:center;gap:6px;font:600 12px var(--font-mono);padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);white-space:nowrap}
 .micpill i{width:8px;height:8px;border-radius:50%;background:var(--bad)}
@@ -483,6 +484,22 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.duelslots{display:flex;flex-wrap:wrap;gap:6px}
+.duelslots i{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font:800 15px var(--font-display);font-style:normal;color:var(--fg)}
+.duelslots i.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.duelslots i.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.duelslots i.cur{border-color:var(--brass);box-shadow:0 0 0 3px var(--brass-soft)}
+.duelslots i.lit{background:var(--brass);border-color:var(--brass);color:var(--on-brass)}
+.duelslots i.wide{width:auto;min-width:30px;padding:0 8px;border-radius:15px}
+.decin .ic{flex:none}
+#dec-voice.on{background:var(--bad);border-color:var(--bad);color:var(--bg)}
+
+.instpill{position:absolute;left:4px;top:-13px;z-index:3}
+.instpill select{min-height:26px;font-size:12px;padding:2px 22px 2px 10px}
+.fbwrap{padding-top:16px}
+.pausebtn[aria-label="Resume"]{border-color:var(--brass);color:var(--brass)}
+body.paused .circgo{opacity:.5}
+
 /* ===== Instruments, quieter neck, piano, tuner, rings ===== */
 .fb,.fnums{grid-template-columns:30px repeat(var(--n,15),minmax(34px,1fr))}
 .fb.zoom,.fnums.zoom{min-width:0;grid-template-columns:30px repeat(var(--n,5),minmax(0,1fr))}
@@ -516,9 +533,10 @@ body[data-screen="game"] .bottomnav{display:none}
 .tscale{position:absolute;inset:10px 14px auto;display:flex;justify-content:space-between;font:600 22px var(--font-body);color:var(--muted);z-index:2}
 .ttrace{position:absolute;inset:0;width:100%;height:100%}
 .ttrace .tmid{stroke:var(--muted);stroke-width:.6;stroke-dasharray:2 2}
-.ttrace polyline{fill:none;stroke:var(--brass);stroke-width:1.6;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.tmeter.in .ttrace polyline{stroke:var(--home)}
-.tread{position:absolute;left:50%;top:42px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;z-index:3}
+.ttrace circle{transition:none}
+.tread{position:absolute;left:50%;top:38px;display:flex;align-items:center;gap:8px;z-index:3;transform:translateX(-26px);transition:transform .12s linear}
+.tread .thint{transition:opacity .2s}
+.tmeter.right .tread{flex-direction:row-reverse}
 .tcents{min-width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font:700 18px var(--font-body);background:var(--surface);border:3px solid var(--brass)}
 .tmeter.in .tcents{border-color:var(--home);background:var(--home-soft);color:var(--home)}
 .thint{padding:5px 12px;border-radius:999px;background:var(--surface);font-size:14px;white-space:nowrap}
@@ -729,7 +747,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <button class="iconbtn" id="set-toggle" aria-label="Settings" aria-expanded="false" aria-controls="sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
   </header>
-  <div class="menu" id="game-menu" hidden><nav id="tabs" role="menu" aria-label="Choose a game"><h4>Practice</h4><button role="menuitem" data-t="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Today</span></button><button role="menuitem" data-t="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span>Name the number</span></button><button role="menuitem" data-t="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span>Note over chord</span></button><button role="menuitem" data-t="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span>Phrases</span></button><button role="menuitem" data-t="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span>Progressions</span></button>
+  <div class="menu" id="game-menu" hidden><nav id="tabs" role="menu" aria-label="Choose a game"><h4>Practice</h4><button role="menuitem" data-t="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Today</span></button><button role="menuitem" data-t="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span>Name the number</span></button><button role="menuitem" data-t="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span>Note over chord</span></button><button role="menuitem" data-t="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span>Phrases</span></button><button role="menuitem" data-t="duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l8-8M20 20l-8-8"/><path d="M14 4h6v6M10 4H4v6"/><path d="M20 4l-6 6M4 4l6 6"/></svg><span>Duel</span></button><button role="menuitem" data-t="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span>Progressions</span></button>
 <h4>Tools</h4><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button>
 <h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button><button role="menuitem" data-t="anc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 11h8"/></svg><span>Song anchors</span></button></nav></div>
 
@@ -742,6 +760,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span><span class="t">Name the number</span><span class="s">Cadence, then one note</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span><span class="t">Note over chord</span><span class="s">The same note over different chords</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span><span class="t">Phrases</span><span class="s">Hear a short line, sing it, name it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+<button class="card" data-open="duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l8-8M20 20l-8-8"/><path d="M14 4h6v6M10 4H4v6"/><path d="M20 4l-6 6M4 4l6 6"/></svg><span><span class="t">Duel</span><span class="s">Call and response: play it back, one more each round</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span><span class="t">Progressions</span><span class="s">Name the chords as they move</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
   </section>
   <section class="screen" id="scr-tools" hidden><p class="sechead">On the neck and making music</p><div class="cards"><button class="card" data-open="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span><span class="t">Find it</span><span class="s">Every place a number lives on the neck</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -796,7 +815,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <div class="sessbar" id="sessbar" hidden>
     <span class="sb-block" id="sb-block"></span><span class="sb-time" id="sb-time"></span>
     <span class="sb-tip" id="sb-tip"></span>
-    <span class="sb-btns"><button class="btn" id="sb-next">Next block</button><button class="btn" id="sb-stop">End session</button></span>
+    <span class="sb-btns"><button class="btn" id="sb-pause">Pause</button><button class="btn" id="sb-next">Next block</button><button class="btn" id="sb-stop">End session</button></span>
   </div>
   <div class="main">
   <div class="games">
@@ -933,6 +952,18 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
   </section>
 
+  <section class="stage" id="panel-duel" hidden>
+    <p class="eyebrow">Duel</p>
+    <div class="howto"><p>The app plays a short phrase. Play it back.</p><p>Get it right and it plays it again, with one more added.</p><p>Keep going as long as you can. One slip and the duel is over.</p><p>Answer by tapping, or play it on your instrument with the mic on.</p></div>
+    <div class="actions"><div class="field"><span>Duel with</span><div class="seg" id="duel-mode"><button data-v="notes">Notes</button><button data-v="chords">Chords</button></div></div>
+      <label class="check"><input type="checkbox" id="duel-show"> Light up the numbers while it plays</label></div>
+    <p class="prompt" id="duel-prompt">Press Start. Notes come from the gig you're on.</p>
+    <div class="phrase duelslots" id="duel-slots"></div>
+    <div class="chordbtns" id="duel-chords" hidden></div>
+    <p class="feedback" id="duel-fb"></p>
+    <div class="actions"><button class="btn primary" id="duel-start">Start</button><button class="btn" id="duel-replay">Replay</button><span class="score" id="duel-score"></span></div>
+  </section>
+
   <section class="stage" id="panel-prog" hidden>
     <p class="eyebrow">Chord to chord</p>
     <div class="howto"><p>The key is set, then a few chords play.</p><p>Tap them in order.</p><p>Start with 1 4 5 6m. Add more chords under the options below.</p></div>
@@ -1040,8 +1071,8 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <button class="tauto" id="tune-auto" aria-pressed="true">Auto</button></div>
     <div class="tmeter">
       <div class="tscale"><span>♭</span><span>♯</span></div>
-      <svg class="ttrace" id="tune-trace" viewBox="0 0 200 90" preserveAspectRatio="none" aria-hidden="true"><line x1="100" y1="0" x2="100" y2="90" class="tmid"/><polyline id="tune-line" points=""/></svg>
-      <div class="tread"><span class="tcents" id="tune-cents">–</span><span class="thint" id="tune-hint">Pluck a string</span></div>
+      <svg class="ttrace" id="tune-trace" aria-hidden="true"><line class="tmid" id="tune-mid"/><g id="tune-dots"></g></svg>
+      <div class="tread" id="tune-read"><span class="tcents" id="tune-cents">–</span><span class="thint" id="tune-hint">Pluck a string</span></div>
       <div class="tnote" id="tune-note">–</div>
     </div>
     <div class="hs" id="hs"></div>
@@ -1075,6 +1106,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </section>
     <section class="fbwrap" id="fbwrap">
       <span class="chordnow" id="chord-now" hidden></span>
+      <label class="pill instpill"><span class="sr">Show as</span><select id="inst-sel" aria-label="Show notes on"><option value="guitar">Guitar</option><option value="uke">Ukulele</option><option value="piano">Piano</option></select></label>
       <div class="fbscroll"><div class="fb" id="fb"></div><div class="fnums" id="fnums"></div></div>
       <div class="kb" id="kb" hidden></div>
     </section>
@@ -1126,6 +1158,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="field" id="fb-nums-f"><span>Neck shows</span><div class="seg" id="fb-nums"><button data-v="all">Notes in play</button><button data-v="home">Home only</button><button data-v="none">Only what lights up</button></div></div>
       <div class="micopts">
         <span class="micopts-h">Microphone</span>
+        <label class="check big"><input type="checkbox" id="mic-auto"> Listen with the microphone in the games and the tuner. You allow it once; it only listens while a game or the tuner is open.</label>
         <label class="field"><span>Sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"></label>
         <label class="check"><input type="checkbox" id="mic-oct"> Octave must match</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
@@ -1155,15 +1188,15 @@ const idOfDeg=p=>p===12?12:((p-S.home)%12+12)%12;
 const WORLD={0:['1','major','Ionian'],2:['2','Dorian','Dorian'],4:['3','Phrygian','Phrygian'],5:['4','Lydian','Lydian'],7:['5','Mixolydian','Mixolydian'],9:['6','minor','Aeolian'],11:['7','Locrian','Locrian']};
 const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
-var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
+var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Song log',anc:'Song anchors',dec:'Chord decoder',tune:'Tuner'};
+const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Song log',anc:'Song anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1370,6 +1403,7 @@ function unlightAt(ms){later(ms,()=>{nowKey=null;renderPad()})}
 function preview(o){if(!JAM.on)stopAll();ensure();const t=ctx.currentTime+0.02;pluck(H()+o,t,1.2,0.5);lightAt(0,o);unlightAt(600)}
 function padPress(o){
   if(S.tab==='mel')return melInput(o);
+  if(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')return duelInput(pc(o));
   if(S.tab==='deg'&&Q&&!Q.done)return answer(o);
   if(S.tab==='chord'&&CQ&&!CQ.done)return answerChord(o);
   if(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done)return enterPhrase(o);
@@ -1676,7 +1710,7 @@ function fbPress(s,f){
   if(S.tab==='dec')return decFret(s,f);
   if(S.tab==='find'&&FQ&&!FQ.done)return answerFind(s,f);
   // any game waiting for a number accepts a tap on the neck: the tapped pitch is turned into its map key
-  const k=keyFor(OPEN[s]+f),waiting=S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
+  const k=keyFor(OPEN[s]+f),waiting=(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')||S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
   if(waiting){cellNow=s+'-'+f;padPress(k);setTimeout(()=>{if(cellNow===s+'-'+f){cellNow=null;renderFB()}},700);return}
   stopAll();ensure();const m=OPEN[s]+f;pluck(m,ctx.currentTime+0.02,1.3,0.5);
   cellNow=s+'-'+f;renderFB();setTimeout(()=>{if(cellNow===s+'-'+f){cellNow=null;renderFB()}},600)}
@@ -2098,7 +2132,7 @@ function setupBlock(i){const w=S.week,P=planFor(w);
   else if(i===1){if(P.mapTab==='vox'){S.voxMode='explore';S.vxStr='0';persist()}showTab(P.mapTab||'find')}
   else if(i===2){if(P.ear==='vox'){S.voxMode='quiz';persist()}showTab(P.ear)}
   else{const useMel=w>=5&&(TD.done%2===1);S.jamProg=P.jam;if(useMel){S.melProg=P.jam;MEL.prog=P.jam}persist();showTab(useMel?'mel':'jam')}}
-function sessTick(){if(!SESS2.on)return;const left=Math.max(0,SESS2.end-Date.now());const m=Math.floor(left/60000),sec=Math.floor(left/1000)%60;$('sb-time').textContent=`${m}:${String(sec).padStart(2,'0')} left`;
+function sessTick(){if(!SESS2.on||PAUSE.on)return;const left=Math.max(0,SESS2.end-Date.now());const m=Math.floor(left/60000),sec=Math.floor(left/1000)%60;$('sb-time').textContent=`${m}:${String(sec).padStart(2,'0')} left`;
   if(left<=0){chime();sessGo(SESS2.i+1)}}
 function chime(){ensure();const t=ctx.currentTime+0.05;[0,7,12].forEach((o,i)=>pluck(T()+12+o,t+i*0.14,0.9,0.35))}
 function sessGo(i){if(i>=BLOCKS().length)return sessEnd(true);SESS2.i=i;SESS2.end=Date.now()+BLOCKS()[i][1]*60000;
@@ -2155,6 +2189,8 @@ function micNext(){const t=S.tab;
 function rootChord(m,set){const r=offOf(m);return set.find(c=>c[0]===r&&VCH.includes(c))||set.find(c=>c[0]===r)||null}
 function micNote(m,cents){
   micHeard(m,cents);lastAct=Date.now();const t=S.tab;
+  if(t==='duel'){if(!DUEL.listen)return;if(S.duelMode==='chords'){const c=rootChord(m,duelChordSet());if(c)return duelInput(c[1]);return}return duelInput(offOf(m))}
+  if(t==='dec')return decAddMidi(m);
   if(t==='deg'&&Q&&!Q.done)return padPress(micKey(m,Q.m));
   if(t==='chord'&&CQ&&!CQ.done)return padPress(micKey(m,CQ.m));
   if(t==='phr'&&P&&!P.done&&S.pmode==='hear')return padPress(micKey(m,P.seq[P.ans.length]));
@@ -2168,29 +2204,50 @@ function micNote(m,cents){
     return answerVQ(String(offOf(m)))}}
 function micFrame(){
   if(!MIC.on)return;MIC.an.getFloatTimeDomainData(MIC.buf);
-  const now=ctx.currentTime,busy=now<busyUntil+0.15||droneNodes;if(busy)MIC.gate=busyUntil+0.15;
+  const now=ctx.currentTime,busy=now<busyUntil+0.15||droneNodes;if(busy){MIC.gate=busyUntil+0.15;MIC.gRms=null}
   const r=detectPitch(MIC.buf,ctx.sampleRate),thr=micThr(),loud=r.rms>thr;
-  if(S.tab==='tune'){const bz=now<busyUntil+0.1;tunerFeed(!bz&&r.rms>thr*0.5&&r.clarity>0.8&&r.freq>60&&r.freq<1500?r.freq:0);return}
+  if(S.tab==='tune'){const bz=now<busyUntil+0.1;tunerFeed(!bz&&r.rms>thr*0.5&&r.clarity>0.7&&r.freq>60&&r.freq<1500?r.freq:0);return}
   $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);
   // re-pluck of the same note: a sharp jump in level counts as a new onset
   const jump=r.rms>Math.max(thr*2.5,MIC.prevRms*2.2);MIC.prevRms=r.rms*0.6+MIC.prevRms*0.4;
   if(S.micNext&&jump&&r.clarity<0.6&&!busy){MIC.hitAt=now}
   if(MIC.hitAt&&now-MIC.hitAt>0.12&&now-MIC.hitAt<0.2){ // still no pitch shortly after the hit: a muted strum
     if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<0.8);MIC.hits.push(now);MIC.hitAt=0;if(MIC.hits.length>=2){MIC.hits=[];micNext()}}else MIC.hitAt=0}
-  if(!loud||r.clarity<0.88||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
-  const mf=69+12*Math.log2(r.freq/440);
-  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false}
+  if(!loud||r.clarity<0.72||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
+  const mf=69+12*Math.log2(r.freq/440),strong=r.clarity>=0.88;
+  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
+  if(strong)MIC.strong=true;
   if(S.micSing)micHeard(MIC.cur,(mf-MIC.cur)*100);
-  if(!MIC.emitted&&now-MIC.since>0.08){MIC.emitted=true;if(!busy&&MIC.since>=MIC.gate)micNote(MIC.cur,(mf-MIC.cur)*100)}}
+  if(!MIC.emitted&&now-MIC.since>(MIC.strong?0.08:0.22)&&!busy){
+    if(MIC.since>=MIC.gate){MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100)}
+    else{ // the note began while the app was still playing (singing along): accept it once it holds steady on its own
+      if(MIC.gRms==null&&now>=MIC.gate)MIC.gRms=r.rms;
+      if(MIC.gRms!=null&&now-MIC.gate>0.45){MIC.emitted=true;if(r.rms>=0.75*MIC.gRms)micNote(MIC.cur,(mf-MIC.cur)*100)}}}}
+const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec'];
+function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone: tap to allow':MIC.muted?'Microphone muted: tap to listen':on?'Listening: tap to mute':'Microphone ready';
+  b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
+  $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn()}
 async function micStart(){ensure();
-  try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
-  catch(e){$('mic-pill').hidden=false;$('mic-pill').classList.remove('live');$('mic-heard').textContent='Mic blocked: allow it in the browser';setTimeout(()=>{if(!MIC.on)$('mic-pill').hidden=true},3500);return}
-  MIC.src=ctx.createMediaStreamSource(MIC.stream);MIC.an=ctx.createAnalyser();MIC.an.fftSize=2048;MIC.buf=new Float32Array(2048);MIC.src.connect(MIC.an);
+  const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
+  if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+    catch(e){S.micAuto=false;persist();$('mic-auto').checked=false;$('mic-pill').hidden=false;$('mic-pill').classList.remove('live');$('mic-heard').textContent='Mic blocked: allow it in your browser settings';setTimeout(()=>{if(!MIC.on)$('mic-pill').hidden=true},3500);micLabel();return}
+    MIC.src=ctx.createMediaStreamSource(MIC.stream);MIC.an=ctx.createAnalyser();MIC.an.fftSize=2048;MIC.buf=new Float32Array(2048);MIC.src.connect(MIC.an)}
+  clearTimeout(MIC.relT);if(MIC.on)return;if(!micWanted()){micRelSoon();return}
   MIC.on=true;MIC.cur=null;MIC.gate=ctx.currentTime+0.2;MIC.timer=setInterval(micFrame,30);
-  $('mic-toggle').setAttribute('aria-pressed','true');$('mic-toggle').setAttribute('aria-label','Microphone on');$('mic-toggle').title='Microphone on';$('mic-pill').hidden=false;$('mic-pill').classList.add('live');$('mic-heard').textContent='Listening';if(typeof tuneMicBtn==='function')tuneMicBtn()}
-function micStop(){MIC.on=false;clearInterval(MIC.timer);if(MIC.stream)MIC.stream.getTracks().forEach(t=>t.stop());MIC.stream=null;
-  $('mic-toggle').setAttribute('aria-pressed','false');$('mic-toggle').setAttribute('aria-label','Microphone off');$('mic-toggle').title='Microphone off';$('mic-pill').hidden=true;if(typeof tuneMicBtn==='function')tuneMicBtn()}
-$('mic-toggle').addEventListener('click',()=>MIC.on?micStop():micStart());
+  $('mic-pill').classList.add('live');$('mic-heard').textContent='Listening';micLabel()}
+function micPause(){if(MIC.on){MIC.on=false;clearInterval(MIC.timer)}micLabel();micRelSoon()}
+function micRelSoon(){clearTimeout(MIC.relT);MIC.relT=setTimeout(micRelease,20000)}   // let the phone's mic light go off when nothing needs it
+function micRelease(){if(MIC.on)return;if(MIC.stream)MIC.stream.getTracks().forEach(t=>t.stop());MIC.stream=null}
+function micStop(){micPause()}
+const micWanted=()=>S.micAuto&&!MIC.muted&&!document.hidden&&document.body.dataset.screen==='game'&&LISTEN_TABS.includes(S.tab)&&(typeof PAUSE==='undefined'||!PAUSE.on);
+function micSync(){if(micWanted()){if(!MIC.on)micStart()}else if(MIC.on)micPause();else micLabel()}
+function micEnable(){S.micAuto=true;MIC.muted=false;persist();$('mic-auto').checked=true;micSync()}
+$('mic-toggle').addEventListener('click',()=>{if(!S.micAuto)return micEnable();MIC.muted=!MIC.muted;micSync()});
+$('mic-auto').checked=S.micAuto;$('mic-auto').addEventListener('change',e=>{if(e.target.checked)micEnable();else{S.micAuto=false;persist();micPause();micRelease()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause();micRelease()}else micSync()});
+{const _st=showTab;showTab=function(t){_st(t);micSync()};const _gs=goScreen;goScreen=function(a,b){_gs(a,b);micSync()};
+ const _pa=pauseAll,_ra=resumeAll;pauseAll=function(){_pa();micSync()};resumeAll=function(){_ra();micSync()}}
+setTimeout(micLabel,0);
 $('mic-sens').value=S.micSens;$('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist()});
 [['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
 
@@ -2226,7 +2283,7 @@ $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');i
 function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','tune'].forEach(k=>$('panel-'+k).hidden=k!==t);tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','tune','duel'].forEach(k=>$('panel-'+k).hidden=k!==t);if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
   applyDock();
@@ -2450,7 +2507,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -2461,7 +2518,7 @@ markStages();
 
 
 /* ---------- lean game screens: only the prompt, the result and the buttons; everything else lives under Options ---------- */
-const FIT_TABS=['deg','chord','phr','find','vox','prog'];
+const FIT_TABS=['deg','chord','phr','find','vox','prog','duel'];
 function leanMark(){FIT_TABS.forEach(t=>{const st=$('panel-'+t);if(!st)return;st.classList.add('fit');
   st.querySelectorAll('.xtra').forEach(x=>x.classList.remove('xtra'));
   const isKeep=el=>el.matches('.prompt,.feedback,.phrase,.chordbtns,.bignum')||(el.matches('.actions')&&el.querySelector(':scope>.btn.primary'));
@@ -2501,7 +2558,7 @@ function iconFor(t){t=t.toLowerCase();
   if(/^next$/.test(t))return 'next';if(/^next shape$/.test(t))return 'fwd';if(/^previous shape$/.test(t))return 'prev';
   if(/both again/.test(t))return 'both';
   if(/^(replay|replay note|replay chord|hear it|hear again|play again)$/.test(t))return 'replay';
-  if(/^(stop|stop loop|end)$/.test(t))return 'stop';if(/^pause/.test(t))return 'pause';
+  if(/^(stop|stop loop|end)$/.test(t))return 'stop';if(/^pause/.test(t))return 'pause';if(/^resume$/.test(t))return 'play';
   if(/^cadence$/.test(t))return 'cadence';if(/^reveal$/.test(t))return 'reveal';if(/top note alone/.test(t))return 'note';if(/^clear/.test(t))return 'clear';
   return null}
 function iconize(b){const t=b.textContent.trim();if(!t)return;const k=iconFor(t);
@@ -2625,7 +2682,7 @@ function applyInst(){const g=S.inst==='uke'?INST.uke:INST.guitar;OPEN=g.open;FRE
   if(piano&&['find','vox'].includes(S.tab))S.tab='deg';
   const vs=$('vx-strings');if(vs){const n=OPEN.length;vs.innerHTML='<option value="all">All string groups</option>'+Array.from({length:n-2},(_,i)=>`<option value="${i}">${STR[i+2]} ${STR[i+1]} ${STR[i]}${i===0?' (top three)':i===n-3?' (bottom three)':''}</option>`).join('');
     if(Number(S.vxStr)>n-3)S.vxStr='all';vs.value=S.vxStr}
-  document.querySelectorAll('#inst button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.inst));
+  document.querySelectorAll('#inst button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.inst));$('inst-sel').value=S.inst;
   const ex=document.querySelector('.decex');if(ex){const X=S.inst==='uke'?['0003','2000','0232','2010','C E G','2 4 6 1','Am7']:S.inst==='piano'?['C E G','A C E G','2 4 6 1','F#m7b5','D/F#','B♭maj7']:['x32010','022000','xx0232','B♭ D F A','2 4 6 1','F#m7b5','D/F#'];
     ex.innerHTML='<span>Try</span>'+X.map(x=>`<button data-x="${x}">${x}</button>`).join('')}
   const dh=document.querySelector('#panel-dec .hint');if(dh)dh.textContent=S.inst==='piano'?'Type a chord any way you know it, or tap the keys below.':`Type a chord any way you know it (tab is ${S.inst==='uke'?'G C E A':'low E first'}), or tap one fret per string on the neck below. Tap it again to mute that string.`;
@@ -2652,7 +2709,7 @@ function renderKB(){const el=$('kb');if(!el||!instReady)return;const c0=H()-(((H
 function kbPress(m){
   if(S.tab==='dec'){DEC.kb=DEC.kb||new Set();DEC.kb.has(m)?DEC.kb.delete(m):DEC.kb.add(m);const ms=[...DEC.kb].sort((a,b)=>a-b);$('dec-in').value=ms.map(x=>NAMES[x%12]).join(' ');
     stopAll();ensure();pluck(m,ctx.currentTime+0.02,1.2,0.5);if(!ms.length){$('dec-out').innerHTML='';$('dec-acts').hidden=true;DEC.cur=null;renderPad();return}decode();return}
-  const waiting=S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
+  const waiting=(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')||S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
   kbNow=m;setTimeout(()=>{if(kbNow===m){kbNow=null;renderKB()}},600);
   if(waiting)return padPress(keyFor(m));
   stopAll();ensure();pluck(m,ctx.currentTime+0.02,1.3,0.5);renderKB()}
@@ -2710,23 +2767,132 @@ function tunerFeed(f){
     $('tune-hint').textContent=Math.abs(TUNE.ema)>350?'Wrong string?':inT?'In tune':TUNE.ema<0?'Tune up':'Tune down';
     document.querySelector('.tmeter').classList.toggle('in',inT);
     if(inT){if(!TUNE.inSince)TUNE.inSince=now;if(now-TUNE.inSince>700&&ms.length&&!TUNE.done.has(TUNE.sel)){TUNE.done.add(TUNE.sel);tuneMark()}}else TUNE.inSince=0;
-    TUNE.trace.push(Math.max(-50,Math.min(50,TUNE.ema)))}
-  else{TUNE.trace.push(null);if(now-TUNE.last>1500){$('tune-hint').textContent=ms.length?'Pluck a string':'Play a note';document.querySelector('.tmeter').classList.remove('in')}}
-  if(TUNE.trace.length>90)TUNE.trace.shift();
-  const pts=[];TUNE.trace.forEach((v,i)=>{if(v!=null)pts.push(`${(100+v*2).toFixed(1)},${(90-i).toFixed(1)}`)});$('tune-line').setAttribute('points',pts.join(' '))}
+    TUNE.trace.push(TUNE.ema)}
+  else{TUNE.trace.push(null);if(now-TUNE.last>1500){$('tune-hint').textContent=ms.length?'Pluck a string':'Play or sing a note';document.querySelector('.tmeter').classList.remove('in')}}
+  if(TUNE.trace.length>120)TUNE.trace.shift();
+  drawTrace()}
+// marker x follows the cents (±50 across the meter); the trail flows downward, oldest at the bottom
+function drawTrace(){
+  const box=document.querySelector('.tmeter'),svg=$('tune-trace');if(!box||!svg)return;
+  const W=box.clientWidth,Hh=box.clientHeight,cx=W/2,half=W/2-34,y0=64,step=Math.max(1,(Hh-y0-70)/80);
+  svg.setAttribute('viewBox',`0 0 ${W} ${Hh}`);const mid=$('tune-mid');mid.setAttribute('x1',cx);mid.setAttribute('x2',cx);mid.setAttribute('y1',0);mid.setAttribute('y2',Hh);
+  const xOf=c=>cx+Math.max(-1,Math.min(1,c/50))*half;let h='';
+  const N=TUNE.trace.length;
+  for(let i=N-1,k=0;i>=0&&k<80;i--,k++){const v=TUNE.trace[i];if(v==null)continue;const a=Math.abs(v);
+    const col=a<=5?'var(--home)':a<=15?'var(--good)':a<=30?'var(--brass)':'#E8794A';
+    h+=`<circle cx="${xOf(v).toFixed(1)}" cy="${(y0+k*step).toFixed(1)}" r="${k<2?2.6:1.8}" fill="${col}" opacity="${(1-k/90).toFixed(2)}"/>`}
+  $('tune-dots').innerHTML=h;
+  const last=[...TUNE.trace].reverse().find(v=>v!=null),rd=$('tune-read');
+  if(last!=null&&performance.now()-TUNE.last<1500){const x=xOf(last)-cx;rd.style.transform=`translateX(${(x-26).toFixed(1)}px)`;box.classList.toggle('right',x>40)}
+  else{rd.style.transform='translateX(-26px)';box.classList.remove('right')}}
 function tuneEnter(on){if(!instReady||!$('tune-mic'))return;
-  const hasMic=typeof micStart==='function';
-  if(on){tuneSetup();$('tune-msg').textContent=hasMic?'Tap a string to hear it. Auto picks the string you play.':'Tap a string to hear its note. Tuning by microphone works in the installed app.';
-    $('tune-mic').hidden=!hasMic;if(hasMic&&!MIC.on){TUNE.ownMic=true;micStart()}}
-  else if(TUNE.ownMic&&hasMic&&MIC.on){TUNE.ownMic=false;micStop()}
-  if(hasMic)tuneMicBtn()}
-function tuneMicBtn(){if(typeof MIC==='undefined')return;const b=$('tune-mic');b.textContent=MIC.on?'Stop listening':'Start listening';b.setAttribute('aria-pressed',MIC.on)}
-$('tune-mic').addEventListener('click',()=>{if(typeof micStart!=='function')return;if(MIC.on){TUNE.ownMic=false;micStop()}else{TUNE.ownMic=true;micStart()}setTimeout(tuneMicBtn,300)});
+  const hasMic=typeof micEnable==='function';
+  if(on){tuneSetup();TUNE.trace=[];drawTrace();$('tune-msg').textContent=hasMic?'Tap a string to hear it. Auto follows the string you play.':'Tap a string to hear its note. Tuning by microphone works in the installed app.'}
+  $('tune-mic').hidden=!hasMic||(typeof S!=='undefined'&&S.micAuto&&!MIC.muted);if(hasMic)tuneMicBtn()}
+function tuneMicBtn(){const b=$('tune-mic');if(!b||typeof micEnable!=='function')return;b.textContent=S.micAuto?'Listen again':'Listen with the microphone';b.hidden=S.micAuto&&!MIC.muted}
+$('tune-mic').addEventListener('click',()=>{if(typeof micEnable!=='function')return;micEnable();setTimeout(tuneMicBtn,400)});
 
-$('inst').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.inst=b.dataset.v;persist();applyInst();applyDock();if(S.tab==='deg'||!['find','vox'].includes(S.tab))showTab(S.tab)});
+$('inst').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.inst=b.dataset.v;persist();applyInst();applyDock();showTab(S.tab)});
+$('inst-sel').addEventListener('change',e=>{S.inst=e.target.value;persist();applyInst();applyDock();showTab(S.tab)});
 // the run dots sit with the level pill so the top row stays on one line
 $('circwrap').appendChild($('runinfo'));
 var instReady=true;applyInst();
+
+
+/* ---------- pause: stops all sound, the auto-next, the drone and the session clock; resume picks up again ---------- */
+var PAUSE={on:false,left:0,drone:false};
+function pauseAll(){if(PAUSE.on)return;PAUSE.on=true;stopAll();jamStop();
+  if(droneNodes){PAUSE.drone=true;setDrone(false)}else PAUSE.drone=false;
+  if(SESS2.on)PAUSE.left=Math.max(0,SESS2.end-Date.now());
+  document.body.classList.add('paused');syncPause()}
+function resumeAll(){if(!PAUSE.on)return;PAUSE.on=false;if(SESS2.on)SESS2.end=Date.now()+PAUSE.left;
+  if(PAUSE.drone){setDrone(true)}document.body.classList.remove('paused');syncPause()}
+function syncPause(){document.querySelectorAll('.pausebtn,#sb-pause').forEach(b=>{b.textContent=PAUSE.on?'Resume':'Pause'})}
+FIT_TABS.forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn pausebtn';b.textContent='Pause';
+  row.insertBefore(b,row.children[1]||null);iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
+document.addEventListener('click',e=>{const b=e.target.closest('.pausebtn,#sb-pause');if(!b)return;PAUSE.on?resumeAll():pauseAll()});
+// any play/next press ends a pause
+document.addEventListener('click',e=>{if(!PAUSE.on)return;const b=e.target.closest('.btn.primary,#circ-go');if(b)resumeAll()},true);
+
+
+/* ---------- Duel: call and response, one more each round ---------- */
+var DUEL={seq:[],i:0,listen:false,over:false,round:0};
+const duelBest=()=>GAME.best['duel-'+S.duelMode]||0;
+const duelChordSet=()=>S.pgSet==='basic'||!S.pgSet?VCH.filter(c=>[0,5,7,9].includes(c[0])||c[0]===S.home):VCH.filter(c=>c[1]!=='7°'||S.pgSet==='all');
+function duelSync(){document.querySelectorAll('#duel-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.duelMode));$('duel-show').checked=S.duelShow;
+  const ch=S.duelMode==='chords';$('duel-chords').hidden=!ch;
+  if(ch)$('duel-chords').innerHTML=duelChordSet().map(c=>`<button class="chip" data-n="${c[1]}">${c[1]}</button>`).join('');
+  $('duel-score').textContent=`Best: ${duelBest()} ${ch?'chords':'notes'}`;duelSlots()}
+function duelSlots(lit=-1){const el=$('duel-slots');if(!DUEL.seq.length){el.innerHTML='';return}
+  el.innerHTML=DUEL.seq.map((x,j)=>{const txt=S.duelMode==='chords'?x[1]:lab(x.o),wide=S.duelMode==='chords'&&txt.length>1?' wide':'';
+    let c='';if(j<DUEL.i)c='ok';else if(DUEL.over&&j===DUEL.i)c='no';else if(DUEL.listen&&j===DUEL.i)c='cur';if(j===lit)c='lit';
+    const show=j<DUEL.i||DUEL.over||(j===lit&&S.duelShow);return `<i class="${c}${wide}">${show?txt:''}</i>`}).join('')}
+function duelAdd(){if(S.duelMode==='chords'){const set=duelChordSet();let c;do{c=pick(set)}while(DUEL.seq.length&&c===DUEL.seq[DUEL.seq.length-1]&&set.length>1);DUEL.seq.push(c)}
+  else{const last=DUEL.seq.length?DUEL.seq[DUEL.seq.length-1].o:null,pl=S.pool.length>1?S.pool.filter(o=>o!==last):S.pool;const o=pick(pl);DUEL.seq.push({o,m:inRange(o,melLo(),melHi())})}}
+function duelPlay(withCad){stopAll();ensure();DUEL.listen=false;DUEL.i=0;duelSlots();const t=ctx.currentTime+0.05;let d=withCad?cadence(t)+0.2:0.1;
+  const st=(S.duelMode==='chords'?1.1:0.62)*PACE();
+  $('duel-prompt').textContent=`Round ${DUEL.seq.length}: listen…`;
+  DUEL.seq.forEach((x,j)=>{const at=d+j*st;
+    if(S.duelMode==='chords')chord(x[0],x[2],t+at,st*0.95,0.22,!S.duelShow);else pluck(x.m,t+at,Math.min(1.1,st*1.4),0.52);
+    later(at*1000,()=>{duelSlots(j);if(S.duelShow&&S.duelMode!=='chords'){nowKey=keyFor(x.m);renderPad()}})});
+  const end=d+DUEL.seq.length*st;later(end*1000,()=>{nowKey=null;DUEL.listen=true;duelSlots();renderPad();$('duel-prompt').textContent=DUEL.seq.length===1?'Your turn: play it back.':`Your turn: play back all ${DUEL.seq.length}.`})}
+function duelStart(){DUEL={seq:[],i:0,listen:false,over:false,round:0};clearMarks();$('duel-fb').textContent='';duelAdd();$('duel-start').textContent='Restart';duelPlay(true)}
+function duelInput(ans){if(!DUEL.listen||DUEL.over)return;const x=DUEL.seq[DUEL.i];
+  const right=S.duelMode==='chords'?ans===x[1]:ans===x.o;
+  if(S.duelMode==='chords'){stopAll();ensure();const c=pgFind(ans)||VCH.find(v=>v[1]===ans);if(c)chord(c[0],c[2],ctx.currentTime+0.02,0.8,0.2,true)}
+  else if(!right){}else{stopAll();ensure();pluck(x.m,ctx.currentTime+0.02,0.8,0.5);nowKey=keyFor(x.m);renderPad();setTimeout(()=>{nowKey=null;renderPad()},350)}
+  if(right){DUEL.i++;duelSlots();
+    if(DUEL.i>=DUEL.seq.length){DUEL.listen=false;const n=DUEL.seq.length;addXP(3+2*n,`round ${n}`);
+      if(n>duelBest()){GAME.best['duel-'+S.duelMode]=n;saveGame();$('duel-score').textContent=`Best: ${n} ${S.duelMode==='chords'?'chords':'notes'}`}
+      $('duel-fb').innerHTML=`<span class="tag ok">${n} in a row</span> Here comes one more.`;duelAdd();later(900*PACE(),()=>duelPlay(n%6===0))}
+    return}
+  // a slip ends the duel: hear what it was, then the result
+  DUEL.over=true;DUEL.listen=false;duelSlots();const n=DUEL.seq.length-1,best=Math.max(duelBest(),n);
+  if(n>duelBest()){GAME.best['duel-'+S.duelMode]=n;saveGame()}
+  const want=S.duelMode==='chords'?x[1]:lab(x.o),got=S.duelMode==='chords'?ans:lab(ans);
+  $('duel-fb').innerHTML=`<span class="tag no">You: ${got}</span> <span class="tag ok">It was: ${want}</span>`;
+  stopAll();ensure();const t=ctx.currentTime+0.1;
+  if(S.duelMode==='chords')chord(x[0],x[2],t+0.5,1.4,0.22);else{pluck(pitchOfKey(idOfDeg(ans),x.m),t,0.8,0.45);pluck(x.m,t+0.9,1.3,0.55)}
+  later(2300,()=>showResult(`${n>=8?confetti():''}<h3>${n>=duelBest()&&n>0?'New record':'Duel over'}</h3><p class="rsub">${TABNAME.duel} · ${S.duelMode==='chords'?'chords':'notes'} · ${paceName(PACE())} pace</p>
+    <span class="rscore">${n}</span><p class="note">${n===1?'one':n} ${S.duelMode==='chords'?'chord':'note'}${n===1?'':'s'} played back in a row. Your best: ${best}.</p>
+    <div class="acts"><button class="btn primary" data-r="duel-again">Duel again</button><button class="btn" data-r="done">Done</button></div>`))}
+$('duel-start').addEventListener('click',duelStart);
+$('duel-replay').addEventListener('click',()=>{if(DUEL.seq.length&&!DUEL.over)duelPlay(false)});
+$('duel-chords').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)duelInput(b.dataset.n)});
+$('duel-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.duelMode=b.dataset.v;persist();DUEL={seq:[],i:0,listen:false,over:false};$('duel-start').textContent='Start';duelSync()});
+$('duel-show').addEventListener('change',e=>{S.duelShow=e.target.checked;persist()});
+$('rescard').addEventListener('click',e=>{const b=e.target.closest('[data-r="duel-again"]');if(b){closeResult();duelStart()}});
+
+/* ---------- decoder: build a chord by playing its notes (mic) or by saying it ---------- */
+function decAddMidi(m){DEC.kb=DEC.kb||new Set();if([...DEC.kb].some(x=>x%12===m%12))return;DEC.kb.add(m);const ms=[...DEC.kb].sort((a,b)=>a-b);
+  $('dec-in').value=ms.map(x=>NAMES[x%12]).join(' ');decode()}
+const NUMW={zero:0,oh:0,o:0,open:0,one:1,won:1,two:2,to:2,too:2,three:3,tree:3,four:4,for:4,fore:4,five:5,six:6,sicks:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15};
+const MUTEW=new Set(['x','ex','eggs','mute','muted','dead','skip','nothing','none','no']);
+function parseSpeech(t){t=t.toLowerCase().replace(/[.,!?]/g,' ').replace(/\bflat five\b/g,'b5').replace(/\bsharp\b/g,'#').replace(/\bflat\b/g,'♭').replace(/\s+([#♭])/g,'$1').trim();
+  const w=t.split(/\s+/).filter(Boolean);
+  // a chord or note names: starts with a letter A–G
+  const L=/^(a|b|c|d|e|f|g)$/;
+  if(w.length&&(L.test(w[0])||/^[a-g][#♭]?$/.test(w[0]))&&!w.every(x=>/^\d+$/.test(x)||NUMW[x]!==undefined||MUTEW.has(x))){
+    const letters=w.filter(x=>/^[a-g][#♭]?$/.test(x)).length,quality=/(minor|major|seven|seventh|diminished|augmented|sus|slash|add|nine|six|dim|aug)/.test(t);
+    if(!quality&&letters>=2){const out=[];w.forEach(x=>{if(/^[a-g][#♭]?$/.test(x))out.push(x[0].toUpperCase()+x.slice(1))});return out.join(' ')}
+    let s2=t.replace(/\bslash\b/g,'/').replace(/\bmajor seven(th)?\b/g,'maj7').replace(/\bminor seven(th)? ?b5\b/g,'m7b5').replace(/\bhalf diminished\b/g,'m7b5')
+      .replace(/\bminor seven(th)?\b/g,'m7').replace(/\bminor\b/g,'m').replace(/\bmajor\b/g,'').replace(/\bdiminished seven(th)?\b/g,'dim7').replace(/\bdiminished\b/g,'dim')
+      .replace(/\baugmented\b/g,'aug').replace(/\bdominant seven(th)?\b/g,'7').replace(/\bseven(th)?\b/g,'7').replace(/\bnine\b/g,'9').replace(/\bsix\b/g,'6').replace(/\bsus four\b/g,'sus4').replace(/\bsus two\b/g,'sus2').replace(/\badd nine\b/g,'add9').replace(/\s+/g,'');
+    s2=s2.replace(/^([a-g])/,m=>m.toUpperCase()).replace(/\/([a-g])/,(m,x)=>'/'+x.toUpperCase());return s2}
+  // otherwise frets or numbers
+  const toks=[];w.forEach(x=>{if(MUTEW.has(x))toks.push('x');else if(NUMW[x]!==undefined)toks.push(String(NUMW[x]));else if(/^[x\d]+$/.test(x)){if(x.length>1&&/^[x\d]+$/.test(x)&&!/^1[0-5]$/.test(x))x.split('').forEach(c=>toks.push(c));else toks.push(x)}});
+  return toks.join(' ')}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+function decVoice(){if(!SR)return;if(rec){rec.stop();return}
+  rec=new SR();rec.lang=navigator.language||'en-US';rec.interimResults=false;rec.maxAlternatives=3;
+  $('dec-voice').classList.add('on');$('dec-out').innerHTML='<p class="decnote">Listening… say the frets (“x 3 2 0 1 0”), the numbers (“2 4 6”), or a name (“A minor seven”).</p>';
+  rec.onresult=e=>{const alts=[...e.results[0]].map(a=>a.transcript);let used=null;for(const a of alts){const v=parseSpeech(a);if(v&&parseInput(v,'auto')){used=v;break}}
+    $('dec-in').value=used||parseSpeech(alts[0])||alts[0];decode();if(used){const ms=decMidis();if(ms.length){stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}}
+    else $('dec-out').insertAdjacentHTML('afterbegin',`<p class="decnote warn">I heard “${esc(alts[0])}”.</p>`)};
+  rec.onerror=e=>{$('dec-out').innerHTML=`<p class="decnote warn">${e.error==='not-allowed'?'Speech needs microphone permission.':'I didn\'t catch that. Try again.'}</p>`};
+  rec.onend=()=>{rec=null;$('dec-voice').classList.remove('on')};rec.start()}
+if(SR){const b=document.createElement('button');b.className='btn ic';b.id='dec-voice';b.setAttribute('aria-label','Say the chord');b.title='Say the chord';b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+  $('dec-go').parentNode.insertBefore(b,$('dec-go'));b.addEventListener('click',decVoice)}
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
