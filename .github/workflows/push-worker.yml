@@ -1,0 +1,49 @@
+name: Deploy notification server
+on:
+  push:
+    branches: [main]
+    paths: ['worker/**', '.github/workflows/push-worker.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install -g wrangler@4
+      - name: Make sure the account has a workers.dev address
+        run: |
+          API=https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain
+          SUB=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" $API | jq -r '.result.subdomain // empty')
+          if [ -z "$SUB" ]; then
+            SUB="bigears-$(echo $CLOUDFLARE_ACCOUNT_ID | cut -c1-6)"
+            curl -s -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" --data "{\"subdomain\":\"$SUB\"}" $API | jq '.success, .errors'
+          fi
+          echo "SUB=$SUB" >> $GITHUB_ENV
+      - name: Make sure the storage exists
+        working-directory: worker
+        run: |
+          ID=$(wrangler kv namespace list 2>/dev/null | jq -r '.[] | select(.title|test("big-ears-subs")) | .id')
+          if [ -z "$ID" ]; then
+            wrangler kv namespace create big-ears-subs > out.txt 2>&1 || true; cat out.txt
+            ID=$(wrangler kv namespace list 2>/dev/null | jq -r '.[] | select(.title|test("big-ears-subs")) | .id')
+          fi
+          echo "KV id: $ID"
+          sed -i "s/KV_ID/$ID/" wrangler.toml
+      - name: Deploy
+        working-directory: worker
+        run: wrangler deploy 2>&1 | tee deploy.txt
+      - name: Save the result in the repo
+        if: always()
+        run: |
+          URL=$(grep -o 'https://[a-z0-9.-]*workers.dev' worker/deploy.txt | head -1)
+          printf '{"url":"%s","ok":%s,"when":"%s"}\n' "$URL" "$([ -n "$URL" ] && echo true || echo false)" "$(date -u +%FT%TZ)" > push-config.json
+          tail -n 25 worker/deploy.txt > worker/last-deploy.log 2>/dev/null || true
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add push-config.json worker/last-deploy.log; git commit -m "Notification server deploy result" || true; git push || true
