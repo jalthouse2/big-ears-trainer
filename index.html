@@ -483,6 +483,7 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+.cc .d.gone{opacity:.28;border-style:dashed;background:transparent}
 
 .hfbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:6px 10px;border-radius:12px;background:var(--home-soft);border:1px solid color-mix(in srgb,var(--home) 40%,transparent);font-size:12.5px}
 .hfmic{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--home)}
@@ -934,7 +935,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <label class="pill" id="pace-pill"><span class="sr">Pace</span><select id="pace" aria-label="Pace"><option value="1.7">Spacious</option><option value="1.3">Relaxed</option><option value="1">Steady</option><option value="0.8">Quick</option><option value="0.62">Fast</option></select></label>
     <span class="runinfo" id="runinfo" hidden></span>
     <p class="keyline" id="keyline"></p>
-    <label class="pill" id="csize-pill"><span class="sr">Chords</span><select id="csize" aria-label="Chord size"><option value="3">Triads</option><option value="4">7ths</option></select></label>
+    <label class="pill" id="csize-pill"><span class="sr">Chords</span><select id="csize" aria-label="Chord size"><option value="3">Triads</option><option value="4">7ths</option><option value="sh">Shells</option></select></label>
     <button class="stagebtn" id="stage-mode" aria-label="How it works and options"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="16.9" r=".6" fill="currentColor"/></svg><span id="stage-lab">How to</span></button>
   </div>
   <div class="hfbar" id="hfbar" hidden><span class="hfmic"><i></i><span id="hf-heard">Listening</span></span><span class="hftxt" id="hf-txt">Play or sing your answer</span><span class="hfg"><span class="strums" id="hf-strums"><b></b><b></b><b></b></span><span id="hf-g">2 muted strums: next · 3: replay</span></span></div>
@@ -1071,6 +1072,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <p><span class="qual min">minor</span> 2, 3, 6: small step, then big. Darker.</p>
       <p><span class="qual dim">diminished</span> 7: two small steps. Tense; it's the 5 chord without its root (5 <b>7 2 4</b>), so it pulls to 1.</p>
       <p class="hint" id="cc-world"></p>
+      <div class="howto shellnote" id="cc-shell" hidden><p><b>Shell chords</b> keep just three notes: <b>1, 3 and 7</b>.</p><p>The <b>3</b> says major or minor. The <b>7</b> says "at home" (maj7) or "on the way somewhere" (7). Those two carry the chord's character.</p><p>The <b>5</b> is the same in almost every chord, so it adds little and can go (faded above). Fewer notes, same chord, and room for a melody on top.</p></div>
     </div>
     <div class="sub">
       <h3>Outside chords (one note borrowed from outside the map)</h3>
@@ -1690,7 +1692,8 @@ const CH={0:{name:'1',t:[0,4,7]},2:{name:'2m',t:[2,5,9]},4:{name:'3m',t:[4,7,11]
 const chordSet=()=>![0,9].includes(S.home)?VCH.filter(c=>c[1]!=='7°').map(c=>[c[0],{name:c[1],t:c[2]}]):S.home===0?[[0,CH[0]],[2,CH[2]],[5,CH[5]],[7,CH[7]],[9,CH[9]]]:[[9,CH[9]],[2,CH[2]],[5,CH[5]],[4,{name:'3',t:[4,8,11]}],[0,CH[0]]];
 let CQ=null,sinceCadC=Infinity;
 const ROLE=['root','3rd','5th','7th'];
-const add7=c=>{if(!S.cc7)return c;const i=DIATONIC.indexOf(c.t[0]),sev=DIATONIC[(i+6)%7],q=QUAL[c.t[0]];const nm=c.name.replace('°','')+(q==='maj'?(c.t[0]===7?'(7)':'maj7'):q==='min'?'7':'ø');return {name:nm,t:[...c.t,sev]}};
+const shell=t=>S.csz==='sh'&&t.length===4?[t[0],t[1],t[3]]:t;
+const add7=c=>{if(!S.cc7)return c;const i=DIATONIC.indexOf(c.t[0]),sev=DIATONIC[(i+6)%7],q=QUAL[c.t[0]];const nm=c.name.replace('°','')+(q==='maj'?(c.t[0]===7?'(7)':'maj7'):q==='min'?'7':'ø');return {name:nm,t:shell([...c.t,sev])}};
 function relation(o,c){const i=c.t.indexOf(o);if(i>=0)return{rest:true,txt:`a chord tone (the ${ROLE[i]})`};
   let best=null,bd=99;c.t.forEach(x=>{const d=Math.min((x-o+12)%12,(o-x+12)%12);if(d<bd){bd=d;best=x}});
   return{rest:false,txt:`tension, a ${bd===1?'half':'whole'} step from ${lab(best)}`,to:best}}
@@ -2053,7 +2056,7 @@ function renderCC(){
         const seg=x=>{for(let j=1;j<stack.length;j++)if(x>stack[j-1]&&x<=stack[j])return j;return 0};
         if(k>s0){const j=seg(k);inner+=`<span class="bar l ${semi(stack[j])-semi(stack[j-1])===4?'big':'small'}"></span>`}
         if(k<sl){const j=seg(k+1);inner+=`<span class="bar r ${semi(stack[j])-semi(stack[j-1])===4?'big':'small'}"></span>`}
-        const i=stack.indexOf(k);if(i>=0)inner+=`<span class="d${i===0?' root':''}">${DEG[DIATONIC[(h0+k)%7]].n}</span>`}
+        const i=stack.indexOf(k);if(i>=0)inner+=`<span class="d${i===0?' root':''}${S.csz==='sh'&&i===2?' gone':''}" ${S.csz==='sh'&&i===2?'title="The 5th: left out of a shell"':''}>${DEG[DIATONIC[(h0+k)%7]].n}</span>`}
       h+=`<div class="cell${k===7?' oct':''}">${inner}</div>`}
     h+='</div>'}
   el.innerHTML=h;
@@ -2062,7 +2065,7 @@ function renderCC(){
     `The numbers never move: in ${w[1]}, home is the ${VCH[DIATONIC.indexOf(S.home)][1]} chord, but 1 is still a major chord, 2m still minor, and so on. Only which chord feels like home changes.`}
 $('cc').addEventListener('click',e=>{const b=e.target.closest('.rowbtn');if(!b)return;const d=Number(b.dataset.d);ccOn=d;renderCC();
   const h0=ccH0(),ad=(h0+d)%7;stopAll();ensure();const seven=!!S.cc7,stack=(seven?[0,2,4,6]:[0,2,4]).map(x=>x+ad),t=ctx.currentTime+0.05,base=T()+(DIATONIC[ad]>7?-12:0);
-  const tones=stack.map(k=>DIATONIC[k%7]);
+  let tones=stack.map(k=>DIATONIC[k%7]);if(S.csz==='sh'&&stack.length===4){stack.splice(2,1);tones=stack.map(k=>DIATONIC[k%7])}
   stack.forEach((k,i)=>pluck(base+semiOf(k),t+i*0.28*PACE(),0.9*PK(),0.5));
   chord(DIATONIC[ad],tones,t+stack.length*0.28*PACE()+0.15,2.4*PK(),0.22)});
 const OUTINFO={'3':'Major 3 chord: 3 ♯5 7. The ♯5 pulls up into 6, so it leads to 6m. Very common in minor keys and pop (it\'s the 3 chord in the minor cadence).','2':'Major 2 chord: 2 ♯4 6. The ♯4 pulls up into 5, so it leads to the 5 chord. The sound of a "lift" before a chorus.','♭7':'♭7 chord: ♭7 2 4. Borrowed from the minor side; the rock and folk move back to 1 (think "♭7 – 4 – 1").'};
@@ -2084,7 +2087,7 @@ const to7=c=>SEV.find(x=>x[0]===c[0])||c;
 const BORROW=[[3,'♭3',[3,7,10]],[8,'♭6',[8,0,3]],[5,'4m',[5,8,0]]];
 const pgFind=n=>VCH.find(x=>x[1]===n)||JZ.find(x=>x[1]===n)||SEV.find(x=>x[1]===n)||OUTCH.find(x=>x[1]===n)||BORROW.find(x=>x[1]===n);
 const pgSet0=()=>S.pgSet==='basic'?VCH.filter(c=>[0,5,7,S.home===0?9:S.home].includes(c[0])||c[0]===S.home):S.pgSet==='jazz'?JZ:S.pgSet==='outside'?[...VCH.filter(c=>['1','2m','4','5','6m'].includes(c[1])),...OUTCH]:VCH;
-const pgSet=()=>{const st=pgSet0();return S.cc7&&['basic','all'].includes(S.pgSet)?st.map(to7):st};
+const pgSet=()=>{const st=pgSet0();return S.cc7&&['basic','all'].includes(S.pgSet)?st.map(to7).map(c=>S.csz==='sh'?[c[0],c[1],shell(c[2])]:c):st};
 function renderPgButtons(){$('pg-answers').innerHTML=pgSet().map(c=>`<button class="chip" data-n="${c[1]}">${c[1]}</button>`).join('')}
 function pgSlots(lit=-1,row='answer'){
   if(!PG){$('pg-slots').innerHTML='';return}
@@ -2776,8 +2779,8 @@ $('drone-fifth').checked=S.droneFifth;$('drone-fifth').addEventListener('change'
 
 /* chord size pill: triads or 7th chords, for the chord chart, note over chord and progressions */
 const CSIZE_TABS=['cc','chord','prog'];
-function syncCsize(){$('csize').value=S.cc7?'4':'3';$('csize-pill').hidden=!CSIZE_TABS.includes(S.tab)}
-$('csize').addEventListener('change',e=>{S.cc7=e.target.value==='4';$('cc-7').checked=S.cc7;persist();renderCC();if(S.tab==='prog'){PG=null;pgSlots();syncProg()}if(S.tab==='chord'){CQ=null;$('ch-next').textContent='Start'}});
+function syncCsize(){$('csize').value=S.csz||(S.cc7?'4':'3');$('csize-pill').hidden=!CSIZE_TABS.includes(S.tab)}
+$('csize').addEventListener('change',e=>{S.csz=e.target.value;S.cc7=e.target.value!=='3';ccShellNote();$('cc-7').checked=S.cc7;persist();renderCC();if(S.tab==='prog'){PG=null;pgSlots();syncProg()}if(S.tab==='chord'){CQ=null;$('ch-next').textContent='Start'}});
 leanMark();
 gameReady=true;applyStage();renderHomeStats();renderRun();renderLvlBtn();
 
@@ -3328,6 +3331,8 @@ function ctxDesc(){let d=$('ctxdesc');if(!d){d=document.createElement('p');d.id=
   d.textContent=CTXDESC[S.ctxMode]||''}
 $('ctxmode').addEventListener('change',()=>{ctxDesc();stopAll();ensure();cadence(ctx.currentTime+0.05)});ctxDesc();
 
+function ccShellNote(){const e=$('cc-shell');if(e)e.hidden=S.csz!=='sh'}
+ccShellNote();
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
