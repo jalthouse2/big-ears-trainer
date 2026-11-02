@@ -2552,7 +2552,8 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='c'||e.key==='C')cadOnly()});
 
 syncSettings();renderPSteps();renderPad();renderScore();renderLoop();renderAnchors();showTab(S.tab);libInit();
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()})}).catch(()=>{});
+{let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()})}
 $('p-fb').textContent='Press New phrase.';
 
 
