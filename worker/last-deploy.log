@@ -1,0 +1,15 @@
+
+ ⛅️ wrangler 4.86.0 (update available 4.156.2)
+──────────────────────────────────────────────
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+Total Upload: 5.07 KiB / gzip: 2.06 KiB
+Your Worker has access to the following bindings:
+Binding                                          Resource          
+env.SUBS (1d006d69c8df42edaa135b3526073063)      KV Namespace      
+
+Uploaded big-ears-push (0.82 sec)
+Deployed big-ears-push triggers (0.79 sec)
+  https://big-ears-push.bigears-eeebce.workers.dev
+  schedule: */15 * * * *
+Current Version ID: 7e05e636-bb5c-48c3-a583-72f05a5783f7
