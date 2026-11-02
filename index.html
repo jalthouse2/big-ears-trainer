@@ -2800,7 +2800,7 @@ function tuneMark(){document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=N
 $('hs').addEventListener('click',e=>{const b=e.target.closest('.sbtn');if(!b)return;TUNE.sel=Number(b.dataset.i);TUNE.auto=false;$('tune-auto').setAttribute('aria-pressed','false');tuneMark();
   const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);
   if(TUNE.droneOn){tuneDrone(m);return}
-  stopAll();ensure();pluckAs(tuneKey()[0]==='u'?'nylon':'steel',m,ctx.currentTime+0.03,2.6,0.6)});
+  stopAll();ensure();pluck(m,ctx.currentTime+0.03,2.6,0.6)});
 $('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto)});
 $('tune-set').addEventListener('change',e=>{tuneKey();S.tunes[S.inst]=e.target.value;persist();tuneSetup()});
 function tunerFeed(f){
