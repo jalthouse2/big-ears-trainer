@@ -515,11 +515,11 @@ body[data-screen="game"] .bottomnav{display:none}
 .tour .tb,.tour .tip{pointer-events:auto}
 .tour .tb{position:fixed;background:rgba(8,10,16,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
 .tour .tring{position:fixed;border-radius:14px;box-shadow:0 0 0 3px var(--brass),0 0 24px 4px color-mix(in srgb,var(--brass) 45%,transparent);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease;pointer-events:none}
-.tour .tip{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;padding:16px 18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:top .3s ease}
-.tour .tip p{margin:0 0 12px;font-size:16px;line-height:1.45}
-.tour .tip .n{font:600 11px var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tour .tip{position:fixed;left:12px;right:12px;max-width:420px;margin:0 auto;padding:10px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:top .3s ease}
+.tour .tip p{margin:0 0 6px;font-size:15px;line-height:1.35}
+.tour .tip .n{font:600 10px var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
 .tour .tip .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tour .tip .btn{border-radius:999px;min-height:40px;padding:6px 16px}
+.tour .tip .btn{border-radius:999px;min-height:34px;padding:4px 14px}
 .tour .tip .skip{border:0;background:none;color:var(--muted);font-size:14px}
 @media (prefers-reduced-motion: reduce){.tour .tb,.tour .tring,.tour .tip{transition:none}}
 .tour.still .tb,.tour.still .ring,.tour.still .tip{transition:none!important}
@@ -1260,6 +1260,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <span class="micopts-h">Microphone</span>
         <label class="check big"><input type="checkbox" id="mic-auto"> Listen with the microphone in the games and the tuner. You allow it once; it only listens while a game or the tuner is open.</label>
         <label class="field"><span>Sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"></label>
+        <label class="check big"><input type="checkbox" id="mic-phones"> I use headphones (turns off the phone's echo cancelling for the cleanest pitch). Leave this off when the app plays through the speaker.</label>
         <label class="check"><input type="checkbox" id="mic-oct"> Octave must match</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
         <label class="check"><input type="checkbox" id="mic-next"> Two muted strums = Next</label>
@@ -1296,7 +1297,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -2281,7 +2282,7 @@ let busyUntil=0;
 // what the app itself played recently, and until when its sound may still ring in the room
 const RECENT=[];
 function micRecent(m,t,dur){const tail=S.voice==='ether'?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
-const echoOf=(m,now)=>(droneNodes&&Math.abs(m-bass(S.home))%12===0)||RECENT.some(x=>now<x.until&&(Math.abs(m-x.m)%12===0));   // the drone's note is the app's too
+const echoOf=(m,now)=>(droneNodes&&[0,7].includes((((m-bass(S.home))%12)+12)%12))||RECENT.some(x=>now<x.until&&[0,7].includes((((m-x.m)%12)+12)%12));   // the drone's note is the app's too
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
 const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
 function micKey(m,ref){
@@ -2318,13 +2319,14 @@ function micFrame(){
   $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);
   // re-pluck of the same note: a sharp jump in level counts as a new onset
   if(r.rms>thr&&r.clarity>0.8&&r.freq>60&&!(now<busyUntil+0.15)&&!echoOf(Math.round(69+12*Math.log2(r.freq/440)),now))lastAct=Date.now();   // playing counts as using the app (wakes a resting drone)
+  if(r.rms<thr*0.5)MIC.quietAt=now;
   const jump=r.rms>Math.max(thr*2.5,MIC.prevRms*2.2);MIC.prevRms=r.rms*0.6+MIC.prevRms*0.4;
   if(S.micNext&&jump&&r.clarity<0.6&&!busy){MIC.hitAt=now}
   if(MIC.hitAt&&now-MIC.hitAt>0.12&&now-MIC.hitAt<0.2){ // still no pitch shortly after the hit: a muted strum
     if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<0.8);MIC.hits.push(now);MIC.hitAt=0;if(MIC.hits.length>=2){MIC.hits=[];micNext()}}else MIC.hitAt=0}
   if(!loud||r.clarity<0.72||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
   const mf=69+12*Math.log2(r.freq/440),strong=r.clarity>=0.88;
-  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=MIC.cur===null||jump;MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
+  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=jump||(MIC.cur===null&&MIC.quietAt!=null&&now-MIC.quietAt<0.25&&now-MIC.quietAt>=0&&MIC.quietAt>busyUntil+0.15);MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
   if(strong)MIC.strong=true;
   if(S.micSing)micHeard(MIC.cur,(mf-MIC.cur)*100);
   if(!MIC.emitted&&now-MIC.since>(MIC.strong?0.08:0.22)&&!busy){
@@ -2339,7 +2341,7 @@ function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Micr
   $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn()}
 async function micStart(){ensure();
   const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
-  if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+  if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:!S.micPhones,noiseSuppression:false,autoGainControl:false}})}
     catch(e){S.micAuto=false;persist();$('mic-auto').checked=false;$('mic-pill').hidden=false;$('mic-pill').classList.remove('live');$('mic-heard').textContent='Mic blocked: allow it in your browser settings';setTimeout(()=>{if(!MIC.on)$('mic-pill').hidden=true},3500);micLabel();return}
     MIC.src=ctx.createMediaStreamSource(MIC.stream);MIC.an=ctx.createAnalyser();MIC.an.fftSize=2048;MIC.buf=new Float32Array(2048);MIC.src.connect(MIC.an)}
   clearTimeout(MIC.relT);if(MIC.on)return;if(!micWanted()){micRelSoon();return}
@@ -2359,6 +2361,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause()
  const _pa=pauseAll,_ra=resumeAll;pauseAll=function(){_pa();micSync()};resumeAll=function(){_ra();micSync()}}
 setTimeout(micLabel,0);
 $('mic-sens').value=S.micSens;$('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist()});
+$('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
 [['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
 
 $('lib-export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'tonal-map-trainer',version:1,songs:LIB.cache.songs,melodies:LIB.cache.melodies},null,1)],{type:'application/json'});
@@ -3105,17 +3108,17 @@ function syncSongSeg(){document.querySelectorAll('.songseg button').forEach(b=>b
 var TOURS={
   deg:[['.ctxrow','Your key, your home world and your pace. Home is where every note wants to return.'],
        ['#circ-go','Press play. You\'ll hear the key, then one note.'],
-       ['#circwrap','Sing the note, then tap its number here on the circle…'],
+       ['#circ','Sing the note, then tap its number here on the circle…'],
        ['#mapwrap','…or on the map. Either works, and so does the neck.'],
        ['#panel-deg .primary-row .btn:not(.primary)','Hear it again, pause, hear the key again, or hold home underneath with the drone.'],
        ['#lvl-btn','Your gig: the notes in play. Get 7 of 10 right to earn a ring and book the next gig.'],
        ['#stage-mode','How it works and more options, any time.']],
-  chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circwrap','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
+  chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circ','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
   phr:[['#circ-go','Press play for a short phrase.'],['#phrase','Sing it, then reveal it, or tap its numbers in order.'],['#stage-mode','Switch between imagine-first and hear-and-name here.']],
   find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
   vox:[['#vox-mode','Learn the shapes, or quiz yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
   prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
-  duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circwrap','Tap them in order, or play them with the mic on. One more each round.']],
+  duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
   dec:[['#dec-in','Type a chord: a tab like x32010, notes like C E G, numbers like 2 4 6, or a name like Am7.'],['#dec-voice','Or say it.'],['#fbwrap','Or tap it on the neck (or the keys).']],
   tune:[['#tune-set','Pick your tuning.'],['#hs','Tap a string to hear it. With the mic on, Auto follows the string you play.'],['#tune-drone','Drone holds the note so you can tune by ear.'],['.tmeter','The dot moves toward the centre as you get closer. Teal means in tune.']],
   beat:[['.bpmrow','Set the tempo, or tap it.'],['#beat-play','Start and stop.'],['#beat-style','Pick a beat: a click, or a groove to play over.']],
@@ -3125,17 +3128,17 @@ const TR={steps:[],i:0,el:null,poll:null,lesson:false};
 /* Lessons: the same spotlight, but you actually play. A step can wait for you to press the lit button, or for something to happen. */
 const LESSONS={
   deg:[['#circ-go','Let\'s play one. Press play.',{act:1}],
-       ['#circwrap','Listen. First the key (the cadence), then one note.',{wait:()=>Q&&!Q.done&&/^Sing/.test($('deg-prompt').textContent)}],
-       ['#circwrap','Sing that note. Then tap its number on the circle.',{wait:()=>Q&&Q.done}],
+       ['#circ','Listen. First the key (the cadence), then one note.',{wait:()=>Q&&!Q.done&&/^Sing/.test($('deg-prompt').textContent)}],
+       ['#circ','Sing that note. Then tap its number on the circle.',{wait:()=>Q&&Q.done}],
        ['#deg-fb','Green is the answer; red would be your guess. Then you hear it walk home.',{}],
        ['#circ-go','Press → for the next note. Get 7 of 10 right to earn a ring.',{}]],
   chord:[['#circ-go','Press play.',{act:1}],
-       ['#circwrap','A chord plays, then one note on top. Listen.',{wait:()=>CQ&&!CQ.done&&!/Cadence/.test($('ch-prompt').textContent)}],
-       ['#circwrap','Tap the top note\'s number, counted from home.',{wait:()=>CQ&&CQ.done}],
+       ['#circ','A chord plays, then one note on top. Listen.',{wait:()=>CQ&&!CQ.done&&!/Cadence/.test($('ch-prompt').textContent)}],
+       ['#circ','Tap the top note\'s number, counted from home.',{wait:()=>CQ&&CQ.done}],
        ['#ch-fb','You hear whether it rests on the chord or leans to a neighbour.',{}]],
   duel:[['#circ-go','Press play. It always starts on home.',{act:1}],
        ['#duel-slots','Listen: home, then one new note.',{wait:()=>DUEL.listen}],
-       ['#circwrap','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
+       ['#circ','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
        ['#duel-slots','Each round adds one more. How far can you go?',{}]],
   prog:[['#circ-go','Press play.',{act:1}],
        ['#pg-answers','Listen to the chords…',{wait:()=>PG&&/Listen to the|Chord/.test($('pg-prompt').textContent)}],
@@ -3176,8 +3179,10 @@ function tourPlace(animate){const c=TR.cur,o=TR.el;if(!c||!o)return;const e=docu
   set('.t1',{left:'0px',top:'0px',width:W+'px',height:y0+'px'});set('.t2',{left:'0px',top:y1+'px',width:W+'px',height:Math.max(0,Hh-y1)+'px'});
   set('.t3',{left:'0px',top:y0+'px',width:x0+'px',height:(y1-y0)+'px'});set('.t4',{left:x1+'px',top:y0+'px',width:Math.max(0,W-x1)+'px',height:(y1-y0)+'px'});
   set('.tring',{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'});
-  const tip=o.querySelector('.tip'),th=tip.offsetHeight||140;const below=y1+12+th<Hh-8,above=y0-12-th>8;
-  tip.style.top=(below?y1+12:above?y0-12-th:Math.max(8,Hh-th-16))+'px'}
+  // the card goes to the far side of the screen from what's lit, so it never covers the words you need
+  const tip=o.querySelector('.tip'),th=tip.offsetHeight||100,mid=(y0+y1)/2,top=8;
+  const atBottom=Hh-16-th,fitsBottom=atBottom>y1+8,fitsTop=top+th<y0-8;
+  tip.style.top=(fitsBottom?atBottom:fitsTop?top:Math.max(8,atBottom))+'px'}   // bottom of the screen first: the prompt lives at the top
 function tourGo(i){if(i>=TR.steps.length)return tourEnd();if(i<0)return;TR.i=i;const [sel,txt,opt]=TR.steps[i];TR.cur={sel,opt:opt||{},done:false};TR.lastKey=null;
   const e=document.querySelector(sel),o=TR.el;
   const tip=o.querySelector('.tip');tip.querySelector('.n').textContent=`${TR.lesson?'Lesson · ':''}${i+1} of ${TR.steps.length}`;tip.querySelector('p').textContent=txt;
