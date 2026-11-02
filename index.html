@@ -489,6 +489,45 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.onb{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 20px max(18px,env(safe-area-inset-bottom))}
+.onb[hidden]{display:none}
+.onbtop{display:flex;align-items:center;gap:12px;min-height:40px}
+.onbbar{flex:1;height:4px;border-radius:4px;background:var(--sunk);overflow:hidden}.onbbar i{display:block;height:100%;background:var(--brass);transition:width .35s ease}
+.onbtop .iconbtn{width:36px;height:36px}
+.onbskip{background:none;border:0;color:var(--muted);font:600 13px var(--font-body);padding:6px}
+.onbbody{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;max-width:460px;width:100%;margin:0 auto;animation:onbin .35s ease}
+@keyframes onbin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.onb h2{font:600 clamp(24px,7vw,30px)/1.2 var(--font-display);margin:0;letter-spacing:-.01em}
+.onb .lead{font-size:16px;line-height:1.5;color:var(--muted);margin:0}
+.onb .lead b{color:var(--fg)}
+.onbopts{display:flex;flex-direction:column;gap:10px}
+.onbopt{display:flex;align-items:center;gap:12px;text-align:left;padding:15px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font:500 16px var(--font-body);cursor:pointer}
+.onbopt .em{font-size:20px;width:26px;text-align:center}
+.onbopt[aria-pressed=true]{border-color:var(--brass);background:var(--brass-soft)}
+.onbfoot{max-width:460px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.onbfoot .btn{width:100%;min-height:52px;font-size:16px}
+.onbfoot .fine{font-size:12px;color:var(--muted);text-align:center;line-height:1.4}
+.onbmark{display:flex;justify-content:center}.onbmark svg{width:120px;height:120px}
+.onbdots{display:flex;justify-content:center;gap:7px}
+.onbdots span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 18px var(--font-body);background:var(--sunk);color:var(--muted);border:1.5px solid var(--line);transition:all .25s}
+.onbdots span.lit{background:var(--brass);color:var(--on-brass);border-color:var(--brass);transform:scale(1.12)}
+.onbdots span.home{border-color:var(--home);color:var(--home)}
+.onbdots span.home.lit{background:var(--home);color:var(--bg)}
+.onbtest{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.onbtest button{min-height:64px;border-radius:14px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font:700 26px var(--font-body)}
+.onbtest button.ok{border-color:var(--home);background:color-mix(in srgb,var(--home) 25%,transparent)}
+.onbtest button.no{border-color:#c66;opacity:.7}
+.onbplan{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
+.onbplan div{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.4}.onbplan div b:first-child{color:var(--brass);min-width:62px}
+.onbfeat{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}.onbfeat li{display:flex;gap:10px;font-size:15px}.onbfeat li:before{content:"✓";color:var(--home);font-weight:700}
+.onbprice{display:flex;flex-direction:column;gap:8px}
+.onbprice button{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font:600 15px var(--font-body)}
+.onbprice button[aria-pressed=true]{border-color:var(--brass);background:var(--brass-soft)}
+.onbprice small{color:var(--muted);font-weight:500}.onbprice button span:first-child{text-align:left}
+.onbquote{font:italic 500 17px/1.45 var(--font-display);margin:0;padding-left:14px;border-left:3px solid var(--brass)}
+.onb input[type=time]{font:600 28px var(--font-body);color:var(--fg);background:var(--sunk);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;align-self:flex-start;color-scheme:dark}
+[data-theme=light] .onb input[type=time]{color-scheme:light}
+
 .remind{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
 .remrow{display:flex;align-items:center;gap:10px}
 .remrow input[type=time]{font:600 18px var(--font-body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 10px;color-scheme:dark}
@@ -1347,6 +1386,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <div class="result" id="result" hidden role="dialog" aria-modal="true" aria-labelledby="res-title"><div class="rescard" id="rescard"></div></div>
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
+  <div class="onb" id="onb" hidden role="dialog" aria-modal="true" aria-label="Welcome to Big Ears"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <div class="sheet-in">
       <header class="appbar sheetbar"><div class="abl"><button class="iconbtn" id="sheet-back" aria-label="Close settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button></div>
@@ -1363,6 +1403,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <button class="btn" id="rem-try">Show me a nudge</button>
         <p class="hint" id="rem-hint">Your calendar sends the reminder at that time, even when the app is closed. Tap it to open Big Ears.</p>
       </div>
+      <button class="btn" id="onb-again" style="align-self:flex-start">See the welcome intro</button>
       <div class="field"><span>Range</span>
         <div class="seg" id="range"><button data-v="one">1 octave</button><button data-v="two">2 octaves</button></div></div>
       <div class="field"><span>Labels</span>
@@ -3568,6 +3609,64 @@ function nudgeText(off=0,seed){const g=typeof GAME!=='undefined'?GAME:{streak:0,
   $('td-min').addEventListener('change',()=>{sync();native()});
   sync();
 })();
+
+
+/* ---------- first-run intro: a short story, a 20-second ear test, set-up, the plan, then (when paid) the offer ---------- */
+const PAYWALL={on:false,trial:7,plans:[['year','Yearly','€24.99 / year','€2.08 a month · best value'],['life','Lifetime','€39.99 once','Pay once, keep it forever']]};
+const ONB={i:0,a:{goals:[]}};
+const ONB_STEPS=[
+  {id:'hi',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>Hear it. Sing it. Play it.</h2><p class="lead">Big Ears trains the skill behind playing by ear: knowing what you hear, and where it lives on your instrument.</p>`,btn:'Get started'},
+  {id:'head',q:'Ever hear a melody in your head but can\'t find it on the guitar?',opts:[['🎯','All the time'],['🤏','Sometimes'],['🙂','Not really']]},
+  {id:'jam',q:'When you jam with others, do you know where you are in the key?',opts:[['😶','Rarely, I just follow the shapes'],['🤔','Kind of, I get lost on solos'],['😎','Usually']]},
+  {id:'goals',q:'What would you love to be able to do?',multi:true,sub:'Pick as many as you like.',opts:[['🎸','Play what I hear in my head'],['🎶','Improvise without getting lost'],['👂','Learn songs by ear'],['🎤','Sing in tune'],['✍️','Write my own songs']]},
+  {id:'gap',render:()=>`<h2>The gap isn't talent.<br>It's a map.</h2><p class="lead">Every note in a key has a number, counted from home: <b>1</b>. Musicians with "big ears" don't hear more notes. They hear <b>the numbers</b>: how far each note sits from home, and where it wants to go.</p><div class="onbdots" id="onb-dots">${[1,2,3,4,5,6,7].map(n=>`<span class="${n===1?'home':''}">${n}</span>`).join('')}</div><p class="lead">The good news: that map can be learned, a few minutes a day.</p>`,on:()=>{let k=0;const seq=[1,3,5,3,1];const tick=()=>{if(ONB.steps[ONB.i].id!=='gap')return;document.querySelectorAll('#onb-dots span').forEach(e=>e.classList.toggle('lit',+e.textContent===seq[k%seq.length]));k++;setTimeout(tick,650)};tick()},btn:'Show me'},
+  {id:'test',render:()=>`<h2>Try it: name a note by ear</h2><p class="lead">You'll hear four chords that set the key, then one note. Is it the <b>1</b>, the <b>3</b> or the <b>5</b>?</p><div class="onbtest" id="onb-test"><button data-o="0">1</button><button data-o="4">3</button><button data-o="7">5</button></div><p class="lead" id="onb-tfb">Turn your sound on, then press Play.</p>`,btn:'Play',on:()=>{ONB.t=null}},
+  {id:'inst',q:'What do you play?',opts:[['🎸','Guitar','guitar'],['🪕','Ukulele','uke'],['🎹','Piano','piano']]},
+  {id:'level',q:'How long have you been playing?',opts:[['🌱','Just starting'],['🌿','A few years'],['🌳','A long time, but by ear is new']]},
+  {id:'mins',q:'How much time can you give it a day?',sub:'Short and daily beats long and rare.',opts:[['⏱️','5 minutes',5],['☕','10 minutes',10],['🎯','15 minutes',15],['🔥','20 minutes',20]]},
+  {id:'when',render:()=>`<h2>When should we nudge you?</h2><p class="lead">One reminder a day, at a time you'll actually play. None on days you've already practised.</p><input type="time" id="onb-time" value="${(S.rem&&S.rem.time)||'18:00'}">`,btn:'Set reminder'},
+  {id:'plan',render:()=>{const a=ONB.a,m=a.mins||15,g=a.goals.length?a.goals:['Play what I hear in my head'];
+    return `<h2>Your plan is ready</h2><p class="lead">${m} minutes a day. Here's what that builds.</p><div class="onbplan"><div><b>Week 1</b><span>Hear home, then name the 1, 3 and 5 in any key.</span></div><div><b>Weeks 2–4</b><span>All seven numbers, and how they feel over each chord.</span></div><div><b>Weeks 5–8</b><span>Phrases: sing a line, then find it on the ${a.inst==='piano'?'keys':'neck'} first try.</span></div><div><b>Weeks 9–12</b><span>Progressions and songs by ear. Toward: <b>${g[0].toLowerCase()}</b>.</span></div></div>`},btn:'Continue'},
+  {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and tour</li><li>Phrases, progressions and songs by ear</li><li>The chord decoder and shapes on the neck</li><li>Daily plan, streaks and reminders</li></ul><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
+    btn:()=>`Start ${PAYWALL.trial}-day free trial`,fine:()=>`Free for ${PAYWALL.trial} days, then the price shown. Cancel any time in your store settings. Restore purchases in Settings.`},
+  {id:'go',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>You're in.</h2><p class="lead">${PAYWALL.on?'':'Big Ears is free while it\'s in early access. '}Your first gig is waiting: name the 1, 3 and 5.</p>`,btn:'Start my first gig'}];
+function onbOpen(){ONB.i=0;ONB.a={goals:[]};ONB.steps=ONB_STEPS.filter(x=>!x.show||x.show());$('onb').hidden=false;onbRender()}
+function onbClose(start){$('onb').hidden=true;S.onboarded=true;persist();if(start&&typeof openGame==='function')openGame('deg')}
+function onbRender(){const st=ONB.steps[ONB.i],n=ONB.steps.length;
+  const body=st.render?st.render():`<h2>${st.q}</h2>${st.sub?`<p class="lead">${st.sub}</p>`:''}<div class="onbopts">${st.opts.map((o,k)=>`<button class="onbopt" data-k="${k}" aria-pressed="${st.multi?ONB.a.goals.includes(o[1]):'false'}"><span class="em">${o[0]}</span>${o[1]}</button>`).join('')}</div>`;
+  const btn=typeof st.btn==='function'?st.btn():st.btn;
+  $('onb').innerHTML=`<div class="onbtop">${ONB.i?'<button class="iconbtn" id="onb-back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>':''}<div class="onbbar"><i style="width:${Math.round((ONB.i+1)/n*100)}%"></i></div>${st.id!=='go'&&st.id!=='pay'?'<button class="onbskip" id="onb-skip">Skip</button>':st.id==='pay'?'<button class="onbskip" id="onb-skip">Not now</button>':''}</div>
+    <div class="onbbody">${body}</div><div class="onbfoot">${btn||st.multi?`<button class="btn primary" id="onb-next">${btn||'Continue'}</button>`:''}${st.fine?`<p class="fine">${st.fine()}</p>`:''}</div>`;
+  st.on&&st.on();
+  if(st.multi)$('onb-next').disabled=!ONB.a.goals.length}
+function onbNext(){if(ONB.i<ONB.steps.length-1){ONB.i++;onbRender()}else onbClose(true)}
+function onbTest(){ensure();stopAll();const o=[0,4,7][Math.floor(Math.random()*3)];ONB.t={o,m:inRange(o,melLo(),melHi()),done:false};
+  const d=cadence(ctx.currentTime+0.05);pluck(ONB.t.m,ctx.currentTime+0.05+d+0.3,1.6,0.6);$('onb-tfb').textContent='Listen…';
+  setTimeout(()=>{if(ONB.t&&!ONB.t.done)$('onb-tfb').textContent='Which number was it?'},(d+0.6)*1000);$('onb-next').textContent='Hear it again'}
+$('onb').addEventListener('click',e=>{const st=ONB.steps[ONB.i];
+  if(e.target.closest('#onb-skip')){if(st.id==='pay'){ONB.i++;return onbRender()}return onbClose(false)}
+  if(e.target.closest('#onb-back')){ONB.i=Math.max(0,ONB.i-1);return onbRender()}
+  const opt=e.target.closest('.onbopt');
+  if(opt){const o=st.opts[+opt.dataset.k];
+    if(st.multi){const i=ONB.a.goals.indexOf(o[1]);i<0?ONB.a.goals.push(o[1]):ONB.a.goals.splice(i,1);opt.setAttribute('aria-pressed',i<0);$('onb-next').disabled=!ONB.a.goals.length;return}
+    opt.setAttribute('aria-pressed','true');ONB.a[st.id]=o[2]!==undefined?o[2]:o[1];
+    if(st.id==='inst'){const b=document.querySelector(`#inst button[data-v="${o[2]}"]`);b&&b.click()}
+    if(st.id==='mins'){$('td-min').value=String(o[2]);$('td-min').dispatchEvent(new Event('change'))}
+    return setTimeout(onbNext,220)}
+  const pb=e.target.closest('#onb-price button');if(pb){document.querySelectorAll('#onb-price button').forEach(b=>b.setAttribute('aria-pressed',b===pb));ONB.a.plan=pb.dataset.p;return}
+  const tb=e.target.closest('#onb-test button');
+  if(tb){if(!ONB.t)return onbTest();if(ONB.t.done)return;const o=+tb.dataset.o;ONB.t.done=o===ONB.t.o;
+    if(ONB.t.done){tb.classList.add('ok');$('onb-tfb').innerHTML=`<b>Yes, the ${lab(o)}.</b> You just named a note by ear. That's the whole skill, and it grows fast.`;$('onb-next').textContent='Continue';walkHome(resolution(ONB.t.m),0.2)}
+    else{tb.classList.add('no');$('onb-tfb').innerHTML=`Not the ${lab(o)}. Listen again: does it feel settled (1), sweet (3) or open (5)?`;const t=ctx.currentTime+0.05;pluck(ONB.t.m,t,1.4,0.6)}
+    return}
+  if(e.target.closest('#onb-next')){
+    if(st.id==='test'&&!(ONB.t&&ONB.t.done))return onbTest();
+    if(st.id==='when'){const v=$('onb-time').value||'18:00';$('rem-time').value=v;$('rem-time').dispatchEvent(new Event('change'))}
+    if(st.id==='pay'){toast('Purchases open with the store version');}
+    onbNext()}});
+// first run only: new players see it; anyone with progress already doesn't
+$('onb-again').addEventListener('click',()=>{closeSheet&&closeSheet(true);onbOpen()});
+if(!S.onboarded){if((GAME.xp||0)>0)S.onboarded=true,persist();else setTimeout(onbOpen,300)}
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
