@@ -634,6 +634,7 @@ body[data-fit="1"] .games .stage.fit{background:none;border:0;padding:2px 0 0;ga
   body[data-fit="1"][data-screen="game"] .games{flex:none;gap:6px}
   body[data-fit="1"][data-screen="game"] .dock{position:static;flex:1;min-height:0;overflow-y:auto;border-top:0;box-shadow:none;padding-top:0;margin-inline:0;padding-inline:0}
   body[data-fit="1"][data-screen="game"] .circwrap{flex:1 1 0;min-height:170px;container-type:size}
+  body[data-fit="1"][data-screen="game"] .fb .fc{height:clamp(24px,5.2vh,44px)}
   body[data-fit="1"][data-screen="game"] #circ{width:min(100cqw,100cqh);max-width:none}
   body[data-fit="1"][data-screen="game"] .circgo{width:min(26cqw,26cqh,92px);height:min(26cqw,26cqh,92px)}
   body:not([data-fit="1"])[data-screen="game"] .dock{position:static;box-shadow:none}
@@ -1294,7 +1295,7 @@ function warmCache(){if(!ctx||S.voice==='synth'||S.voice==='ether')return;const 
   let i=0;(function step(){const end=Math.min(list.length,i+6);for(;i<end;i++)noteBuffer(list[i]);if(i<list.length)setTimeout(step,15)})()}
 const hz=m=>440*Math.pow(2,(m-69)/12);
 function pluck(m,t,dur=1.2,vel=0.5){
-  busyUntil=Math.max(busyUntil,t+Math.min(dur,1.6));
+  busyUntil=Math.max(busyUntil,t+Math.min(dur+(S.voice==='ether'?0.5:0.15),2.2));micRecent(m,t,dur);
   if(S.voice==='ether')return etherNote(m,t,dur,vel);
   if(S.voice!=='synth'){const v=VOICES[S.voice],src=ctx.createBufferSource(),g=ctx.createGain();src.buffer=noteBuffer(m);
     const ring=S.voice==='piano'?0.35:0.6,end=Math.min(t+src.buffer.duration-0.02,t+dur+ring);
@@ -1337,7 +1338,7 @@ function cadChords(t){const st=0.6*PACE(),L=CAD[S.home]||CAD[0];L.forEach((c,i)=
 
 // A held tone that swells in and dies away slowly (used by the bloom and the drone)
 function swell(m,t,len,vel,att,bright){
-  busyUntil=Math.max(busyUntil,t+Math.min(len,2.6));
+  busyUntil=Math.max(busyUntil,t+Math.min(len,2.6));micRecent(m,t,len);
   const f=hz(m),g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.Q.value=0.4;
   fl.frequency.setValueAtTime(Math.min(9000,f*(bright?9:4)),t);fl.frequency.exponentialRampToValueAtTime(Math.max(300,f*(bright?3:1.6)),t+len);
   [['triangle',1,1],['sine',2,bright?0.42:0.16],['sine',1.004,0.45],['sine',3,bright?0.12:0.03]].forEach(([ty,mul,a])=>{
@@ -2174,6 +2175,10 @@ function detectPitch(x,sr){
 
 
 let busyUntil=0;
+// what the app itself played recently, and until when its sound may still ring in the room
+const RECENT=[];
+function micRecent(m,t,dur){const tail=S.voice==='ether'?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
+const echoOf=(m,now)=>RECENT.some(x=>now<x.until&&(Math.abs(m-x.m)%12===0));
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
 const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
 function micKey(m,ref){
@@ -2215,12 +2220,13 @@ function micFrame(){
     if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<0.8);MIC.hits.push(now);MIC.hitAt=0;if(MIC.hits.length>=2){MIC.hits=[];micNext()}}else MIC.hitAt=0}
   if(!loud||r.clarity<0.72||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
   const mf=69+12*Math.log2(r.freq/440),strong=r.clarity>=0.88;
-  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
+  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=MIC.cur===null||jump;MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
   if(strong)MIC.strong=true;
   if(S.micSing)micHeard(MIC.cur,(mf-MIC.cur)*100);
   if(!MIC.emitted&&now-MIC.since>(MIC.strong?0.08:0.22)&&!busy){
-    if(MIC.since>=MIC.gate){MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100)}
-    else{ // the note began while the app was still playing (singing along): accept it once it holds steady on its own
+    const echo=echoOf(MIC.cur,now);
+    if(MIC.since>=MIC.gate){if(echo&&!MIC.onset)return;MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100)}
+    else if(!echo){ // began while the app was playing, and it isn't the app's own note: a voice singing along
       if(MIC.gRms==null&&now>=MIC.gate)MIC.gRms=r.rms;
       if(MIC.gRms!=null&&now-MIC.gate>0.45){MIC.emitted=true;if(r.rms>=0.75*MIC.gRms)micNote(MIC.cur,(mf-MIC.cur)*100)}}}}
 const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec'];
@@ -2274,7 +2280,8 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=t==='anc'||t==='tune';
-  $('mapwrap').hidden=['find','vox'].includes(t)||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec';$('circwrap').hidden=!S.showCircle;
+  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=neckGame||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
+  document.querySelector('#dock-show button[data-v="circle"]').disabled=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
   document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?S.showMap:b.dataset.v==='circle'?S.showCircle:S.showNeck));
   document.querySelector('#dock-show button[data-v="map"]').disabled=['find','vox'].includes(t);}
