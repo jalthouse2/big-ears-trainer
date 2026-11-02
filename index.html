@@ -883,7 +883,8 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span><span class="t">Chord chart</span><span class="s">Every chord in the key and its numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span><span class="t">Jam</span><span class="s">Loop a progression and play over it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span><span class="t">Write a melody</span><span class="s">Compose in numbers over chords</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
-  <section class="screen" id="scr-songs" hidden><p class="sechead">Your songs</p><div class="cards"><button class="card" data-open="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span><span class="t">Songs</span><span class="s">Your song log, and a tune for every number</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
+  <section class="screen" id="scr-songs" hidden><p class="sechead">Your songs</p><div class="cards"><button class="card" data-open="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span><span class="t">My songs</span><span class="s">Songs you know, written in numbers, by section</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+<button class="card" data-open="anc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 11h8"/></svg><span><span class="t">Interval anchors</span><span class="s">A song you know for every jump and every number</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
   <section class="screen" id="scr-stats" hidden>
     <div class="cards">
       <div class="panelcard" id="rankcard"></div>
@@ -1181,7 +1182,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
 
   <section class="stage" id="panel-songs" hidden>
-    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Anchors</button></div>
+    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Interval anchors</button></div>
     <p class="eyebrow">Songs you've mapped</p>
     <div class="howto songwhy"><p>Map a song you love into numbers: its key, then its chords.</p><p>You'll start hearing the same few moves everywhere (1 5 6m 4 is in hundreds of songs).</p><p>Then play it back in any key, or jam over it.</p></div>
     <p class="hint" id="lib-status"></p>
@@ -1251,11 +1252,11 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
 
   <section class="stage" id="panel-anc" hidden>
-    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Anchors</button></div>
-    <p class="eyebrow">One tune you know cold for each sound</p>
-    <p class="hint">Press play to hear the sound in the current key, then write the song it reminds you of (its opening, a hook, a bass line). When you miss a note in the drills, your anchor for the right answer shows up as a hint. Anchors stay in this browser.</p>
+    <div class="seg keep songseg"><button data-sv="songs">My songs</button><button data-sv="anc">Interval anchors</button></div>
+    <p class="eyebrow">Interval anchors</p>
+    <div class="howto"><p>An anchor is a song you already know that starts with a sound. "Here Comes the Bride" starts with a jump of a 4th; the Star Wars theme opens with a jump up a 5th.</p><p>Pick one for each jump and each number, and the sound becomes instantly familiar.</p><p>Press ▶ to hear it in your key, then write your song. When you miss that sound in a game, your anchor shows up as a hint.</p></div>
     <div class="anc">
-      <div><h3>Numbers</h3><div id="anc-deg"></div></div>
+      <div><h3>Numbers (from home)</h3><div id="anc-deg"></div></div>
       <div id="anc-jump"></div>
     </div>
   </section>
@@ -1366,7 +1367,7 @@ const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
 var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'Songs',anc:'Songs',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
+const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'My songs',anc:'Interval anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
