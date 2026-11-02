@@ -1505,7 +1505,7 @@ function renderCirc(){
     const t=S.labels==='sol'?DEG[p].s:DEG[p].n;
     h+=`<g class="${c}" data-p="${p}" role="button" tabindex="0" aria-label="${DEG[p].n}"><circle class="hit" cx="${((x+lx)/2).toFixed(1)}" cy="${((y+ly)/2).toFixed(1)}" r="22"/><circle class="d" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${p===S.home?8:6.5}"/><text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${t}</text></g>`});
   svg.innerHTML=h;
-  const go=$('circ-go'),pb=document.querySelector(`#panel-${S.tab}:not([hidden]) .btn.primary`);
+  const go=$('circ-go'),pb=['deg','chord','phr','prog','duel'].includes(S.tab)?document.querySelector(`#panel-${S.tab}:not([hidden]) .btn.primary`):null;
   if(pb&&!pb.hidden){go.hidden=false;const txt=(pb.dataset.label||pb.textContent).trim(),first=/^(start|new|play)/i.test(txt);go.innerHTML=(first?PLAY_I:NEXT_I)+`<span>${txt}</span>`;go.setAttribute('aria-label',txt)}else go.hidden=true}
 function circPress(p){
   const ref=S.tab==='deg'&&Q&&!Q.done?Q.m:S.tab==='chord'&&CQ&&!CQ.done?CQ.m:S.tab==='phr'&&P&&!P.done&&S.pmode==='hear'?P.seq[P.ans.length]:null;
@@ -2350,7 +2350,7 @@ function resetQuestions(){stopAll();Q=null;CQ=null;P=null;$('deg-next').textCont
 function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeout(decRender,0);sinceCad=Infinity;sinceCadC=Infinity;
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
-  $('dock').hidden=t==='anc'||t==='tune'||t==='beat';
+  $('dock').hidden=['anc','songs','tune','beat','today'].includes(t);
   const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
   document.querySelector('#dock-show button[data-v="circle"]').hidden=neckGame;document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
