@@ -1398,6 +1398,8 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <div class="field"><span>Practice reminder</span>
           <div class="remrow"><input type="time" id="rem-time" value="18:00" aria-label="Reminder time"><span class="remmin" id="rem-min"></span></div></div>
         <div class="seg remdays" id="rem-days"><button data-d="MO">M</button><button data-d="TU">T</button><button data-d="WE">W</button><button data-d="TH">T</button><button data-d="FR">F</button><button data-d="SA">S</button><button data-d="SU">S</button></div>
+        <div class="field" id="rem-push" hidden><span>Phone notifications</span><button class="btn toggle" id="push-on" aria-pressed="false">Off</button></div>
+        <p class="hint" id="push-hint" hidden></p>
         <div class="remgo" id="rem-web"><button class="btn" id="rem-ics">Add to Apple / Outlook calendar</button><button class="btn" id="rem-gcal">Add to Google Calendar</button></div>
         <div class="remgo" id="rem-native" hidden><button class="btn toggle" id="rem-on" aria-pressed="false">Off</button></div>
         <button class="btn" id="rem-try">Show me a nudge</button>
@@ -3601,10 +3603,10 @@ function nudgeText(off=0,seed){const g=typeof GAME!=='undefined'?GAME:{streak:0,
   $('rem-days').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset.d,i=S.rem.days.indexOf(d);i<0?S.rem.days.push(d):S.rem.days.splice(i,1);persist();sync();native()});
   $('rem-ics').addEventListener('click',ics);$('rem-gcal').addEventListener('click',gcal);
   $('rem-on').addEventListener('click',()=>{S.rem.on=!S.rem.on;persist();sync();native()});
-  $('rem-try').addEventListener('click',async()=>{const t=nudgeText(GAME.lastGoal===today()?1:0);toast(t,'big');
+  $('rem-try').addEventListener('click',async()=>{if(typeof PUSH!=='undefined'&&PUSH.test&&await PUSH.test()){toast('Sent. It should arrive in a few seconds.');return}const t=nudgeText(GAME.lastGoal===today()?1:0);toast(t,'big');
     try{if('Notification' in window&&navigator.serviceWorker&&Notification.permission==='granted'){const r=await navigator.serviceWorker.ready;r.showNotification('Big Ears',{body:t,icon:'icon-192.png'})}}catch(e){}});
   // keep the store app's queue fresh, and leave a note for the service worker (used by web push)
-  window.remRefresh=()=>{native();try{caches.open('be-state').then(c=>c.put('state',new Response(JSON.stringify({streak:GAME.streak,lastGoal:GAME.lastGoal,daily:S.daily,today:today()}))))}catch(e){}};
+  window.remRefresh=()=>{native();try{PUSH.done&&PUSH.done()}catch(e){}try{caches.open('be-state').then(c=>c.put('state',new Response(JSON.stringify({streak:GAME.streak,lastGoal:GAME.lastGoal,daily:S.daily,today:today()}))))}catch(e){}};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)window.remRefresh()});setTimeout(window.remRefresh,1500);
   $('td-min').addEventListener('change',()=>{sync();native()});
   sync();
@@ -3667,6 +3669,40 @@ $('onb').addEventListener('click',e=>{const st=ONB.steps[ONB.i];
 // first run only: new players see it; anyone with progress already doesn't
 $('onb-again').addEventListener('click',()=>{closeSheet&&closeSheet(true);onbOpen()});
 if(!S.onboarded){if((GAME.xp||0)>0)S.onboarded=true,persist();else setTimeout(onbOpen,300)}
+
+
+/* web push: one nudge a day from the Big Ears server, for the app on your home screen */
+const PUSH={url:null};
+(function(){
+  if(!S.push)S.push={on:false,id:null};
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  const ios=/iP(hone|ad|od)/.test(navigator.userAgent);
+  const can=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+  const b64=s=>{const p='='.repeat((4-s.length%4)%4),r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))};
+  async function api(path,body){if(!PUSH.url)throw new Error('offline');const r=await fetch(PUSH.url+path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});return r.json()}
+  const tz=()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return 'UTC'}};
+  function ui(){const box=$('rem-push'),hint=$('push-hint');if(window.Capacitor){box.hidden=true;hint.hidden=true;return}
+    box.hidden=false;hint.hidden=false;const b=$('push-on');b.textContent=S.push.on?'On':'Off';b.setAttribute('aria-pressed',S.push.on);
+    if(!PUSH.url){b.disabled=true;hint.textContent='Phone notifications work in the app on your home screen.';return}
+    if(ios&&!standalone){b.disabled=true;hint.innerHTML='On iPhone, notifications need Big Ears on your home screen: in Safari tap <b>Share → Add to Home Screen</b>, then open it from there.';return}
+    if(!can()){b.disabled=true;hint.textContent='This browser can\'t show notifications. The calendar reminder below still works.';return}
+    b.disabled=false;hint.textContent=S.push.on?`One nudge a day at ${S.rem.time}, on the days you picked. None once you've practised.`:'One nudge a day at your reminder time. None on days you\'ve already practised.'}
+  async function subscribe(){const perm=await Notification.requestPermission();if(perm!=='granted'){toast('Notifications are blocked. Allow them for Big Ears in your phone settings.');return false}
+    const reg=await navigator.serviceWorker.ready;const {key}=await api('/vapid');
+    let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(key)});
+    const r=await api('/sub',{sub:sub.toJSON(),time:S.rem.time,tz:tz(),days:S.rem.days});S.push={on:true,id:r.id};persist();return true}
+  async function unsubscribe(){try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe();if(S.push.id)await api('/unsub',{id:S.push.id})}catch(e){}S.push={on:false,id:null};persist()}
+  $('push-on').addEventListener('click',async()=>{const b=$('push-on');b.disabled=true;
+    try{if(S.push.on){await unsubscribe();toast('Phone notifications off')}else if(await subscribe())toast('Done. Your first nudge comes at '+S.rem.time,'big')}catch(e){toast('Could not turn on notifications. Try again in a moment.')}
+    b.disabled=false;ui()});
+  // keep the server in step with your time, days and practice
+  PUSH.update=()=>{if(S.push.on&&PUSH.url)navigator.serviceWorker.ready.then(r=>r.pushManager.getSubscription()).then(sub=>sub&&api('/sub',{sub:sub.toJSON(),time:S.rem.time,tz:tz(),days:S.rem.days})).catch(()=>{})};
+  PUSH.done=()=>{if(S.push.on&&S.push.id&&PUSH.url&&GAME.lastGoal===today())api('/done',{id:S.push.id,date:today()}).catch(()=>{})};
+  PUSH.test=()=>S.push.on&&S.push.id&&PUSH.url?api('/test',{id:S.push.id}).then(()=>true).catch(()=>false):Promise.resolve(false);
+  $('rem-time').addEventListener('change',()=>{PUSH.update();ui()});$('rem-days').addEventListener('click',()=>setTimeout(PUSH.update,50));
+  fetch('push-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(c=>{if(c&&c.url)PUSH.url=c.url.replace(/\/$/,'');ui();PUSH.done()}).catch(()=>ui());
+  ui();
+})();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
