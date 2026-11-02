@@ -1372,7 +1372,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -2486,13 +2486,13 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=['anc','songs','tune','beat','today'].includes(t);
-  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||!S.showMap;$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
+  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||(t==='vox'?!S.voxMap:!S.showMap);$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
   document.querySelector('#dock-show button[data-v="circle"]').hidden=neckGame;document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
-  document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?S.showMap:b.dataset.v==='circle'?S.showCircle:S.showNeck));
+  document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?(t==='vox'?!!S.voxMap:S.showMap):b.dataset.v==='circle'?S.showCircle:S.showNeck));
   }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  if(b.dataset.v==='map')S.showMap=!S.showMap;else if(b.dataset.v==='circle')S.showCircle=!S.showCircle;else S.showNeck=!S.showNeck;persist();applyDock();if(S.showNeck)renderFB();renderCirc()});
+  if(b.dataset.v==='map'){if(S.tab==='vox')S.voxMap=!S.voxMap;else S.showMap=!S.showMap}else if(b.dataset.v==='circle')S.showCircle=!S.showCircle;else S.showNeck=!S.showNeck;persist();applyDock();if(S.showNeck)renderFB();renderCirc()});
 function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
