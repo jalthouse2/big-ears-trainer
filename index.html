@@ -484,19 +484,26 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.tour.still .tb,.tour.still .ring,.tour.still .tip{transition:none!important}
+.tour .tb{transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
+.tour .tring{transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
+.tourbtns{display:flex;flex-wrap:wrap;gap:8px}
+
 .btn.ic.primary.same{width:46px;height:46px}.btn.ic.primary.same svg{width:22px;height:22px}
 .songseg{align-self:flex-start;margin-bottom:4px}
 /* ===== Guided tour: spotlight one thing, blur the rest ===== */
-.tour{position:fixed;inset:0;z-index:70;pointer-events:auto}
-.tour .tb{position:fixed;background:rgba(8,10,16,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:all .35s cubic-bezier(.3,.9,.3,1)}
-.tour .ring{position:fixed;border-radius:14px;box-shadow:0 0 0 3px var(--brass),0 0 24px 4px color-mix(in srgb,var(--brass) 45%,transparent);transition:all .35s cubic-bezier(.3,.9,.3,1);pointer-events:none}
-.tour .tip{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;padding:16px 18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:top .35s cubic-bezier(.3,.9,.3,1)}
+.tour{position:fixed;inset:0;z-index:70;pointer-events:none}
+.tour .tb,.tour .tip{pointer-events:auto}
+.tour .tb{position:fixed;background:rgba(8,10,16,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
+.tour .tring{position:fixed;border-radius:14px;box-shadow:0 0 0 3px var(--brass),0 0 24px 4px color-mix(in srgb,var(--brass) 45%,transparent);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease;pointer-events:none}
+.tour .tip{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;padding:16px 18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px -12px rgba(0,0,0,.6);transition:top .3s ease}
 .tour .tip p{margin:0 0 12px;font-size:16px;line-height:1.45}
 .tour .tip .n{font:600 11px var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .tour .tip .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .tour .tip .btn{border-radius:999px;min-height:40px;padding:6px 16px}
 .tour .tip .skip{border:0;background:none;color:var(--muted);font-size:14px}
-@media (prefers-reduced-motion: reduce){.tour .tb,.tour .ring,.tour .tip{transition:none}}
+@media (prefers-reduced-motion: reduce){.tour .tb,.tour .tring,.tour .tip{transition:none}}
+.tour.still .tb,.tour.still .ring,.tour.still .tip{transition:none!important}
 .tourbtn{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;border-radius:999px;min-height:40px;padding:6px 16px}
 
 .dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg)}
@@ -3081,31 +3088,79 @@ var TOURS={
   beat:[['.bpmrow','Set the tempo, or tap it.'],['#beat-play','Start and stop.'],['#beat-style','Pick a beat: a click, or a groove to play over.']],
   songs:[['.songseg','Your songs, and your anchor tunes for each number.'],['#song-form-wrap','Add a song in numbers, then play it back.']],
   anc:[['#panel-anc .songseg','Switch between your songs and your anchors.'],['#panel-anc .play','Hear a number in your key, then write the tune it reminds you of.']]};
-const TR={steps:[],i:0,el:null};
-function tourStart(tab,force){const steps=(TOURS[tab]||[]).filter(([sel])=>{const e=document.querySelector(sel);return e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0});
+const TR={steps:[],i:0,el:null,poll:null,lesson:false};
+/* Lessons: the same spotlight, but you actually play. A step can wait for you to press the lit button, or for something to happen. */
+const LESSONS={
+  deg:[['#circ-go','Let\'s play one. Press play.',{act:1}],
+       ['#circwrap','Listen. First the key (the cadence), then one note.',{wait:()=>Q&&!Q.done&&/^Sing/.test($('deg-prompt').textContent)}],
+       ['#circwrap','Sing that note. Then tap its number on the circle.',{wait:()=>Q&&Q.done}],
+       ['#deg-fb','Green is the answer; red would be your guess. Then you hear it walk home.',{}],
+       ['#circ-go','Press → for the next note. Get 7 of 10 right to earn a ring.',{}]],
+  chord:[['#circ-go','Press play.',{act:1}],
+       ['#circwrap','A chord plays, then one note on top. Listen.',{wait:()=>CQ&&!CQ.done&&!/Cadence/.test($('ch-prompt').textContent)}],
+       ['#circwrap','Tap the top note\'s number, counted from home.',{wait:()=>CQ&&CQ.done}],
+       ['#ch-fb','You hear whether it rests on the chord or leans to a neighbour.',{}]],
+  duel:[['#circ-go','Press play. It always starts on home.',{act:1}],
+       ['#duel-slots','Listen: home, then one new note.',{wait:()=>DUEL.listen}],
+       ['#circwrap','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
+       ['#duel-slots','Each round adds one more. How far can you go?',{}]],
+  prog:[['#circ-go','Press play.',{act:1}],
+       ['#pg-answers','Listen to the chords…',{wait:()=>PG&&/Listen to the|Chord/.test($('pg-prompt').textContent)}],
+       ['#pg-answers','Now tap them in order.',{wait:()=>PG&&PG.done}],
+       ['#pg-fb','Green ones you got; red ones you can hear again with ↻.',{}]],
+  find:[['#find-next','Press start.',{act:1}],
+       ['#find-num','Find this number.',{}],
+       ['#fbwrap','Tap one place on the neck where it lives.',{wait:()=>FQ&&(FQ.found.size>0||FQ.done)}],
+       ['#fbwrap','Keep going until you\'ve found them all, inside the bright frets.',{}]],
+  vox:[['#vox-chords','Tap a chord.',{act:1}],
+       ['#fbwrap','Its shape lights up in gold on the neck.',{}],
+       ['#vox-nextshape','Press → to move the same chord up the neck.',{act:1}],
+       ['#vox-info','Same three notes, new order: that\'s an inversion.',{}],
+       ['#vox-play','Hear it.',{act:1}]]};
+function tourStart(tab,force,lesson){
+  const src=lesson?LESSONS[tab]:TOURS[tab];const vis=e=>e&&e.getClientRects().length>0&&e.getBoundingClientRect().height>0;
+  const steps=(src||[]).filter(([sel])=>lesson||vis(document.querySelector(sel)));
   if(!steps.length){if(force)toast('Nothing to show here');return}
-  TR.steps=steps;TR.i=0;TR.tab=tab;stopAll();
-  const o=document.createElement('div');o.className='tour';o.innerHTML='<div class="tb t1"></div><div class="tb t2"></div><div class="tb t3"></div><div class="tb t4"></div><div class="ring"></div><div class="tip" role="dialog" aria-live="polite"><div class="n"></div><p></p><div class="row"><button class="skip">Skip</button><span><button class="btn back" hidden>Back</button> <button class="btn primary nx">Next</button></span></div></div>';
+  if(TR.el)tourEnd(true);
+  TR.steps=steps;TR.i=0;TR.tab=tab;TR.lesson=!!lesson;TR.first=true;if(!lesson)stopAll();
+  const o=document.createElement('div');o.className='tour';o.innerHTML='<div class="tb t1"></div><div class="tb t2"></div><div class="tb t3"></div><div class="tb t4"></div><div class="tring"></div><div class="tip" role="dialog" aria-live="polite"><div class="n"></div><p></p><div class="row"><button class="skip">Skip</button><span><button class="btn back" hidden>Back</button> <button class="btn primary nx">Next</button></span></div></div>';
   document.body.appendChild(o);TR.el=o;
-  o.querySelector('.skip').onclick=tourEnd;o.querySelector('.nx').onclick=()=>tourGo(TR.i+1);o.querySelector('.back').onclick=()=>tourGo(TR.i-1);
-  o.addEventListener('click',e=>{if(e.target.classList.contains('tb'))tourGo(TR.i+1)});
+  o.querySelector('.skip').onclick=()=>tourEnd();o.querySelector('.nx').onclick=()=>tourGo(TR.i+1);o.querySelector('.back').onclick=()=>tourGo(TR.i-1);
+  o.addEventListener('click',e=>{if(e.target.classList.contains('tb')&&!TR.cur.opt.act&&!TR.cur.opt.wait)tourGo(TR.i+1)});
+  clearInterval(TR.poll);TR.poll=setInterval(tourTick,200);
   tourGo(0)}
-function tourGo(i){if(i>=TR.steps.length)return tourEnd();if(i<0)return;TR.i=i;const [sel,txt]=TR.steps[i],e=document.querySelector(sel),o=TR.el;
-  e.scrollIntoView({block:'center',behavior:'instant'});
-  requestAnimationFrame(()=>{const r=e.getBoundingClientRect(),pad=8,W=innerWidth,Hh=innerHeight;
-    const x0=Math.max(0,r.left-pad),y0=Math.max(0,r.top-pad),x1=Math.min(W,r.right+pad),y1=Math.min(Hh,r.bottom+pad);
-    const set=(c,st)=>Object.assign(o.querySelector(c).style,st);
-    set('.t1',{left:0,top:0,width:W+'px',height:y0+'px'});set('.t2',{left:0,top:y1+'px',width:W+'px',height:(Hh-y1)+'px'});
-    set('.t3',{left:0,top:y0+'px',width:x0+'px',height:(y1-y0)+'px'});set('.t4',{left:x1+'px',top:y0+'px',width:(W-x1)+'px',height:(y1-y0)+'px'});
-    set('.ring',{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'});
-    const tip=o.querySelector('.tip');tip.querySelector('.n').textContent=`${i+1} of ${TR.steps.length}`;tip.querySelector('p').textContent=txt;
-    tip.querySelector('.nx').textContent=i===TR.steps.length-1?'Got it':'Next';tip.querySelector('.back').hidden=i===0;
-    const th=tip.offsetHeight||140,below=y1+12+th<Hh-8;tip.style.top=(below?y1+12:Math.max(8,y0-12-th))+'px';tip.querySelector('.nx').focus()})}
-function tourEnd(){if(TR.el){TR.el.remove();TR.el=null}S.toured=S.toured||{};S.toured[TR.tab]=true;persist()}
-document.addEventListener('keydown',e=>{if(!TR.el)return;if(e.key==='Escape'){e.preventDefault();tourEnd()}else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();tourGo(TR.i+1)}else if(e.key==='ArrowLeft'){tourGo(TR.i-1)}},true);
-// "Show me around" sits at the top of every game's How it works page
-function addTourBtn(){const body=$('opt-body');if(!TOURS[S.tab])return;const b=document.createElement('button');b.className='btn primary tourbtn';b.textContent='Show me around';
-  b.onclick=()=>{const t=S.tab;closeOpts();setTimeout(()=>tourStart(t,true),250)};body.insertBefore(b,body.firstChild)}
+function tourTick(){if(!TR.el)return clearInterval(TR.poll);const c=TR.cur;if(!c)return;
+  if(c.opt.wait&&!c.done&&c.opt.wait()){c.done=true;setTimeout(()=>{if(TR.cur===c)tourGo(TR.i+1)},600)}
+  tourPlace(false)}
+// a press on the lit button moves an "act" step on (the click still reaches the button)
+document.addEventListener('click',e=>{const c=TR.cur;if(!TR.el||!c||!c.opt.act||c.done)return;const t=document.querySelector(c.sel);if(t&&t.contains(e.target)){c.done=true;setTimeout(()=>{if(TR.cur===c)tourGo(TR.i+1)},350)}},true);
+function tourPlace(animate){const c=TR.cur,o=TR.el;if(!c||!o)return;const e=document.querySelector(c.sel);if(!e||!e.getClientRects().length)return;
+  const r=e.getBoundingClientRect(),pad=8,W=innerWidth,Hh=innerHeight;
+  const x0=Math.max(4,r.left-pad),y0=Math.max(4,r.top-pad),x1=Math.min(W-4,r.right+pad),y1=Math.min(Hh-4,r.bottom+pad);
+  const key=[x0,y0,x1,y1].map(Math.round).join(',');if(key===TR.lastKey)return;TR.lastKey=key;
+  o.classList.toggle('still',!animate);
+  const set=(cl,st)=>Object.assign(o.querySelector(cl).style,st);
+  set('.t1',{left:'0px',top:'0px',width:W+'px',height:y0+'px'});set('.t2',{left:'0px',top:y1+'px',width:W+'px',height:Math.max(0,Hh-y1)+'px'});
+  set('.t3',{left:'0px',top:y0+'px',width:x0+'px',height:(y1-y0)+'px'});set('.t4',{left:x1+'px',top:y0+'px',width:Math.max(0,W-x1)+'px',height:(y1-y0)+'px'});
+  set('.tring',{left:x0+'px',top:y0+'px',width:(x1-x0)+'px',height:(y1-y0)+'px'});
+  const tip=o.querySelector('.tip'),th=tip.offsetHeight||140;const below=y1+12+th<Hh-8,above=y0-12-th>8;
+  tip.style.top=(below?y1+12:above?y0-12-th:Math.max(8,Hh-th-16))+'px'}
+function tourGo(i){if(i>=TR.steps.length)return tourEnd();if(i<0)return;TR.i=i;const [sel,txt,opt]=TR.steps[i];TR.cur={sel,opt:opt||{},done:false};TR.lastKey=null;
+  const e=document.querySelector(sel),o=TR.el;
+  const tip=o.querySelector('.tip');tip.querySelector('.n').textContent=`${TR.lesson?'Lesson · ':''}${i+1} of ${TR.steps.length}`;tip.querySelector('p').textContent=txt;
+  const waiting=!!(TR.cur.opt.act||TR.cur.opt.wait);tip.querySelector('.nx').hidden=waiting;tip.querySelector('.nx').textContent=i===TR.steps.length-1?'Got it':'Next';tip.querySelector('.back').hidden=i===0||TR.lesson;
+  if(e&&e.getClientRects().length)e.scrollIntoView({block:'center'});
+  // place once the scroll has settled; the first placement jumps, later ones glide
+  const first=TR.first;TR.first=false;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{tourPlace(!first);setTimeout(()=>{TR.lastKey=null;tourPlace(true)},180);if(!waiting)tip.querySelector('.nx').focus()}))}
+function tourEnd(quiet){clearInterval(TR.poll);if(TR.el){TR.el.remove();TR.el=null}TR.cur=null;if(!quiet){S.toured=S.toured||{};S.toured[TR.tab]=true;persist()}}
+window.addEventListener('resize',()=>{if(TR.el){TR.lastKey=null;tourPlace(false)}});
+document.addEventListener('keydown',e=>{if(!TR.el)return;if(e.key==='Escape'){e.preventDefault();tourEnd()}else if((e.key==='ArrowRight'||e.key==='Enter')&&!(TR.cur&&(TR.cur.opt.act||TR.cur.opt.wait))){e.preventDefault();tourGo(TR.i+1)}else if(e.key==='ArrowLeft'&&!TR.lesson){tourGo(TR.i-1)}},true);
+// the ? page offers both: play a guided round, or a quick look around
+function addTourBtn(){const body=$('opt-body'),t=S.tab;const wrap=document.createElement('div');wrap.className='tourbtns';
+  if(LESSONS[t]){const b=document.createElement('button');b.className='btn primary tourbtn';b.textContent='Learn this game: play a guided round';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true,true),250)};wrap.appendChild(b)}
+  if(TOURS[t]){const b=document.createElement('button');b.className='btn tourbtn';b.textContent='Quick look around';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true),250)};wrap.appendChild(b)}
+  if(wrap.children.length)body.insertBefore(wrap,body.firstChild)}
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
@@ -3118,7 +3173,7 @@ function goScreen(sc,fromPop){
   if(sc!=='game'){S.scr=sc;persist()}
   if(sc==='game'&&!fromPop)try{history.pushState({bet:'game'},'')}catch(e){}
   window.scrollTo(0,0)}
-function openGame(t){goScreen('game');showTab(t);renderCirc();if(!(S.toured||{})[t])setTimeout(()=>{if(S.tab===t&&document.body.dataset.screen==='game'&&!TR.el)tourStart(t)},500)}
+function openGame(t){goScreen('game');showTab(t);renderCirc();if(!(S.toured||{})[t])setTimeout(()=>{if(S.tab===t&&document.body.dataset.screen==='game'&&!TR.el)tourStart(t,false,!!LESSONS[t])},500)}
 function closeMenu(){$('game-menu').hidden=true;$('game-title').setAttribute('aria-expanded','false')}
 function openSheet(){$('sheet').hidden=false;$('set-toggle').setAttribute('aria-expanded','true');document.body.style.overflow='hidden';try{history.pushState({bet:'sheet'},'')}catch(e){};$('sheet-back').focus()}
 function closeSheet(fromPop){if($('sheet').hidden)return;$('sheet').hidden=true;$('set-toggle').setAttribute('aria-expanded','false');document.body.style.overflow='';if(!fromPop&&history.state&&history.state.bet==='sheet'){skipPop=true;try{history.back()}catch(e){skipPop=false}}}
