@@ -2932,11 +2932,10 @@ $('hs').addEventListener('click',e=>{const b=e.target.closest('.sbtn');if(!b)ret
   const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);
   if(TUNE.droneOn){tuneDrone(m);return}
   stopAll();ensure();const t0=ctx.currentTime+0.03;pluck(m,t0,4,0.7);if(m<60)pluck(m+12,t0,4,0.35)});
-$('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto);tuneExplain()});
-function tuneExplain(){const ms=tuning()[1],nm=ms.length?NAMES[ms[TUNE.sel]%12]:'';$('tune-msg').textContent=TUNE.droneOn?'Drone: play the string along with it and turn the peg until the wobble slows down and stops.':TUNE.auto?'Auto: play any string and the tuner finds which one it is. Tap a string to hear its note.':`Locked on the ${nm} string: the tuner only measures against ${nm}. Tap another string to switch, or turn Auto back on.`}
+$('tune-auto').addEventListener('click',e=>{TUNE.auto=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.auto);if(TUNE.auto&&typeof micEnable==='function'&&!(S.micAuto&&!MIC.muted))micEnable();tuneExplain()});
+function tuneExplain(){const ms=tuning()[1],nm=ms.length?NAMES[ms[TUNE.sel]%12]:'';$('tune-msg').textContent=TUNE.droneOn?'Drone on: tune by ear (the wobble slows as you get close) and by the dot, both at once.':TUNE.auto?'Auto: play any string and the tuner finds which one it is. Tap a string to hear its note.':`Locked on the ${nm} string: the tuner only measures against ${nm}. Tap another string to switch, or turn Auto back on.`}
 $('tune-set').addEventListener('change',e=>{tuneKey();S.tunes[S.inst]=e.target.value;persist();tuneSetup()});
 function tunerFeed(f){
-  if(TUNE.droneOn){return}
   const now=performance.now(),ms=tuning()[1];
   if(f>0){const mf=69+12*Math.log2(f/440);let target;
     if(!ms.length)target=Math.round(mf);
@@ -2968,7 +2967,8 @@ function drawTrace(){
 function tuneEnter(on){if(!instReady||!$('tune-mic'))return;
   const hasMic=typeof micEnable==='function';
   if(on){tuneSetup();TUNE.trace=[];drawTrace();$('tune-msg').textContent=hasMic?'Tap a string to hear it. Auto follows the string you play.':'Tap a string to hear its note. Tuning by microphone works in the installed app.'}
-  $('tune-mic').hidden=!hasMic||(typeof S!=='undefined'&&S.micAuto&&!MIC.muted);if(hasMic)tuneMicBtn()}
+  if(on&&hasMic&&(TUNE.auto||S.micAuto)&&!(S.micAuto&&!MIC.muted&&MIC.on))micEnable();
+  $('tune-mic').hidden=!hasMic||(S.micAuto&&!MIC.muted);if(hasMic)tuneMicBtn()}
 function tuneMicBtn(){const b=$('tune-mic');if(!b||typeof micEnable!=='function')return;b.textContent=S.micAuto?'Listen again':'Listen with the microphone';b.hidden=S.micAuto&&!MIC.muted}
 $('tune-mic').addEventListener('click',()=>{if(typeof micEnable!=='function')return;micEnable();setTimeout(tuneMicBtn,400)});
 
@@ -3084,7 +3084,7 @@ function tuneDrone(m){ensure();tuneDroneOff();if(m==null)return;
   fl.frequency.value=Math.min(6000,hz(m)*12);
   const os=[['sawtooth',1,0.22],['triangle',1,0.45],['triangle',2,0.55],['sine',4,0.12]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
   g.gain.value=0.0001;g.gain.setTargetAtTime(0.26,ctx.currentTime,0.15);tdNodes={g,os};
-  $('tune-hint').textContent='Tune by ear';$('tune-msg').textContent='Play the string with the drone. Turn the peg until the wobble between them slows down and stops.';document.querySelector('.tmeter').classList.remove('in')}
+  $('tune-msg').textContent='Play the string with the drone: the wobble slows as you get close, and the dot moves to the centre.';document.querySelector('.tmeter').classList.remove('in')}
 function tuneDroneOff(){if(!tdNodes)return;const n=tdNodes;tdNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.12);setTimeout(()=>n.os.forEach(o=>{try{o.stop()}catch(e){}}),600)}
 $('tune-drone').addEventListener('click',e=>{TUNE.droneOn=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.droneOn);
   if(TUNE.droneOn){const ms=tuning()[1];tuneDrone(ms.length?ms[TUNE.sel]:57)}else{tuneDroneOff();$('tune-hint').textContent='Pluck a string'}tuneExplain()});
