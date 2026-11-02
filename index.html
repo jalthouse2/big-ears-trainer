@@ -111,6 +111,11 @@ input[type=range]{accent-color:var(--brass);width:90px}
 .score{font-family:var(--font-mono);font-size:13px;color:var(--muted);margin-left:auto}
 .hint{font-size:13px;color:var(--muted);margin:0}
 .micopts{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;padding-top:10px;border-top:1px dashed var(--line)}
+.sheet .micopts{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:14px}
+.sheet .micopts .check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.4;color:var(--fg)}
+.sheet .micopts .check input{flex:none;width:18px;height:18px;margin:2px 0 0}
+.sheet .micopts .field input[type=range]{width:100%}
+.sheet .micopts .hint{font-size:13px}
 .micopts-h{flex-basis:100%;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 #mic-toggle[aria-pressed="true"]{background:var(--bad);color:var(--bg)}
 #mic-toggle.muted{opacity:.45}
@@ -483,6 +488,9 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+.sheet .appbar.sheetbar{background:var(--bg)!important}
+.sheet .drawer .check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.4;color:var(--fg)}
+.sheet .drawer .check input{flex:none;width:18px;height:18px;margin:2px 0 0}
 .prompt b.gold,.bignum{color:var(--brass)}
 .homedot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brass);color:var(--on-brass);font:700 12px var(--font-mono);vertical-align:middle}
 .badge .bi{overflow:hidden;line-height:1}
@@ -1351,9 +1359,9 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="field" id="fb-nums-f"><span>Neck shows</span><div class="seg" id="fb-nums"><button data-v="all">Notes in play</button><button data-v="home">Home only</button><button data-v="none">Only what lights up</button></div></div>
       <div class="micopts">
         <span class="micopts-h">Microphone</span>
-        <label class="check big"><input type="checkbox" id="hands-free"> <b>Hands-free mode</b>: answer by playing or singing, two muted strums for the next question, three to hear it again, and games move on by themselves after an answer.</label>
+        <label class="check big"><input type="checkbox" id="hands-free"><span><b>Hands-free mode</b>: answer by playing or singing, two muted strums for the next question, three to hear it again, and games move on by themselves after an answer.</span></label>
         <label class="check big"><input type="checkbox" id="mic-auto"> Listen with the microphone in the games and the tuner. You allow it once; it only listens while a game or the tuner is open.</label>
-        <label class="field"><span>Sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"></label>
+        <label class="field"><span>Mic sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"><p class="hint" id="mic-sens-txt" style="margin:2px 0 0">How quiet a note can be and still count.</p></label>
         <label class="check big"><input type="checkbox" id="mic-phones"> I use headphones (turns off the phone's echo cancelling for the cleanest pitch). Leave this off when the app plays through the speaker.</label>
         <label class="check"><input type="checkbox" id="mic-oct"> Octave must match</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
@@ -2485,7 +2493,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause()
 {const _st=showTab;showTab=function(t){_st(t);micSync()};const _gs=goScreen;goScreen=function(a,b){_gs(a,b);micSync()};
  const _pa=pauseAll,_ra=resumeAll;pauseAll=function(){_pa();micSync()};resumeAll=function(){_ra();micSync()}}
 setTimeout(micLabel,0);
-$('mic-sens').value=S.micSens;$('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist()});
+$('mic-sens').value=S.micSens;const sensTxt=()=>{const v=S.micSens;$('mic-sens-txt').textContent=(v<=3?'Low: only clear, strong notes count. Good in a noisy room.':v<=7?'Medium: normal playing and singing count.':'High: soft playing and quiet singing count, but so might room noise.')+' (How quiet a note can be and still count.)'};sensTxt();
+$('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist();sensTxt()});
 $('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{persist();micLabel()}});
 $('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
 [['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
