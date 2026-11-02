@@ -489,6 +489,14 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.remind{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
+.remrow{display:flex;align-items:center;gap:10px}
+.remrow input[type=time]{font:600 18px var(--font-body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 10px;color-scheme:dark}
+[data-theme=light] .remrow input[type=time]{color-scheme:light}
+.remmin{font-size:13px;color:var(--muted)}
+.remdays{display:flex}.remdays button{flex:1;min-width:0;padding:6px 0}
+.remgo{display:flex;flex-wrap:wrap;gap:8px}.remgo .btn{flex:1 1 auto}
+
 #psteps{gap:4px}
 #psteps li{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--sunk);border:0}
 #psteps li b{display:none}
@@ -1346,6 +1354,14 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <div class="abr"><button class="iconbtn" id="theme-toggle" aria-label="Switch to day"></button></div></header>
     <div class="drawer" id="drawer">
       <div class="field"><span>I play</span><div class="seg" id="inst"><button data-v="guitar">Guitar</button><button data-v="uke">Ukulele</button><button data-v="piano">Piano</button></div></div>
+      <div class="remind" id="remind">
+        <div class="field"><span>Practice reminder</span>
+          <div class="remrow"><input type="time" id="rem-time" value="18:00" aria-label="Reminder time"><span class="remmin" id="rem-min"></span></div></div>
+        <div class="seg remdays" id="rem-days"><button data-d="MO">M</button><button data-d="TU">T</button><button data-d="WE">W</button><button data-d="TH">T</button><button data-d="FR">F</button><button data-d="SA">S</button><button data-d="SU">S</button></div>
+        <div class="remgo" id="rem-web"><button class="btn" id="rem-ics">Add to Apple / Outlook calendar</button><button class="btn" id="rem-gcal">Add to Google Calendar</button></div>
+        <div class="remgo" id="rem-native" hidden><button class="btn toggle" id="rem-on" aria-pressed="false">Off</button></div>
+        <p class="hint" id="rem-hint">Your calendar sends the reminder at that time, even when the app is closed. Tap it to open Big Ears.</p>
+      </div>
       <div class="field"><span>Range</span>
         <div class="seg" id="range"><button data-v="one">1 octave</button><button data-v="two">2 octaves</button></div></div>
       <div class="field"><span>Labels</span>
@@ -3488,6 +3504,47 @@ function goPrev(t){const x=HIST[t].pop();syncPrev();if(!x)return;stopAll();ensur
     const end=playProg(PG.seq,0.2,true,'none');later(end*1000,()=>{if(!PG||PG.done)return;PG.phase='answer';pgSlots();$('pg-prompt').textContent=`Your turn: which chord was ${ORD[0]}?`})}}
 [['deg','#panel-deg'],['chord','#panel-chord'],['phr','#panel-phr'],['prog','#panel-prog']].forEach(([t,sel])=>{const row=document.querySelector(sel+' .primary-row');if(!row)return;
   const b=document.createElement('button');b.className='btn prevq';b.dataset.t=t;b.textContent='Previous';b.hidden=true;row.insertBefore(b,row.firstChild);iconize(b);b.addEventListener('click',()=>goPrev(t))});
+
+
+/* practice reminder: calendar event on the web; real notifications inside the store app */
+(function(){
+  if(!S.rem)S.rem={time:'18:00',days:['MO','TU','WE','TH','FR','SA','SU'],on:false};
+  const APP_URL=/github\.io$/.test(location.hostname)?location.origin+location.pathname:'https://jalthouse2.github.io/big-ears-trainer/';
+  const LN=()=>window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications;
+  const ORDER=['MO','TU','WE','TH','FR','SA','SU'];
+  function sync(){$('rem-time').value=S.rem.time;$('rem-min').textContent=`for your ${S.daily} minutes`;
+    document.querySelectorAll('#rem-days button').forEach(b=>b.setAttribute('aria-pressed',S.rem.days.includes(b.dataset.d)));
+    const nat=!!LN();$('rem-web').hidden=nat;$('rem-native').hidden=!nat;
+    if(nat){$('rem-on').textContent=S.rem.on?'On':'Off';$('rem-on').setAttribute('aria-pressed',S.rem.on);$('rem-hint').textContent='Big Ears sends a notification at that time on the days you pick.'}}
+  const body=()=>`Time for your ${S.daily} minutes of ear training. Hear it, sing it, play it.`;
+  const rrule=()=>`RRULE:FREQ=WEEKLY;BYDAY=${ORDER.filter(d=>S.rem.days.includes(d)).join(',')}`;
+  function start(){const [h,m]=S.rem.time.split(':');const d=new Date();d.setDate(d.getDate()+1);
+    const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${h}${m}00`}
+  function endT(){const [h,m]=S.rem.time.split(':').map(Number);const t=h*60+m+S.daily,s0=start();return s0.slice(0,9)+String(Math.floor(t/60)%24).padStart(2,'0')+String(t%60).padStart(2,'0')+'00'}
+  function ics(){if(!S.rem.days.length)return toast('Pick at least one day');
+    const now=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+    const txt=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Big Ears//Reminder//EN','BEGIN:VEVENT',`UID:big-ears-practice-${Date.now()}@big-ears`,`DTSTAMP:${now}`,
+      `DTSTART:${start()}`,`DTEND:${endT()}`,rrule(),'SUMMARY:Big Ears practice',`DESCRIPTION:${body()}\\n${APP_URL}`,`URL:${APP_URL}`,
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Big Ears practice','TRIGGER:PT0M','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(txt);a.download='big-ears-practice.ics';document.body.appendChild(a);a.click();a.remove();
+    toast('Open the file to add the reminder to your calendar')}
+  function gcal(){if(!S.rem.days.length)return toast('Pick at least one day');
+    const u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Big Ears practice')+'&dates='+start()+'/'+endT()+
+      '&recur='+encodeURIComponent(rrule())+'&details='+encodeURIComponent(body()+'\n'+APP_URL);
+    window.open(u,'_blank')}
+  async function native(){const L=LN();if(!L)return;try{
+    const pend=await L.getPending();if(pend.notifications.length)await L.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    if(!S.rem.on)return;const perm=await L.requestPermissions();if(perm.display!=='granted'){S.rem.on=false;persist();sync();return toast('Notifications are off for Big Ears in your phone settings')}
+    const [h,m]=S.rem.time.split(':').map(Number);
+    await L.schedule({notifications:S.rem.days.map(d=>({id:100+ORDER.indexOf(d),title:'Big Ears',body:body(),schedule:{on:{weekday:(ORDER.indexOf(d)+1)%7+1,hour:h,minute:m},allowWhileIdle:true}}))})
+  }catch(e){toast('Could not set the reminder')}}
+  $('rem-time').addEventListener('change',e=>{S.rem.time=e.target.value||'18:00';persist();sync();native()});
+  $('rem-days').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset.d,i=S.rem.days.indexOf(d);i<0?S.rem.days.push(d):S.rem.days.splice(i,1);persist();sync();native()});
+  $('rem-ics').addEventListener('click',ics);$('rem-gcal').addEventListener('click',gcal);
+  $('rem-on').addEventListener('click',()=>{S.rem.on=!S.rem.on;persist();sync();native()});
+  $('td-min').addEventListener('change',()=>{sync();native()});
+  sync();
+})();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
