@@ -483,6 +483,7 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+.shq button{min-width:52px}
 .cc .d.gone{opacity:.28;border-style:dashed;background:transparent}
 
 .hfbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:6px 10px;border-radius:12px;background:var(--home-soft);border:1px solid color-mix(in srgb,var(--home) 40%,transparent);font-size:12.5px}
@@ -1041,7 +1042,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
     <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
-    <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Learn the shapes</button><button data-v="quiz">Quiz: which chord?</button></div>
+    <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
       <p class="prompt" id="vox-prompt">Pick a chord. The arrows move the same chord up the neck.</p>
       <div class="chordbtns" id="vox-chords"></div>
@@ -1049,6 +1050,14 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <option value="all">All string groups</option><option value="0">G B e (top three)</option><option value="1">D G B</option><option value="2">A D G</option><option value="3">E A D (bottom three)</option></select></label></div>
       <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary same" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play it</button></div>
       <p class="feedback" id="vox-info"></p>
+    </div>
+    <div id="vox-shell" class="sub" style="border-top:0;padding-top:0" hidden>
+      <p class="prompt" id="sh-prompt">Pick a chord. Its shell (1, 3, 7) lights up: three fingers, movable anywhere.</p>
+      <div class="chordbtns" id="sh-chords"></div>
+      <div class="actions keep"><div class="field"><span>Root on</span><div class="seg" id="sh-root"><button data-v="6">6th string</button><button data-v="5">5th string</button></div></div></div>
+      <div class="actions keep"><div class="field"><span>The four shapes: move one finger to change the colour</span><div class="seg shq" id="sh-q"><button data-v="maj7">maj7</button><button data-v="7">7</button><button data-v="m7">m7</button><button data-v="dim">dim / m6</button></div></div></div>
+      <div class="actions"><button class="btn primary same" id="sh-play">Play it</button><button class="btn" id="sh-arp">One by one</button></div>
+      <p class="feedback" id="sh-info"></p>
     </div>
     <div id="vox-quiz" class="sub" style="border-top:0;padding-top:0" hidden>
       <div class="actions">
@@ -1358,7 +1367,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1853,14 +1862,14 @@ const inWin=(f,W)=>f>=W.lo&&f<=W.hi;
 function renderFB(){
   if(S.inst==='piano')return renderKB();
   const el=$('fb');if(!el)return;const W0=curWin(),W={lo:Math.min(W0.lo,FRETS),hi:Math.min(W0.hi,FRETS),name:W0.name},whole=W.lo===0&&W.hi>=FRETS;
-  const zoom=!whole&&!(S.tab==='vox'&&S.vxStr!=='all');
+  const zoom=!whole&&!(S.tab==='vox'&&(S.vxStr!=='all'||S.voxMode==='shell'));
   FRETLIST=zoom?Array.from({length:W.hi-W.lo+1},(_,i)=>W.lo+i):Array.from({length:FRETS+1},(_,i)=>i);
   const hasNut=FRETLIST[0]===0,nf=FRETLIST.length-(hasNut?1:0);
   [el,$('fnums')].forEach(x=>{x.style.setProperty('--n',nf);x.classList.toggle('zoom',zoom)});
   const show=S.tab==='find'?S.findShow:S.tab==='vox'||S.tab==='dec'?'home':S.fbNums;
   const markPc={};Object.entries(marks).forEach(([k,v])=>{const p=pc(Number(k));if(!markPc[p]||v==='ok')markPc[p]=v});
   const trailPc=new Set([...trail].map(k=>pc(k))),nowPc=nowKey==null?null:pc(nowKey);
-  const ch=VCH[S.voxChord],shape=VX.shapes[VX.i];const shapeIds=new Set(S.tab==='vox'&&S.voxMode==='explore'&&shape?shape.ids:[]);
+  const ch=VCH[S.voxChord],shape=VX.shapes[VX.i];const shapeIds=new Set(S.tab==='vox'&&S.voxMode==='explore'&&shape?shape.ids:S.tab==='vox'&&S.voxMode==='shell'&&typeof SHL!=='undefined'&&SHL.ids?SHL.ids:[]);
   const quizIds=new Set(S.tab==='vox'&&S.voxMode==='quiz'&&VQ?VQ.v.ids:[]);
   let h='';
   for(let s=0;s<OPEN.length;s++)for(const f of FRETLIST){
@@ -1873,6 +1882,7 @@ function renderFB(){
     if(chordNow&&iw&&!st&&S.tab!=='vox'&&!(S.tab==='dec'&&DEC.src==='tab')&&chordNow.tones.includes(o)){vis=true;extra=(o===chordNow.root?'vox':'tone')+' pip'}
     if(S.tab==='vox'){
       if(S.voxMode==='explore'&&ch[2].includes(o)){vis=true;extra=shapeIds.has(id)?'vox':'tone pip'}
+      if(S.voxMode==='shell'&&shapeIds.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='quiz'&&quizIds.has(id)){vis=true;extra=st?'':'vox';if(!VQ.done)label=''}}
     if(!vis){if(show==='all'&&S.pool.includes(o)){vis=true;if(o!==S.home)extra='pool pip'}else if(show==='home'&&o===S.home)vis=true}
     const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
@@ -2016,7 +2026,7 @@ $('vq-next').addEventListener('click',nextVQ);$('vq-cad').addEventListener('clic
 function syncVox(){document.querySelectorAll('#vox-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.voxMode));
   document.querySelectorAll('#vox-set button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.voxSet));
   document.querySelectorAll('#vq-ask button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.vqAsk));$('vx-strings').value=S.vxStr;
-  $('vox-explore').hidden=S.voxMode!=='explore';$('vox-quiz').hidden=S.voxMode!=='quiz';renderVoxChords()}
+  $('vox-explore').hidden=S.voxMode!=='explore';$('vox-quiz').hidden=S.voxMode!=='quiz';$('vox-shell').hidden=S.voxMode!=='shell';renderVoxChords();if(S.voxMode==='shell'&&gameReady&&typeof SHAPE_READY!=='undefined')shRender()}
 $('vox-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.voxMode=b.dataset.v;persist();VQ=null;cellMarks={};syncVox();renderFB()});
 $('vox-set').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.voxSet=b.dataset.v;persist();syncVox()});
 
@@ -3197,7 +3207,7 @@ var TOURS={
   chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circ','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
   phr:[['#p-new','Press play for a new short phrase.'],['#p-play','In Imagine first, the eye reveals the phrase so you can check your singing.'],['#circ','In Hear and name, you tap its numbers in order here.'],['#stage-mode','Switch between the two ways under How to.']],
   find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
-  vox:[['#vox-mode','Learn the shapes, or quiz yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
+  vox:[['#vox-mode','Triads: three-note chords and their inversions. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
   prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
   duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
   dec:[['#dec-in','Type a chord: a tab like x32010, notes like C E G, numbers like 2 4 6, or a name like Am7.'],['#dec-voice','Or say it.'],['#fbwrap','Or tap it on the neck (or the keys).']],
@@ -3279,7 +3289,7 @@ function tourEnd(quiet){clearInterval(TR.poll);if(TR.el){TR.el.remove();TR.el=nu
 window.addEventListener('resize',()=>{if(TR.el){TR.lastKey=null;tourPlace(false)}});
 document.addEventListener('keydown',e=>{if(!TR.el)return;if(e.key==='Escape'){e.preventDefault();tourEnd()}else if((e.key==='ArrowRight'||e.key==='Enter')&&!(TR.cur&&(TR.cur.opt.act||TR.cur.opt.wait))){e.preventDefault();tourGo(TR.i+1)}else if(e.key==='ArrowLeft'&&!TR.lesson){tourGo(TR.i-1)}},true);
 // the ? page offers both: play a guided round, or a quick look around
-function addTourBtn(){const body=$('opt-body'),t=S.tab;const wrap=document.createElement('div');wrap.className='tourbtns';
+function addTourBtn(){const body=$('opt-body'),t=S.tab==='vox'&&S.voxMode==='shell'?'voxsh':S.tab;const wrap=document.createElement('div');wrap.className='tourbtns';
   if(LESSONS[t]){const b=document.createElement('button');b.className='btn primary tourbtn';b.textContent='Learn this game: play a guided round';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true,true),250)};wrap.appendChild(b)}
   if(TOURS[t]){const b=document.createElement('button');b.className='btn tourbtn';b.textContent='Quick look around';b.onclick=()=>{closeOpts();setTimeout(()=>tourStart(t,true),250)};wrap.appendChild(b)}
   if(wrap.children.length)body.insertBefore(wrap,body.firstChild)}
@@ -3318,6 +3328,7 @@ $('sf-mode').addEventListener('click',()=>setTimeout(sfRender,0));
 if(!SF.secs){SF.cur='verse';SF.secs={intro:[],verse:[],pre:[],chorus:[],bridge:[]};SF.mel=[]}sfRender();
 
 
+LESSONS.voxsh=[['#sh-chords','Tap a chord.',{act:1}],['#fbwrap','Three gold dots: root, 7th, 3rd. No 5th needed.',{}],['#sh-q','Now change one finger: tap each of the four shapes on the same root and hear the colour change.',{act:1}],['#sh-root','The same four shapes exist with the root on the 5th string.',{act:1}]];
 const WHYTXT={'deg': 'Why: this is the core skill. Hearing any note as a number against home is what lets you play what you hear, find a melody by ear, and always know where you are.', 'chord': 'Why: a melody note feels different over each chord, resting on one and pulling on the next. Feeling that is how soloists choose notes as the chords change.', 'phr': "Why: it joins your inner ear to the numbers. You imagine and sing before you hear, which is how you'll one day play the lines in your head.", 'find': 'Why: it puts the map under your fingers. Each number gets places on the neck in every position, so hearing a number means knowing where your hand goes.', 'vox': 'Why: one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.', 'prog': 'Why: most songs move through the same few chords. Hearing 1, 4, 5 and 6m change is how you work out songs by ear.', 'duel': 'Why: playing back a growing phrase trains musical memory, the heart of learning by ear and trading phrases with others.'};
 Object.keys(WHYTXT).forEach(t=>{const L=LESSONS[t];const first=['#game-title',WHYTXT[t]+' Let’s play one.',{}];
   if(typeof L==='function')LESSONS[t]=()=>[first,...L()];else if(L)LESSONS[t]=[first,...L]});
@@ -3333,6 +3344,37 @@ $('ctxmode').addEventListener('change',()=>{ctxDesc();stopAll();ensure();cadence
 
 function ccShellNote(){const e=$('cc-shell');if(e)e.hidden=S.csz!=='sh'}
 ccShellNote();
+
+/* ---------- Shells on the neck: four movable three-note shapes (1, 3, 7), root on string 6 or 5 ---------- */
+// OPEN index: 0 high e, 1 B, 2 G, 3 D, 4 A, 5 low E. Each shape = [string, fret offset from the root's fret] for root, 7th, 3rd
+const SHAPE={'6':{root:5,s7:3,s3:2,off:{maj7:[1,1],'7':[0,1],m7:[0,0],dim:[-1,0]}},'5':{root:4,s7:2,s3:1,off:{maj7:[1,2],'7':[0,2],m7:[0,1],dim:[-1,1]}}};
+const QOF={maj:'maj7',min:'m7',dim:'dim'};var SHL={ids:null,ms:[],q:null};
+const shQual=d=>d===7?'7':QOF[QUAL[d]];          // the 5 chord is the dominant 7
+function shCompute(){const d=DIATONIC[S.shChord],q=SHL.q||shQual(d),G=SHAPE[S.shRoot];
+  const rootPc=(T()+d)%12;let r=((rootPc-OPEN[G.root]%12)+12)%12;if(r<1)r+=12;if(q==='dim'&&r<1)r+=12;
+  const [o7,o3]=G.off[q],fr=[[G.root,r],[G.s7,r+o7],[G.s3,r+o3]];
+  SHL.ids=fr.map(([st,f])=>st+'-'+f);SHL.ms=fr.map(([st,f])=>OPEN[st]+f);SHL.fr=fr;SHL.q=q;SHL.d=d;return fr}
+function shTab(fr){const t=['x','x','x','x','x','x'];fr.forEach(([st,f])=>{t[5-st]=String(f)});return t.some(x=>x.length>1)?t.join(' '):t.join('')}
+function shRender(){if(S.inst!=='guitar'){$('sh-info').textContent='Shell shapes are for guitar. Pick Guitar on the neck to see them.';SHL.ids=null;renderFB();return}
+  $('sh-chords').innerHTML=DIATONIC.map((d,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===S.shChord}">${SEV[i][1]}</button>`).join('');
+  document.querySelectorAll('#sh-root button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.shRoot));
+  const fr=shCompute();document.querySelectorAll('#sh-q button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SHL.q));
+  const nat=shQual(SHL.d),nm=DEG[SHL.d].n+{maj7:'maj7','7':'(7)',m7:'m7',dim:'°7 / m6'}[SHL.q];
+  const roles=[['root',SHL.ms[0]],[SHL.q==='dim'?'6 / °7':'7th',SHL.ms[1]],['3rd',SHL.ms[2]]];
+  $('sh-info').innerHTML=`<b>${nm}</b> shell · tab <span class="path">${shTab(fr)}</span><br>`+roles.map(([r,m])=>`${r} <b>${lab(offOf(m))}</b>`).join(' · ')+
+    (SHL.q!==nat?`<br><span class="hint">Not this key’s own ${DEG[SHL.d].n} chord (that’s ${nat}): try it to hear the colour change.</span>`:'')+
+    (SHL.q==='dim'?`<br><span class="hint">The middle note works as a 6 as well as a diminished 7th, so the same shape is also a minor 6 chord (think Summertime).</span>`:'');
+  renderFB()}
+function shPlay(arp){if(!SHL.ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05,ms=SHL.ms.slice().sort((a,b)=>a-b);
+  if(arp){ms.forEach((m,i)=>{pluck(m,t+i*0.4,1.1,0.5);later(i*400,()=>{cellNow=SHL.ids[SHL.ms.indexOf(m)];renderFB()})});later(ms.length*400+300,()=>{cellNow=null;renderFB()})}
+  else ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}
+$('sh-chords').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;S.shChord=Number(b.dataset.i);SHL.q=null;persist();shRender();shPlay()});
+$('sh-root').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.shRoot=b.dataset.v;persist();shRender();shPlay()});
+$('sh-q').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;SHL.q=b.dataset.v;shRender();shPlay()});
+$('sh-play').addEventListener('click',()=>shPlay(false));$('sh-arp').addEventListener('click',()=>shPlay(true));
+var SHAPE_READY=true;
+document.querySelectorAll('#vox-shell .btn').forEach(b=>{iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
+
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
