@@ -484,6 +484,24 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.mapdemo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;margin:4px 0 10px;font-family:var(--font-display)}
+.mapdemo b{font-weight:800;font-size:21px;min-width:20px;text-align:center}
+.mapdemo b:first-child,.mapdemo b:last-child{color:var(--home)}
+.mapdemo i{font:600 11px var(--font-mono);font-style:normal;color:var(--muted);padding:1px 4px;border-radius:4px;background:var(--sunk)}
+.mapdemo i.h{color:var(--on-brass);background:var(--brass)}
+.worldlist{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:8px}
+.worldlist li{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:baseline}
+.worldlist li>b{font:800 22px var(--font-display);color:var(--brass);text-align:center}
+.worldlist span{font-size:14px;line-height:1.4}
+.intro p{font-size:16px}
+.why{display:block;padding:10px 12px;margin-bottom:2px;border-radius:10px;background:var(--home-soft);color:var(--fg);font-size:14px;line-height:1.45}
+.why b{color:var(--home)}
+.ctxdesc{font-size:13px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+.cc .stp{height:16px;position:relative}
+.cc .stp span{position:absolute;left:0;top:50%;transform:translate(-50%,-50%);font:600 10px var(--font-mono);padding:0 3px;border-radius:3px;background:var(--sunk);color:var(--muted);z-index:2}
+.cc .stp span.h{background:var(--brass);color:var(--on-brass)}
+@media (max-width:620px){.halfsteps{display:grid!important;font-size:9px;margin-top:-2px}}
+
 .secttabs{display:flex;flex-wrap:wrap;gap:6px}
 .secttabs button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px}
 .secttabs button[aria-pressed="true"]{background:var(--brass-soft);border-color:var(--brass)}
@@ -850,14 +868,35 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
   <section class="screen" id="scr-guide" hidden>
     <div class="cards guide">
-      <div class="panelcard"><h3>How it works</h3>
-        <p>Every note has a number, counted from the key's 1. The cadence (or the drone) tells your ear where 1 is; then you name what you hear. Minor is the same map, with home on 6.</p>
-        <p>Start with <b>Today</b>: it runs a 15-minute session in blocks. Pick any game from the title at the top of a game; the gear holds the sound and key settings.</p></div>
+      <div class="panelcard intro"><h3>Why Big Ears</h3>
+        <p>Most of us learn music as shapes and letters. Good ears hear something else: <b>relationships</b>. Every note in a song has a job, depending on where "home" is.</p>
+        <p>This app teaches that one idea until it's automatic: <b>hear a note, know its number, play it</b>. That's what lets you work out songs by ear, improvise what you hear in your head, and know where you are on the neck.</p></div>
+      <div class="panelcard"><h3>The tonal map</h3>
+        <p>Every key has the same seven notes, numbered from its home note, <b>1</b>:</p>
+        <div class="mapdemo" aria-label="1 W 2 W 3 H 4 W 5 W 6 W 7 H 1′">
+          <b>1</b><i>W</i><b>2</b><i>W</i><b>3</b><i class="h">H</i><b>4</b><i>W</i><b>5</b><i>W</i><b>6</b><i>W</i><b>7</b><i class="h">H</i><b>1′</b></div>
+        <p><b>W</b> is a whole step (two frets), <b>H</b> a half step (one fret). The two half steps, 3–4 and 7–1, are where notes lean hardest: 7 pulls up to 1, 4 falls to 3.</p>
+        <p>Change the key and the letters change, but the numbers, the steps and the feelings stay the same. Learn them once, use them in every key.</p>
+        <p>The five notes between the seven (♭3, ♯4, ♭7…) are <b>outside notes</b>: colour and tension.</p></div>
+      <div class="panelcard"><h3>The seven worlds</h3>
+        <p>The map never moves. A world is simply <b>which number feels like home</b>. Same seven notes, measured from the same 1; only the resting place changes, and with it the mood.</p>
+        <ul class="worldlist">
+          <li><b>1</b><span><b>Major</b> · home on 1 · 1 2 3 4 5 6 7 1′ · bright, settled</span></li>
+          <li><b>6</b><span><b>Minor</b> · home on 6 · 6 7 1 2 3 4 5 6 · darker; the same notes as major</span></li>
+          <li><b>2</b><span><b>Dorian</b> · home on 2 · minor, but with a hopeful 7 (the 1)</span></li>
+          <li><b>5</b><span><b>Mixolydian</b> · home on 5 · major with a bluesy flat 7 (the 4); rock and folk</span></li>
+          <li><b>4</b><span><b>Lydian</b> · home on 4 · major with a floating, raised 4 (the 7)</span></li>
+          <li><b>3</b><span><b>Phrygian</b> · home on 3 · dark, with a half step right above home (the 4)</span></li>
+          <li><b>7</b><span><b>Locrian</b> · home on 7 · unstable; rarely home for long</span></li></ul>
+        <p>So in minor you still call the notes 6, 7, 1… not 1, 2, ♭3. One map for everything; you just hear a different home.</p></div>
+      <div class="panelcard"><h3>How to use it</h3>
+        <p><b>1. Start with Today.</b> It runs a short session (5–45 minutes, your choice) and switches games for you.</p>
+        <p><b>2. In every game, sing before you answer.</b> The singing is the training; the tap just checks it.</p>
+        <p><b>3. Answer any way:</b> tap the circle, the map, the neck or keys, or play or sing it with the mic on.</p>
+        <p><b>4. Earn rings, book gigs.</b> 7 of 10 right earns a ring and opens the next set of notes. Go slowly; speed comes on its own.</p>
+        <p>Every game has a <b>?</b> button: how it works, its options, and a guided round.</p></div>
       <div class="panelcard"><h3>The circle</h3>
         <p>Numbers around the circle are a fifth apart, so neighbours sound related: 1 sits between 4 and 5, and the seven notes of the key make one unbroken arc. Chords show up as shapes: a major chord is always the same triangle.</p></div>
-      <div class="panelcard"><h3>The seven worlds</h3>
-        <p>Choose a home from the pill under the title. The map always runs from home to home.</p>
-        <ul class="worlds"><li><b>1</b> Major</li><li><b>2</b> Dorian</li><li><b>3</b> Phrygian</li><li><b>4</b> Lydian</li><li><b>5</b> Mixolydian</li><li><b>6</b> Minor</li><li><b>7</b> Locrian</li></ul></div>
       <div class="panelcard"><h3>What the colours mean</h3><ul class="legend">
           <li><span class="sw home"></span>Home (1 in major, 6 in minor)</li>
           <li><span class="sw off"></span>Faded: not in play</li>
@@ -889,7 +928,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <div class="games">
   <section class="stage" id="panel-deg">
     <p class="eyebrow">Cadence, then one note</p>
-    <div class="howto"><p>You hear the key: a cadence, or the drone.</p><p>Then one note.</p><p>Sing it, then tap its number on the circle, the map or the neck.</p><p>You'll hear it walk home.</p><p>Keys: 1–8 answer · Space next · R replay · C cadence</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> this is the core skill. Hearing any note as a number against home is what lets you play what you hear, find a melody by ear, and always know where you are.</p><p>You hear the key: a cadence, or the drone.</p><p>Then one note.</p><p>Sing it, then tap its number on the circle, the map or the neck.</p><p>You'll hear it walk home.</p><p>Keys: 1–8 answer · Space next · R replay · C cadence</p></div>
     <p class="starter" id="starter"><b>New here?</b> Keep Notes on "Home chord". Move on after 8 in a row.</p>
     <p class="prompt" id="deg-prompt"></p>
     <p class="feedback" id="deg-fb"></p>
@@ -915,7 +954,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-chord" hidden>
     <p class="eyebrow">Melody note over a chord</p>
-    <div class="howto"><p>The key is set, then a chord plays.</p><p>One note rings on top of it.</p><p>Name that top note's number, counted from the key's 1.</p><p>The same note rests on one chord and pulls on another. That's soloing.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> a melody note feels different over each chord, resting on one and pulling on the next. Feeling that is how soloists choose notes as the chords change.</p><p>The key is set, then a chord plays.</p><p>One note rings on top of it.</p><p>Name that top note's number, counted from the key's 1.</p><p>The same note rests on one chord and pulls on another. That's soloing.</p></div>
     <p class="prompt" id="ch-prompt">Press Start.</p>
     <p class="feedback" id="ch-fb"></p>
     <div class="actions">
@@ -941,7 +980,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-phr" hidden>
     <p class="eyebrow">Imagine, sing, play</p>
-    <div class="howto"><p>Imagine first: read the numbers, sing them, then reveal.</p><p>Hear and name: a short line plays. Tap its numbers in order.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> it joins your inner ear to the numbers. You imagine and sing before you hear, which is how you'll one day play the lines in your head.</p><p>Imagine first: read the numbers, sing them, then reveal.</p><p>Hear and name: a short line plays. Tap its numbers in order.</p></div>
     <div class="actions">
       <div class="seg" id="pmode"><button data-v="imagine">Imagine first</button><button data-v="hear">Hear and name</button></div>
       <label class="field"><span>Length</span><select id="plen"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
@@ -961,7 +1000,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-find" hidden>
     <p class="eyebrow">The map on the neck</p>
-    <div class="howto"><p>A number appears.</p><p>Tap every place it lives on the neck, inside the bright frets.</p><p>Ask by sound plays the note instead of showing it.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> it puts the map under your fingers. Each number gets places on the neck in every position, so hearing a number means knowing where your hand goes.</p><p>A number appears.</p><p>Tap every place it lives on the neck, inside the bright frets.</p><p>Ask by sound plays the note instead of showing it.</p></div>
     <details class="more"><summary>Options</summary>
     <div class="actions" style="margin-top:8px">
       <div class="field"><span>Ask by</span><div class="seg" id="find-ask"><button data-v="number">Number</button><button data-v="sound">Sound</button></div></div>
@@ -981,7 +1020,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
-    <div class="howto"><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
     <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Learn the shapes</button><button data-v="quiz">Quiz: which chord?</button></div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
       <p class="prompt" id="vox-prompt">Pick a chord. The arrows move the same chord up the neck.</p>
@@ -1008,7 +1047,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <input type="checkbox" id="cc-7" hidden>
     <div class="ccscroll"><div class="cc" id="cc"></div></div>
     <div class="ccnotes">
-      <p class="cclegend"><span class="li"><span class="lg big"></span> big step: 4 frets on one string</span><span class="li"><span class="lg small"></span> small step: 3 frets</span></p>
+      <p class="cclegend"><span class="li"><b>W</b> whole step (2 frets) · <b style="color:var(--brass)">H</b> half step (1 fret)</span><span class="li"><span class="lg big"></span> big step: 4 frets on one string</span><span class="li"><span class="lg small"></span> small step: 3 frets</span></p>
       <p><span class="qual maj">major</span> 1, 4, 5: big step, then small. Bright, stable.</p>
       <p><span class="qual min">minor</span> 2, 3, 6: small step, then big. Darker.</p>
       <p><span class="qual dim">diminished</span> 7: two small steps. Tense; it's the 5 chord without its root (5 <b>7 2 4</b>), so it pulls to 1.</p>
@@ -1022,7 +1061,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-duel" hidden>
     <p class="eyebrow">Duel</p>
-    <div class="howto"><p>It always starts on home (1), so the first note is free.</p><p>Then it plays the notes so far, plus one new one. Play them all back, one note at a time.</p><p>Keep going as long as you can. One slip and the duel is over.</p><p>Answer by tapping, or play or sing them with the mic on.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> playing back a growing phrase trains musical memory, the heart of learning by ear and trading phrases with others.</p><p>It always starts on home (1), so the first note is free.</p><p>Then it plays the notes so far, plus one new one. Play them all back, one note at a time.</p><p>Keep going as long as you can. One slip and the duel is over.</p><p>Answer by tapping, or play or sing them with the mic on.</p></div>
     <div class="actions"><div class="seg" id="duel-mode" hidden><button data-v="notes">Notes</button></div>
       <label class="check"><input type="checkbox" id="duel-show"> Light up the numbers while it plays</label></div>
     <p class="prompt" id="duel-prompt">Press Start. The first note is always home: 1.</p>
@@ -1034,7 +1073,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-prog" hidden>
     <p class="eyebrow">Chord to chord</p>
-    <div class="howto"><p>The key is set, then a few chords play.</p><p>Tap them in order.</p><p>Start with 1 4 5 6m. Add more chords under the options below.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> most songs move through the same few chords. Hearing 1, 4, 5 and 6m change is how you work out songs by ear.</p><p>The key is set, then a few chords play.</p><p>Tap them in order.</p><p>Start with 1 4 5 6m. Add more chords under the options below.</p></div>
     <p class="prompt" id="pg-prompt">Press Start. After the cadence, a short progression plays. Tap its chords in order.</p>
     <div class="phrase" id="pg-slots"></div>
     <div class="chordbtns" id="pg-answers"></div>
@@ -1982,6 +2021,7 @@ function renderCC(){
   const seven=!!S.cc7,cols=seven?13:11,el=$('cc'),h0=ccH0();
   el.style.gridTemplateColumns=`minmax(118px,auto) repeat(${cols},minmax(30px,1fr))`;
   let h='<div></div>'+Array.from({length:cols},(_,k)=>`<div class="hd">${colLab(k)}</div>`).join('');
+  h+='<div class="stp"></div>'+Array.from({length:cols},(_,k)=>{if(!k)return '<div class="stp"></div>';const st=semiOf(h0+k)-semiOf(h0+k-1);return `<div class="stp"><span class="${st===1?'h':''}" title="${st===1?'Half step: 1 fret':'Whole step: 2 frets'}">${st===1?'H':'W'}</span></div>`}).join('');
   for(let d=0;d<7;d++){
     const ad=(h0+d)%7,stack=seven?[d,d+2,d+4,d+6]:[d,d+2,d+4],root=DIATONIC[ad],q=QUAL[root];
     const semi=k=>semiOf(h0+k);
@@ -3246,6 +3286,20 @@ $('sf-melback').addEventListener('click',()=>{SF.mel.pop();sfRender()});
 $('sf-melplay').addEventListener('click',()=>{sfKeyNow();playNumbers(SF.mel.join(' '))});
 $('sf-mode').addEventListener('click',()=>setTimeout(sfRender,0));
 if(!SF.secs){SF.cur='verse';SF.secs={intro:[],verse:[],pre:[],chorus:[],bridge:[]};SF.mel=[]}sfRender();
+
+
+const WHYTXT={'deg': 'Why: this is the core skill. Hearing any note as a number against home is what lets you play what you hear, find a melody by ear, and always know where you are.', 'chord': 'Why: a melody note feels different over each chord, resting on one and pulling on the next. Feeling that is how soloists choose notes as the chords change.', 'phr': "Why: it joins your inner ear to the numbers. You imagine and sing before you hear, which is how you'll one day play the lines in your head.", 'find': 'Why: it puts the map under your fingers. Each number gets places on the neck in every position, so hearing a number means knowing where your hand goes.', 'vox': 'Why: one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.', 'prog': 'Why: most songs move through the same few chords. Hearing 1, 4, 5 and 6m change is how you work out songs by ear.', 'duel': 'Why: playing back a growing phrase trains musical memory, the heart of learning by ear and trading phrases with others.'};
+Object.keys(WHYTXT).forEach(t=>{const L=LESSONS[t];const first=['#game-title',WHYTXT[t]+' Let’s play one.',{}];
+  if(typeof L==='function')LESSONS[t]=()=>[first,...L()];else if(L)LESSONS[t]=[first,...L]});
+/* settings: "Set the key with" says what each option is, and lets you hear it */
+const CTXDESC={cad:'Four chords that walk home (for example 1 – 4 – 5 – 1). The clearest way to say "this is the key".',
+  bloom:'A low home note swells, a brighter 3 joins and fades. Softer and slower; you feel home before you think it.',
+  both:'The bloom first, then the chords. The strongest sense of home, and the slowest.'};
+function ctxDesc(){let d=$('ctxdesc');if(!d){d=document.createElement('p');d.id='ctxdesc';d.className='ctxdesc';$('ctxmode').closest('.field').appendChild(d);
+    const b=document.createElement('button');b.type='button';b.className='btn';b.id='ctx-hear';b.textContent='Hear it';b.style.marginTop='6px';b.style.alignSelf='flex-start';$('ctxmode').closest('.field').appendChild(b);
+    b.addEventListener('click',()=>{stopAll();ensure();cadence(ctx.currentTime+0.05)})}
+  d.textContent=CTXDESC[S.ctxMode]||''}
+$('ctxmode').addEventListener('change',()=>{ctxDesc();stopAll();ensure();cadence(ctx.currentTime+0.05)});ctxDesc();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
