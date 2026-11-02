@@ -483,6 +483,10 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+.badge .bi{overflow:hidden;line-height:1}
+.badge .bi.sm{font-size:13px;letter-spacing:-.02em}
+.badge .bi svg.rings{width:14px;height:22px;margin-left:4px}
+.badge.on .bi svg.rings path{stroke:color-mix(in srgb,var(--on-brass) 30%,transparent)}.badge.on .bi svg.rings path.on{stroke:var(--on-brass)}.badge.on .bi svg.rings circle{fill:var(--on-brass)}
 
 .pgsteps{display:flex;gap:4px;flex-wrap:wrap}
 .pgsteps span{font:600 11px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;color:var(--muted);background:var(--sunk)}
@@ -2730,7 +2734,7 @@ function renderRank(){const x=GAME.xp,r=rankOf(x),nx=RANKS[r+1];
    <div class="rankbar"><i style="width:${nx?Math.round(100*(x-RANKS[r][0])/(nx[0]-RANKS[r][0])):100}%"></i></div>
    <p class="hint">${x.toLocaleString()} XP${nx?` · ${(nx[0]-x).toLocaleString()} to ${nx[1]}`:' · top rank'}. The Big Ears Club starts at ${RANKS[CLUB][0].toLocaleString()} XP.</p>
    <div class="ranks">${RANKS.map((q,j)=>`<span class="${j<=r?'on':''}">${q[1]}</span>`).join('')}</div>`;
-  $('badges').innerHTML=BADGES.map(b=>`<div class="badge${GAME.badges[b[0]]?' on':''}" title="${b[3]}"><span class="bi">${b[1]}</span><b>${b[2]}</b><span>${b[3]}</span></div>`).join('')}
+  $('badges').innerHTML=BADGES.map(b=>`<div class="badge${GAME.badges[b[0]]?' on':''}" title="${b[3]}"><span class="bi${String(b[1]).length>2?' sm':''}">${b[0]==='gem1'?ringsSVG(1):b[0]==='gem3'?ringsSVG(3):b[1]}</span><b>${b[2]}</b><span>${b[3]}</span></div>`).join('')}
 
 // panel toggle: full, buttons only, hidden
 const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',mini:'Buttons',none:'Hidden'};
