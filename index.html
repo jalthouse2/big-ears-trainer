@@ -483,6 +483,11 @@ body[data-screen="game"] .bottomnav{display:none}
   .hero{min-height:min(34vh,300px)}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
+
+#vox-chords,#sh-chords,#vq-answers{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+#vq-answers:has(> :nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr))}
+#vox-chords>*,#sh-chords>*,#vq-answers>*{min-width:0;padding-left:0;padding-right:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip}
+#sh-chords>*{font-size:clamp(11px,3.3vw,15px);letter-spacing:-.02em}
 .shq button{min-width:52px}
 .cc .d.gone{opacity:.28;border-style:dashed;background:transparent}
 
