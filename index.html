@@ -484,6 +484,10 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
+.dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg)}
+.voxmode{align-self:flex-start}
+.voxmode button{min-height:36px;padding:6px 14px}
+
 .tbtns{display:inline-flex;gap:6px}
 #tune-drone[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:var(--on-brass)}
 .beatp{align-items:stretch;gap:16px}
@@ -934,14 +938,14 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
-    <div class="howto"><p>Explore: pick a chord, then walk its shapes up the neck.</p><p>Quiz: a shape lights up and plays. Name the chord, its top note or its bass.</p></div>
-    <div class="seg" id="vox-mode"><button data-v="explore">Explore shapes</button><button data-v="quiz">Which chord is this?</button></div>
+    <div class="howto"><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
+    <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Learn the shapes</button><button data-v="quiz">Quiz: which chord?</button></div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
-      <p class="hint">Pick a chord, then a group of three strings. "Next shape" walks the triad up the neck: root position, 1st inversion, 2nd inversion, and round again.</p>
+      <p class="prompt" id="vox-prompt">Pick a chord. The arrows move the same chord up the neck.</p>
       <div class="chordbtns" id="vox-chords"></div>
-      <div class="actions"><label class="field"><span>Strings</span><select id="vx-strings">
+      <div class="actions keep"><label class="field"><span>On strings</span><select id="vx-strings">
         <option value="all">All string groups</option><option value="0">G B e (top three)</option><option value="1">D G B</option><option value="2">A D G</option><option value="3">E A D (bottom three)</option></select></label></div>
-      <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play shape</button></div>
+      <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play it</button></div>
       <p class="feedback" id="vox-info"></p>
     </div>
     <div id="vox-quiz" class="sub" style="border-top:0;padding-top:0" hidden>
@@ -975,10 +979,10 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-duel" hidden>
     <p class="eyebrow">Duel</p>
-    <div class="howto"><p>The app plays a short phrase. Play it back.</p><p>Get it right and it plays it again, with one more added.</p><p>Keep going as long as you can. One slip and the duel is over.</p><p>Answer by tapping, or play it on your instrument with the mic on.</p></div>
-    <div class="actions"><div class="field"><span>Duel with</span><div class="seg" id="duel-mode"><button data-v="notes">Notes</button><button data-v="chords">Chords</button></div></div>
+    <div class="howto"><p>It always starts on home (1), so the first note is free.</p><p>Then it plays the notes so far, plus one new one. Play them all back, one note at a time.</p><p>Keep going as long as you can. One slip and the duel is over.</p><p>Answer by tapping, or play or sing them with the mic on.</p></div>
+    <div class="actions"><div class="seg" id="duel-mode" hidden><button data-v="notes">Notes</button></div>
       <label class="check"><input type="checkbox" id="duel-show"> Light up the numbers while it plays</label></div>
-    <p class="prompt" id="duel-prompt">Press Start. Notes come from the gig you're on.</p>
+    <p class="prompt" id="duel-prompt">Press Start. The first note is always home: 1.</p>
     <div class="phrase duelslots" id="duel-slots"></div>
     <div class="chordbtns" id="duel-chords" hidden></div>
     <p class="feedback" id="duel-fb"></p>
@@ -1201,7 +1205,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <label class="check"><input type="checkbox" id="mic-oct"> Octave must match</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
         <label class="check"><input type="checkbox" id="mic-next"> Two muted strums = Next</label>
-        <span class="hint">The mic pauses while the app plays (and while the drone is on). Use headphones so it only hears you. Answer any question by playing or singing the note; chord questions take the chord's root.</span>
+        <span class="hint">The mic pauses while the app plays, and ignores the drone's note unless you start it yourself. Use headphones so it only hears you. Answer any question by playing or singing the note; chord questions take the chord's root.</span>
       </div>
       <div class="drawer-folds">
       <details class="more"><summary>Pick notes yourself</summary>
@@ -1240,6 +1244,7 @@ const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
 if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
+if(!S.v6){S.v6=true;if(S.vxStr==='all')S.vxStr='0';S.duelMode='notes'}
 const persist=()=>save('tmt-settings',S);
 
 /* ---------- levels ---------- */
@@ -1833,8 +1838,8 @@ $('vx-strings').addEventListener('change',e=>{S.vxStr=e.target.value;persist();r
 function voiceText(ms){const sorted=ms.slice().sort((a,b)=>a-b);return sorted.map(m=>lab(offOf(m))).join(' · ')}
 function showShapeInfo(){
   const sh=VX.shapes[VX.i],c=VCH[S.voxChord];
-  $('vox-info').innerHTML=sh?`The <b>${c[1]}</b> chord = ${c[2].map(lab).join(' ')}. Shape ${VX.i+1} of ${VX.shapes.length}, low to high: <span class="path">${voiceText(sh.ms)}</span> <br><b>${invOf(sh,c[2])}</b> on the ${setName(sh)}, top note ${lab(offOf(Math.max(...sh.ms)))}.`+(VX.wide?`<br><span class="hint">No shape for this chord fits inside ${WINDOWS[S.win].name.toLowerCase()}, so these are the nearest ones on the neck.</span>`:'')
-    :`No three-string shapes for this chord in ${WINDOWS[S.win].name.toLowerCase()}. Try a wider window.`;renderFB()}
+  $('vox-info').innerHTML=sh?`<b>${c[1]}</b> chord (${c[2].map(lab).join(' ')}) · shape ${VX.i+1} of ${VX.shapes.length}<br><b>${invOf(sh,c[2]).split(' (')[0][0].toUpperCase()+invOf(sh,c[2]).split(' (')[0].slice(1)}</b>: ${voiceText(sh.ms)} from low to high, on the ${setName(sh)}`
+    :`No three-string shapes for this chord in ${WINDOWS[S.win].name.toLowerCase()}. Pick Whole neck.`;renderFB()}
 function playShape(ms,delay=0){if(!delay)stopAll();ensure();const t=ctx.currentTime+0.05+delay,sorted=ms.slice().sort((a,b)=>a-b);
   sorted.forEach((m,i)=>pluck(m,t+i*0.22,1,0.45));sorted.forEach((m,i)=>pluck(m,t+0.9+i*0.025,1.8,0.38));}
 function renderVoxChords(){
@@ -2215,7 +2220,7 @@ let busyUntil=0;
 // what the app itself played recently, and until when its sound may still ring in the room
 const RECENT=[];
 function micRecent(m,t,dur){const tail=S.voice==='ether'?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
-const echoOf=(m,now)=>RECENT.some(x=>now<x.until&&(Math.abs(m-x.m)%12===0));
+const echoOf=(m,now)=>(droneNodes&&Math.abs(m-bass(S.home))%12===0)||RECENT.some(x=>now<x.until&&(Math.abs(m-x.m)%12===0));   // the drone's note is the app's too
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
 const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
 function micKey(m,ref){
@@ -2246,7 +2251,7 @@ function micNote(m,cents){
     return answerVQ(String(offOf(m)))}}
 function micFrame(){
   if(!MIC.on)return;MIC.an.getFloatTimeDomainData(MIC.buf);
-  const now=ctx.currentTime,busy=now<busyUntil+0.15||droneNodes;if(busy){MIC.gate=busyUntil+0.15;MIC.gRms=null}
+  const now=ctx.currentTime,busy=now<busyUntil+0.15;if(busy){MIC.gate=busyUntil+0.15;MIC.gRms=null}
   const r=detectPitch(MIC.buf,ctx.sampleRate),thr=micThr(),loud=r.rms>thr;
   if(S.tab==='tune'){const bz=now<busyUntil+0.1;tunerFeed(!bz&&r.rms>thr*0.5&&r.clarity>0.7&&r.freq>60&&r.freq<1500?r.freq:0);return}
   $('mic-pill').classList.toggle('busy',now<busyUntil+0.15);
@@ -2565,10 +2570,10 @@ markStages();
 const FIT_TABS=['deg','chord','phr','find','vox','prog','duel'];
 function leanMark(){FIT_TABS.forEach(t=>{const st=$('panel-'+t);if(!st)return;st.classList.add('fit');
   st.querySelectorAll('.xtra').forEach(x=>x.classList.remove('xtra'));
-  const isKeep=el=>el.matches('.prompt,.feedback,.phrase,.chordbtns,.bignum')||(el.matches('.actions')&&el.querySelector(':scope>.btn.primary'));
+  const isKeep=el=>el.matches('.prompt,.feedback,.phrase,.chordbtns,.bignum,.keep')||(el.matches('.actions')&&el.querySelector(':scope>.btn.primary'));
   const walk=el=>{[...el.children].forEach(c=>{
-    if(isKeep(c)){if(c.matches('.actions'))[...c.children].forEach(x=>{if(!x.matches('.btn'))x.classList.add('xtra')});return}
-    if(c.querySelector('.prompt,.feedback,.phrase,.chordbtns,.bignum,.btn.primary'))walk(c);else c.classList.add('xtra')})};
+    if(isKeep(c)){if(c.matches('.actions')&&!c.matches('.keep'))[...c.children].forEach(x=>{if(!x.matches('.btn'))x.classList.add('xtra')});return}
+    if(c.querySelector('.prompt,.feedback,.phrase,.chordbtns,.bignum,.btn.primary,.keep'))walk(c);else c.classList.add('xtra')})};
   walk(st)})}
 const OPT={moved:[]};
 function openOpts(){const st=$('panel-'+S.tab);if(!st)return;const body=$('opt-body');body.innerHTML='';OPT.moved=[];
@@ -2591,6 +2596,7 @@ const IC={
   both:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v5h5"/><circle cx="10" cy="12.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
   stop:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></svg>',
   pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>',
+  drone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12c2.5-4 4.5-4 6 0s3.5 4 6 0 3.5-4 6 0"/><path d="M3 18h18" opacity=".45"/></svg>',
   cadence:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 19v-6M10 19V9M15 19V6M20 19v-6"/></svg>',
   reveal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   prev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
@@ -2603,7 +2609,7 @@ function iconFor(t){t=t.toLowerCase();
   if(/both again/.test(t))return 'both';
   if(/^(replay|replay note|replay chord|hear it|hear again|play again)$/.test(t))return 'replay';
   if(/^(stop|stop loop|end)$/.test(t))return 'stop';if(/^pause/.test(t))return 'pause';if(/^resume$/.test(t))return 'play';
-  if(/^cadence$/.test(t))return 'cadence';if(/^reveal$/.test(t))return 'reveal';if(/top note alone/.test(t))return 'note';if(/^clear/.test(t))return 'clear';
+  if(/^cadence$/.test(t))return 'cadence';if(/^drone$/.test(t))return 'drone';if(/^reveal$/.test(t))return 'reveal';if(/top note alone/.test(t))return 'note';if(/^clear/.test(t))return 'clear';
   return null}
 function iconize(b){const t=b.textContent.trim();if(!t)return;const k=iconFor(t);
   if(!k){if(b.classList.contains('ic')){b.classList.remove('ic');b.removeAttribute('aria-label')}return}
@@ -2856,7 +2862,7 @@ function pauseAll(){if(PAUSE.on)return;PAUSE.on=true;stopAll();jamStop();
 function resumeAll(){if(!PAUSE.on)return;PAUSE.on=false;if(SESS2.on)SESS2.end=Date.now()+PAUSE.left;
   if(PAUSE.drone){setDrone(true)}document.body.classList.remove('paused');syncPause()}
 function syncPause(){document.querySelectorAll('.pausebtn,#sb-pause').forEach(b=>{b.textContent=PAUSE.on?'Resume':'Pause'})}
-FIT_TABS.forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn pausebtn';b.textContent='Pause';
+FIT_TABS.filter(t=>t!=='vox').forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn pausebtn';b.textContent='Pause';
   row.insertBefore(b,row.children[1]||null);iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
 document.addEventListener('click',e=>{const b=e.target.closest('.pausebtn,#sb-pause');if(!b)return;PAUSE.on?resumeAll():pauseAll()});
 // any play/next press ends a pause
@@ -2874,17 +2880,17 @@ function duelSync(){document.querySelectorAll('#duel-mode button').forEach(b=>b.
 function duelSlots(lit=-1){const el=$('duel-slots');if(!DUEL.seq.length){el.innerHTML='';return}
   el.innerHTML=DUEL.seq.map((x,j)=>{const txt=S.duelMode==='chords'?x[1]:lab(x.o),wide=S.duelMode==='chords'&&txt.length>1?' wide':'';
     let c='';if(j<DUEL.i)c='ok';else if(DUEL.over&&j===DUEL.i)c='no';else if(DUEL.listen&&j===DUEL.i)c='cur';if(j===lit)c='lit';
-    const show=j<DUEL.i||DUEL.over||(j===lit&&S.duelShow);return `<i class="${c}${wide}">${show?txt:''}</i>`}).join('')}
-function duelAdd(){if(S.duelMode==='chords'){const set=duelChordSet();let c;do{c=pick(set)}while(DUEL.seq.length&&c===DUEL.seq[DUEL.seq.length-1]&&set.length>1);DUEL.seq.push(c)}
+    const show=j===0||j<DUEL.i||DUEL.over||(j===lit&&S.duelShow);return `<i class="${c}${wide}">${show?txt:''}</i>`}).join('')}
+function duelAdd(){S.duelMode='notes';if(!DUEL.seq.length){DUEL.seq.push({o:S.home,m:inRange(S.home,melLo(),melHi())});return}if(S.duelMode==='chords'){const set=duelChordSet();let c;do{c=pick(set)}while(DUEL.seq.length&&c===DUEL.seq[DUEL.seq.length-1]&&set.length>1);DUEL.seq.push(c)}
   else{const last=DUEL.seq.length?DUEL.seq[DUEL.seq.length-1].o:null,pl=S.pool.length>1?S.pool.filter(o=>o!==last):S.pool;const o=pick(pl);DUEL.seq.push({o,m:inRange(o,melLo(),melHi())})}}
 function duelPlay(withCad){stopAll();ensure();DUEL.listen=false;DUEL.i=0;duelSlots();const t=ctx.currentTime+0.05;let d=withCad?cadence(t)+0.2:0.1;
   const st=(S.duelMode==='chords'?1.1:0.62)*PACE();
-  $('duel-prompt').textContent=`Round ${DUEL.seq.length}: listen…`;
+  $('duel-prompt').textContent=`Round ${DUEL.seq.length-1}: listen…`;
   DUEL.seq.forEach((x,j)=>{const at=d+j*st;
     if(S.duelMode==='chords')chord(x[0],x[2],t+at,st*0.95,0.22,!S.duelShow);else pluck(x.m,t+at,Math.min(1.1,st*1.4),0.52);
     later(at*1000,()=>{duelSlots(j);if(S.duelShow&&S.duelMode!=='chords'){nowKey=keyFor(x.m);renderPad()}})});
-  const end=d+DUEL.seq.length*st;later(end*1000,()=>{nowKey=null;DUEL.listen=true;duelSlots();renderPad();$('duel-prompt').textContent=DUEL.seq.length===1?'Your turn: play it back.':`Your turn: play back all ${DUEL.seq.length}.`})}
-function duelStart(){DUEL={seq:[],i:0,listen:false,over:false,round:0};clearMarks();$('duel-fb').textContent='';duelAdd();$('duel-start').textContent='Restart';duelPlay(true)}
+  const end=d+DUEL.seq.length*st;later(end*1000,()=>{nowKey=null;DUEL.listen=true;duelSlots();renderPad();$('duel-prompt').textContent=`Your turn: start on ${lab(S.home)}, then play back all ${DUEL.seq.length}.`})}
+function duelStart(){DUEL={seq:[],i:0,listen:false,over:false,round:0};clearMarks();$('duel-fb').textContent='';duelAdd();duelAdd();$('duel-start').textContent='Restart';duelPlay(true)}
 function duelInput(ans){if(!DUEL.listen||DUEL.over)return;const x=DUEL.seq[DUEL.i];
   const right=S.duelMode==='chords'?ans===x[1]:ans===x.o;
   if(S.duelMode==='chords'){stopAll();ensure();const c=pgFind(ans)||VCH.find(v=>v[1]===ans);if(c)chord(c[0],c[2],ctx.currentTime+0.02,0.8,0.2,true)}
@@ -3009,6 +3015,14 @@ $('beat-vol').addEventListener('input',e=>{S.beatVol=Number(e.target.value);pers
 $('beat-accent').addEventListener('change',e=>{S.beatAccent=e.target.checked;persist()});
 $('beat-climb').addEventListener('change',e=>{S.beatClimb=e.target.checked;persist()});
 document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.observe(b,{childList:true,characterData:true,subtree:true})});
+
+
+/* drone at hand: the same drone as in Settings, from the game's button row */
+['deg','chord','phr','duel','prog'].forEach(t=>{const row=document.querySelector(`#panel-${t} .primary-row`);if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
+  row.appendChild(b);iconize(b)});
+function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?'Drone on: tap to stop':'Drone: hold home underneath'})}
+document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
+new MutationObserver(syncDroneBtns).observe($('drone'),{attributes:true,attributeFilter:['aria-pressed']});syncDroneBtns();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
