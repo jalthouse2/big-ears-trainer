@@ -817,15 +817,18 @@ body.paused .circgo{opacity:.5}
 .kfbest .hd .q{font-size:13px;color:var(--muted)}
 .kfbest .hd .pc{margin-left:auto;font:700 20px/1 var(--font-display);color:var(--brass)}
 .kfcands{display:flex;flex-direction:column;gap:6px}
-.kfcand{display:grid;grid-template-columns:minmax(0,1fr) 56px 36px 40px;gap:8px;align-items:center}
+.kfcand{display:grid;grid-template-columns:minmax(0,1fr) 36px 32px 40px 40px;gap:6px;gap:8px;align-items:center}
 .kfcand .k{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;text-align:left;color:var(--fg);font:600 15px var(--font-body);min-height:40px}
-.kfcand .k small{display:block;font:500 11px var(--font-mono);color:var(--muted)}
+.kfcand .k small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:500 11px var(--font-mono);color:var(--muted)}
 .kfcand .k[aria-pressed="true"]{border:2px solid var(--home)}
 .kfcand .b{height:8px;border-radius:99px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
 .kfcand .b i{display:block;height:100%;background:var(--brass)}
 .kfcand .p{font:600 13px var(--font-mono);color:var(--muted);text-align:right}
 .kfcand .play{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center}
 .kfcand .play svg{width:12px;height:12px;fill:currentColor}
+.kfcand .play.dr svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.kfcand .play.dr[aria-pressed="true"],.kfask .opt button.dr[aria-pressed="true"]{background:var(--home);border-color:var(--home);color:var(--on-brass)}
+.kfask .opt button.dr svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .kfask{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:16px;border:2px dashed var(--brass);background:var(--brass-soft)}
 .kfask .eb{font:600 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
 .kfask p{margin:0;font-size:15px;line-height:1.4}
@@ -1595,7 +1598,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const homeName=()=>`${NAMES[(S.key+S.home)%12]} ${WORLD[S.home][1]}`;
 
 /* ---------- audio ---------- */
-let ctx=null,master=null,active=[],gen=0,droneNodes=null;
+let ctx=null,master=null,active=[],gen=0,droneNodes=null,droneRootPin=null;
 let voiceIn=null,wet=null,conv=null;
 function makeIR(sec){const sr=ctx.sampleRate,n=Math.floor(sr*sec),b=ctx.createBuffer(2,n,sr);
   for(let c=0;c<2;c++){const d=b.getChannelData(c);let lp=0;for(let i=0;i<n;i++){lp=lp*0.6+(Math.random()*2-1)*0.4;d[i]=lp*Math.pow(1-i/n,3.2)}}return b}
@@ -1709,15 +1712,15 @@ function bloom(t){
   later(at+550*k,()=>{if(chordNow&&chordNow.tok===tok){chordNow.tones=[root,third];showChordNow()}});
   later(at+2300*kk,()=>{if(chordNow&&chordNow.tok===tok){chordNow=null;showChordNow()}});
   return 1.9*k}
-function setDrone(on,slow){
+function setDrone(on,slow,rootM){
   if(droneNodes){const n=droneNodes;droneNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,slow?1.2:0.15);setTimeout(()=>n.o.forEach(o=>{try{o.stop()}catch(e){}}),slow?6000:700)}
   if(!on)return;ensure();
   const g=ctx.createGain();g.gain.value=0.0001;g.connect(master);
   const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=900;fl.Q.value=0.6;fl.connect(g);
   const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=0.07;lg.gain.value=350;lfo.connect(lg);lg.connect(fl.frequency);lfo.start();
-  const root=bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.5],[root+12,'sine',0.32],...(S.droneFifth?[[root+7,'sine',0.1]]:[]),[root+12.06,'sine',0.12]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
+  const root=rootM??droneRootPin??bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.5],[root+12,'sine',0.32],...(S.droneFifth?[[root+7,'sine',0.1]]:[]),[root+12.06,'sine',0.12]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
     const gg=ctx.createGain();gg.gain.value=a;x.connect(gg);gg.connect(fl);x.start();return x});o.push(lfo);
-  g.gain.setTargetAtTime(0.09,ctx.currentTime,0.6);droneNodes={g,o}}
+  g.gain.setTargetAtTime(0.09,ctx.currentTime,0.6);droneNodes={g,o,root}}
 
 /* ---------- the pad (tonal map) ---------- */
 let marks={},trail=new Set(),nowKey=null;
@@ -2564,7 +2567,7 @@ let busyUntil=0;
 // what the app itself played recently, and until when its sound may still ring in the room
 const RECENT=[];
 function micRecent(m,t,dur){const tail=S.voice==='ether'?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
-const echoOf=(m,now)=>(droneNodes&&[0,7].includes((((m-bass(S.home))%12)+12)%12))||RECENT.some(x=>now<x.until&&[0,7].includes((((m-x.m)%12)+12)%12));   // the drone's note is the app's too
+const echoOf=(m,now)=>(droneNodes&&[0,7].includes((((m-(droneNodes.root??bass(S.home)))%12)+12)%12))||RECENT.some(x=>now<x.until&&[0,7].includes((((m-x.m)%12)+12)%12));   // the drone's note is the app's too
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
 const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
 function micKey(m,ref){
@@ -3096,7 +3099,7 @@ $('dec-clear').addEventListener('click',()=>{$('dec-in').value='';DEC.frets=Arra
 var KF=null;
 const KK_MAJ=[6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88],KK_MIN=[6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17];
 const SC_MAJ=[0,2,4,5,7,9,11],SC_MIN=[0,2,3,5,7,8,10];
-function kfInit(){KF={ev:[],g:0,w:Array(12).fill(0),max:0,yes:new Set(),no:new Set(),home:null,notHome:new Set(),q:null,skipped:new Set(),follow:true,prev:null,keep:false,shown:null,flash:null,tm:null,holdP:null,holdT:0,R:[]}}
+function kfInit(){KF={drone:null,ev:[],g:0,w:Array(12).fill(0),max:0,yes:new Set(),no:new Set(),home:null,notHome:new Set(),q:null,skipped:new Set(),follow:true,prev:null,keep:false,shown:null,flash:null,tm:null,holdP:null,holdT:0,R:[]}}
 kfInit();
 const kfName=k=>`${NAMES[k.t]} ${k.mn?'minor':'major'}`;
 const kfKey1=k=>k.mn?(k.t+3)%12:k.t;
@@ -3135,6 +3138,11 @@ function kfUpdate(){if(!KF)return;kfRecalc();const R=kfRank();KF.R=R;const best=
   kfRender();renderPad();if(S.showNeck||S.inst==='piano')renderFB()}
 function kfSoon(){if(KF.tm)return;KF.tm=setTimeout(()=>{KF.tm=null;kfUpdate()},220)}
 const kfPlayIcon='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>';
+const kfDroneIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h3c2 0 2-5 4-5s2 10 4 10 2-10 4-10 2 5 4 5h1"/></svg>';
+// a drone on a candidate's home note: play along over it and hear whether the song settles there
+function kfDroneOn(t){KF.drone=t;droneRootPin=40+((t-4+12)%12);ensure();setDrone(true);if(typeof DR!=='undefined')DR.sleep=false}
+function kfDroneOff(){if(KF&&KF.drone==null)return;if(KF)KF.drone=null;droneRootPin=null;setDrone(false,true)}
+function kfDroneToggle(t){if(KF.drone===t)kfDroneOff();else kfDroneOn(t);kfRender()}
 function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
   const cur=R.find(r=>r.id===KF.shown)||null,scl=cur?kfScale(cur):null;
   // strip: twelve notes from the 1 of the key on the map
@@ -3143,10 +3151,10 @@ function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
     return `<div class="${cls}" title="${NAMES[ap]}: ${w?Math.round(w*10)/10:'not heard'}"><span class="bar"><i style="height:${h}%"></i></span><span class="nt">${NAMES[ap]}</span><span class="dg">${lab(d)}</span></div>`}).join('');
   // question
   const q=KF.q;let a='';
-  if(q){const opt=(p,i)=>`<span class="opt"><button data-kfa="${p}">${NAMES[p]}</button><button class="h" data-kfh="${i}" aria-label="Hear ${NAMES[p]}">${kfPlayIcon}</button></span>`;
+  if(q){const opt=(p,i)=>`<span class="opt"><button data-kfa="${p}">${NAMES[p]}</button><button class="h" data-kfh="${i}" aria-label="Hear ${NAMES[p]}">${kfPlayIcon}</button>${q.type==='home'?`<button class="h dr" data-kfd="${p}" aria-pressed="${KF.drone===p}" aria-label="Drone on ${NAMES[p]}">${kfDroneIcon}</button>`:''}</span>`;
     if(q.type==='pick')a=`<div class="kfask"><span class="eb">One note decides it</span><p><b>${kfName(q.A)}</b> or <b>${kfName(q.B)}</b>? They differ by one note: <b>${NAMES[q.opts[0]]}</b> or <b>${NAMES[q.opts[1]]}</b>. Play along with the song, try both, then play the one that fits. Or tap it.</p><div class="opts">${q.opts.map(opt).join('')}</div><button class="skip" data-kfs="1">Can't tell, ask something else</button></div>`;
-    else if(q.type==='home')a=`<div class="kfask"><span class="eb">Where's home?</span><p>Same notes, two possible homes: <b>${NAMES[q.A.t]}</b> (${kfName(q.A)}) or <b>${NAMES[q.B.t]}</b> (${kfName(q.B)}). Which note does the song come to rest on, at the end of a phrase or the very end? Hold it for a second on the guitar, or tap it. Play to hear each key's cadence.</p><div class="opts">${q.opts.map(opt).join('')}</div><button class="skip" data-kfs="1">Not sure, skip</button></div>`;
-    else a=`<div class="kfask"><span class="eb">Check home</span><p>Hold <b>${NAMES[q.A.t]}</b> under the song (play to hear it). Does it sound settled, like nothing is left to resolve?</p><div class="opts"><span class="opt"><button data-kfc="1">Yes, that's home</button></span><span class="opt"><button data-kfc="0">No</button></span><span class="opt"><button data-kfh="0">${kfPlayIcon}&nbsp;${NAMES[q.A.t]}</button></span></div></div>`}
+    else if(q.type==='home')a=`<div class="kfask"><span class="eb">Where's home?</span><p>Same notes, two possible homes: <b>${NAMES[q.A.t]}</b> (${kfName(q.A)}) or <b>${NAMES[q.B.t]}</b> (${kfName(q.B)}). Which note does the song come to rest on, at the end of a phrase or the very end? Hold it for a second on the guitar, or tap it. ▶ plays each key's cadence; the wave holds a drone on it while the song plays.</p><div class="opts">${q.opts.map(opt).join('')}</div><button class="skip" data-kfs="1">Not sure, skip</button></div>`;
+    else a=`<div class="kfask"><span class="eb">Check home</span><p>Turn on the <b>${NAMES[q.A.t]}</b> drone and play the song over it. Does it sound settled, like nothing is left to resolve?</p><div class="opts"><span class="opt"><button class="dr" data-kfd="${q.A.t}" aria-pressed="${KF.drone===q.A.t}">${kfDroneIcon} Drone ${NAMES[q.A.t]}</button></span><span class="opt"><button data-kfc="1">Yes, that's home</button></span><span class="opt"><button data-kfc="0">No</button></span></div></div>`}
   $('kf-ask').innerHTML=a;
   // result
   let o='';
@@ -3156,7 +3164,7 @@ function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
     o=`<div class="kfbest"><div class="hd"><span class="nm">${kfName(best)}</span><span class="q">home ${best.mn?'6':'1'} · ${NAMES[kfKey1(best)]} = 1</span><span class="pc">${best.pct}%</span></div>`
       +(settled?`<p class="kfdone"><b>Settled.</b> The notes fit and you confirmed ${NAMES[best.t]} as home.</p>`:'')
       +(outs.length&&cur?`<p class="kfdone">Outside ${kfName(cur)}: ${outs.map(p=>`<b style="color:var(--bad)">${NAMES[p]}</b> (${lab((p-S.key+12)%12)})`).join(', ')}. ${outs.length===1?'One borrowed note is normal; a whole section of them can mean the key changes there.':'Several outside notes can mean a key change, or a section in another key.'}</p>`:'')
-      +`<div class="kfcands">${top.map(k=>`<div class="kfcand"><button class="k" data-kfk="${k.id}" aria-pressed="${KF.shown===k.id}">${kfName(k)}<small>home ${k.mn?'6':'1'} · ${NAMES[kfKey1(k)]} = 1</small></button><span class="b"><i style="width:${k.pct}%"></i></span><span class="p">${k.pct}%</span><button class="play" data-kfp="${k.id}" aria-label="Hear ${kfName(k)}">${kfPlayIcon}</button></div>`).join('')}</div>`
+      +`<div class="kfcands">${top.map(k=>`<div class="kfcand"><button class="k" data-kfk="${k.id}" aria-pressed="${KF.shown===k.id}">${kfName(k)}<small>home ${k.mn?'6':'1'} · ${NAMES[kfKey1(k)]} = 1</small></button><span class="b"><i style="width:${k.pct}%"></i></span><span class="p">${k.pct}%</span><button class="play" data-kfp="${k.id}" aria-label="Hear a cadence in ${kfName(k)}">${kfPlayIcon}</button><button class="play dr" data-kfd="${k.t}" aria-pressed="${KF.drone===k.t}" aria-label="Drone on ${NAMES[k.t]}" title="Drone on ${NAMES[k.t]}">${kfDroneIcon}</button></div>`).join('')}</div>`
       +`<label class="kffollow"><input type="checkbox" id="kf-follow" ${KF.follow?'checked':''}> The map follows the best guess</label>`
       +`<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn${KF.keep?'':' primary'}" id="kf-keep">${KF.keep?'Kept for every game':'Practise in '+(cur?kfName(cur):kfName(best))}</button></div></div>`}
   $('kf-out').innerHTML=o}
@@ -3208,13 +3216,13 @@ function kfAddText(){const v=$('kf-in').value;if(!v.trim())return;const r=kfPars
   $('kf-in').value='';kfAdd(r.ps,1,'text')}
 function kfEnter(){if(!KF)kfInit();if(S.tab!=='key')return;if(!KF.prev)KF.prev={key:S.key,home:S.home};KF.keep=false;
   const cur=KF.R.find(r=>r.id===KF.shown);if(cur)kfApplyKey(cur);kfUpdate()}
-function kfLeave(){if(!KF||!KF.prev)return;const p=KF.prev;KF.prev=null;
+function kfLeave(){kfDroneOff();if(!KF||!KF.prev)return;const p=KF.prev;KF.prev=null;
   if(!KF.keep&&(S.key!==p.key||S.home!==p.home)){S.key=p.key;S.home=p.home;if(gameReady)resetKeyContext();else syncSettings()}
   else if(KF.keep&&gameReady)resetKeyContext()}
 $('kf-add').addEventListener('click',kfAddText);
 $('kf-in').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();kfAddText()}});
 $('kf-undo').addEventListener('click',()=>{if(!KF.ev.length)return;const g=KF.ev[KF.ev.length-1].g;KF.ev=KF.ev.filter(e=>e.g!==g);KF.q=null;$('kf-read').textContent='Undone.';kfUpdate()});
-$('kf-clear').addEventListener('click',()=>{const prev=KF.prev,keep=KF.keep;kfInit();KF.prev=prev;KF.keep=keep;$('kf-read').textContent='';$('kf-in').value='';
+$('kf-clear').addEventListener('click',()=>{kfDroneOff();const prev=KF.prev,keep=KF.keep;kfInit();KF.prev=prev;KF.keep=keep;$('kf-read').textContent='';$('kf-in').value='';
   if(prev){S.key=prev.key;S.home=prev.home;syncSettings();renderCirc()}kfUpdate()});
 $('kf-ex').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('kf-in').value=b.dataset.x;kfAddText()});
 $('panel-key').addEventListener('click',e=>{const t=e.target.closest('button,input');if(!t)return;const d=t.dataset;
@@ -3224,6 +3232,7 @@ $('panel-key').addEventListener('click',e=>{const t=e.target.closest('button,inp
   if(d.kfc!==undefined){const q=KF.q;if(!q)return;if(d.kfc==='1'){KF.home=q.A.t;toast(`Home: ${NAMES[q.A.t]}`)}else KF.notHome.add(q.A.t);KF.q=null;return kfUpdate()}
   if(d.kfk){const k=KF.R.find(r=>r.id===d.kfk);if(!k)return;KF.follow=false;KF.shown=k.id;kfApplyKey(k);return kfUpdate()}
   if(d.kfp){const k=KF.R.find(r=>r.id===d.kfp);if(k)kfHearKey(k);return}
+  if(d.kfd!==undefined)return kfDroneToggle(Number(d.kfd));
   if(t.id==='kf-follow'){KF.follow=t.checked;if(KF.follow)KF.shown=null;return kfUpdate()}
   if(t.id==='kf-keep'){const k=KF.R.find(r=>r.id===KF.shown)||KF.R[0];if(!k)return;kfApplyKey(k);KF.keep=true;persist();toast(`Every game now uses ${kfName(k)}`);kfRender()}});
 
