@@ -37,6 +37,7 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Bottom nav: Home · Path · Games · Tools · More. Home stays short: Today, Your path, Weekly challenge. Games (`scr-games`) lists every game. Path (`scr-path`) shows tours, gigs, rings and a "Next gig" Play button. More (`scr-more`) holds Profile (`scr-profile`), Stats and badges, Settings, Guide, Welcome intro, About (`scr-about`: what it is, what's free, your data, tips, share). Keep About in step when pricing or data handling changes. The settings gear only shows inside games; elsewhere Settings is in More. Songs live at the end of Tools.
 - Leaving a game turns the drone off at once.
 - Audio runs through headroom, a gentle compressor and a limiter (`ensure()`), with `latencyHint:'playback'`, so it never crackles. Keep new voices quiet enough not to stack into clipping.
+- Encourage generously: right answers show a line from `CHEER` via `cheer(streak)`, four tiers that grow with the streak (some jazz-flavoured, no real musicians' names). No paragraph longer than two sentences in the intro.
 - Sounds lean ethereal and spacey: Ethereal (default), Shimmer, Glass bells, Choir pad, Bowed strings (`PADS`, `SPACEY()`).
 
 ## Product decisions

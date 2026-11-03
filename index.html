@@ -489,7 +489,10 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
-#pg-prompt{display:none}.about{display:flex;flex-direction:column;gap:12px;padding:4px 2px}
+#pg-prompt{display:none}
+.cheer{color:var(--home);font-weight:700}
+.onbplay{width:18px;height:18px;vertical-align:-3px;margin-right:8px}
+.about{display:flex;flex-direction:column;gap:12px;padding:4px 2px}
 .ab-head{display:flex;align-items:center;gap:14px;margin-bottom:4px}.ab-head .mark{width:60px;height:60px}
 .ab-head h2{margin:0;font:600 26px var(--font-display)}.ab-head p{margin:2px 0 0;color:var(--muted)}
 .ab-card{padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
@@ -618,7 +621,7 @@ body:not([data-screen="game"]) #set-toggle{display:none}
 .onbbar{flex:1;height:4px;border-radius:4px;background:var(--sunk);overflow:hidden}.onbbar i{display:block;height:100%;background:var(--brass);transition:width .35s ease}
 .onbtop .iconbtn{width:36px;height:36px}
 .onbskip{background:none;border:0;color:var(--muted);font:600 13px var(--font-body);padding:6px}
-.onbbody{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;max-width:460px;width:100%;margin:0 auto;animation:onbin .35s ease}
+.onbbody{flex:0 0 auto;margin-top:auto!important;display:flex;flex-direction:column;justify-content:center;gap:18px;max-width:460px;width:100%;margin:0 auto;animation:onbin .35s ease}
 @keyframes onbin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .onb h2{font:600 clamp(24px,7vw,30px)/1.2 var(--font-display);margin:0;letter-spacing:-.01em}
 .onb .lead{font-size:16px;line-height:1.5;color:var(--muted);margin:0}
@@ -627,7 +630,7 @@ body:not([data-screen="game"]) #set-toggle{display:none}
 .onbopt{display:flex;align-items:center;gap:12px;text-align:left;padding:15px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--sunk);color:var(--fg);font:500 16px var(--font-body);cursor:pointer}
 .onbopt .em{font-size:20px;width:26px;text-align:center}
 .onbopt[aria-pressed=true]{border-color:var(--brass);background:var(--brass-soft)}
-.onbfoot{max-width:460px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.onbfoot{max-width:460px;width:100%;margin:28px auto auto;display:flex;flex-direction:column;gap:8px}
 .onbfoot .btn{width:100%;min-height:52px;font-size:16px}
 .onbfoot .fine{font-size:12px;color:var(--muted);text-align:center;line-height:1.4}
 .onbmark{display:flex;justify-content:center}.onbmark svg{width:120px;height:120px}
@@ -2068,7 +2071,7 @@ function answer(o){
   Q.tries++;
   if(isRight(o,Q.m)){stopAll();ensure();Q.done=true;record('deg',Q.o,Q.tries===1);marks={};marks[keyFor(Q.m)]='ok';trail=new Set();renderPad();
     const p=resolution(Q.m),end=walkHome(p,0);
-    $('deg-fb').innerHTML=`<span class="tag ok">${labM(Q.m)}</span> Right. Walk home: <span class="path">${pathText(p)}</span>`;
+    $('deg-fb').innerHTML=`<span class="tag ok">${labM(Q.m)}</span> <b class="cheer">${cheer(SESS.deg.streak)}</b> Walk home: <span class="path">${pathText(p)}</span>`;
     setPrompt('Sing the walk home along with it.');
     if(S.auto)later(end*1000+400+700*Math.max(0,PACE()-1),nextDeg);return}
   Q.guess=o;
@@ -2124,7 +2127,7 @@ function answerChord(o){
   CQ.tries++;
   if(isRight(o,CQ.m)){stopAll();ensure();CQ.done=true;record('chord',CQ.o,CQ.tries===1);marks={};marks[keyFor(CQ.m)]='ok';trail=new Set();renderPad();
     const rel=resolveOverChord(0);
-    $('ch-fb').innerHTML=`<span class="tag ok">${labK(o)}</span> Right. Over the ${CQ.c.name} chord it is ${rel.txt}.${rel.rest?'':' You heard it lean there.'}`;
+    $('ch-fb').innerHTML=`<span class="tag ok">${labK(o)}</span> <b class="cheer">${cheer(SESS.chord.streak)}</b> Over the ${CQ.c.name} chord it is ${rel.txt}.${rel.rest?'':' You heard it lean there.'}`;
     $('ch-prompt').textContent='Press Next when ready.';if(S.handsFree)later(3200*PACE(),nextChord);return}
   CQ.guess=o;
   if(S.retry&&CQ.tries<2){stopAll();ensure();marks={};marks[o]='no';renderPad();const t=ctx.currentTime+0.05;
@@ -2210,7 +2213,7 @@ function enterPhrase(o){
   if(P.ans.length===P.seq.length){P.done=true;const ok=P.seq.filter((m,i)=>isRight(P.ans[i],m)).length;
     marks={};P.seq.forEach(m=>marks[keyFor(m)]='ok');P.ans.forEach((a,i)=>{if(!isRight(a,P.seq[i])&&!marks[a])marks[a]='no'});
     $('p-mine').hidden=false;
-    $('p-fb').innerHTML=ok===P.seq.length?`<span class="tag ok">All ${ok} right</span> Here it is again. Now play it on the guitar.`
+    $('p-fb').innerHTML=ok===P.seq.length?`<span class="tag ok">All ${ok} right</span> <b class="cheer">${cheer(1)}</b> Here it is again. Now play it on your instrument!`
       :`<span class="tag no">${ok} of ${P.seq.length} right</span> You'll hear your version, then the answer. Green keys are the real phrase, red ones your misses.`;
     renderPad();renderPhrase();
     if(ok===P.seq.length)later(400,()=>playSeq(P.seq,0.1,'answer'));
@@ -2534,7 +2537,7 @@ function answerProg(name){
   PS.n++;if(all){PS.c++;PS.streak++}else PS.streak=0;onAnswer('prog',all);$('pg-score').textContent=`This session ${PS.c}/${PS.n} right · streak ${PS.streak}`;
   pgSlots();$('pg-mine').hidden=false;if(S.handsFree)later(3500*PACE(),nextProg);
   const ansTxt=PG.seq.map(c=>c[1]).join(' – ');
-  if(all){$('pg-prompt').textContent='All right! Here it is once more.';$('pg-fb').innerHTML=`<span class="tag ok">${ansTxt}</span>`;later(700,()=>playProg(PG.seq,0,false,'answer'))}
+  if(all){$('pg-prompt').textContent=cheer(PS.streak)+' Here it is once more.';$('pg-fb').innerHTML=`<span class="tag ok">${ansTxt}</span>`;later(700,()=>playProg(PG.seq,0,false,'answer'))}
   else{$('pg-prompt').textContent=`${ok} of ${PG.seq.length} right. You'll hear yours, then the real one.`;$('pg-fb').innerHTML=`<span class="tag no">You: ${PG.ans.join(' – ')}</span> <span class="tag ok">It was: ${ansTxt}</span>`;
     const mine=PG.ans.map(pgFind);later(700,()=>{const end=playProg(mine,0,false,'mine');later(end*1000+400,()=>playProg(PG.seq,0,false,'answer'))})}}
 $('pg-answers').addEventListener('click',e=>{const b=e.target.closest('button');if(b)answerProg(b.dataset.n)});
@@ -4092,9 +4095,9 @@ const ONB_STEPS=[
   {id:'head',q:'Ever hear a melody in your head but can\'t find it on the guitar?',opts:[['🎯','All the time'],['🤏','Sometimes'],['🙂','Not really']]},
   {id:'jam',q:'When you jam with others, do you know where you are in the key?',opts:[['😶','Rarely, I just follow the shapes'],['🤔','Kind of, I get lost on solos'],['😎','Usually']]},
   {id:'goals',q:'What would you love to be able to do?',multi:true,sub:'Pick as many as you like.',opts:[['🎸','Play what I hear in my head'],['🎶','Improvise without getting lost'],['👂','Learn songs by ear'],['🎤','Sing in tune'],['✍️','Write my own songs']]},
-  {id:'gap',render:()=>`<h2>The gap isn't talent.<br>It's a map.</h2><p class="lead">Every note in a key has a number, counted from home: <b>1</b>. Musicians with "big ears" don't hear more notes. They hear <b>the numbers</b>: how far each note sits from home, and where it wants to go.</p><div class="onbdots" id="onb-dots">${[1,2,3,4,5,6,7].map(n=>`<span class="${n===1?'home':''}">${n}</span>`).join('')}</div><p class="lead">The good news: that map can be learned, a few minutes a day.</p>`,on:()=>{let k=0;const seq=[1,3,5,3,1];const tick=()=>{if(ONB.steps[ONB.i].id!=='gap')return;document.querySelectorAll('#onb-dots span').forEach(e=>e.classList.toggle('lit',+e.textContent===seq[k%seq.length]));k++;setTimeout(tick,650)};tick()},btn:'Show me'},
-  {id:'test',render:()=>`<h2>Try it: name a note by ear</h2><p class="lead">You'll hear four chords that set the key, then one note. Is it the <b>1</b>, the <b>3</b> or the <b>5</b>?</p><div class="onbtest" id="onb-test"><button data-o="0">1</button><button data-o="4">3</button><button data-o="7">5</button></div><p class="lead" id="onb-tfb">Turn your sound on, then press Play.</p>`,btn:'Play',on:()=>{ONB.t=null}},
-  {id:'inst',q:'What do you play?',opts:[['🎸','Guitar','guitar'],['🪕','Ukulele','uke'],['🎹','Piano','piano']]},
+  {id:'gap',render:()=>`<h2>The gap isn't talent.<br>It's a map.</h2><p class="lead">Every note in a key has a number, counted from home: <b>1</b>. Musicians with big ears don't hear more notes, they hear <b>the numbers</b>.</p><p class="lead">They also hear how the numbers relate: 3 to 5 is a short hop, 5 back to 1 is a strong landing, 7 pulls up to 1. Those distances never change, in any key.</p><div class="onbdots" id="onb-dots">${[1,2,3,4,5,6,7].map(n=>`<span class="${n===1?'home':''}">${n}</span>`).join('')}</div><p class="lead">The good news? That map can be learned! A few minutes a day is enough.</p>`,on:()=>{let k=0;const seq=[1,3,5,3,1];const tick=()=>{if(ONB.steps[ONB.i].id!=='gap')return;document.querySelectorAll('#onb-dots span').forEach(e=>e.classList.toggle('lit',+e.textContent===seq[k%seq.length]));k++;setTimeout(tick,650)};tick()},btn:'Show me'},
+  {id:'test',render:()=>`<h2>Try it: name a note by ear!</h2><p class="lead">Four chords set the key, then one note plays.</p><p class="lead">Is it the <b>1</b>, the <b>3</b> or the <b>5</b>?</p><div class="onbtest" id="onb-test"><button data-o="0">1</button><button data-o="4">3</button><button data-o="7">5</button></div><p class="lead" id="onb-tfb">Turn your sound on, then press Play.</p>`,btn:'Play',on:()=>{ONB.t=null}},
+  {id:'inst',q:'Which instrument do you want freedom on first?',sub:'Play more than one? Start with one. You can switch any time in Settings.',opts:[['🎸','Guitar','guitar'],['🪕','Ukulele','uke'],['🎹','Piano','piano']]},
   {id:'level',q:'How long have you been playing?',opts:[['🌱','Just starting'],['🌿','A few years'],['🌳','A long time, but by ear is new']]},
   {id:'mins',q:'How much time can you give it a day?',sub:'Short and daily beats long and rare.',opts:[['⏱️','5 minutes',5],['☕','10 minutes',10],['🎯','15 minutes',15],['🔥','20 minutes',20]]},
   {id:'when',render:()=>`<h2>When should we nudge you?</h2><p class="lead">One reminder a day, at a time you'll actually play. None on days you've already practised.</p><input type="time" id="onb-time" value="${(S.rem&&S.rem.time)||'18:00'}">`,btn:'Set reminder'},
@@ -4109,7 +4112,7 @@ function onbRender(){const st=ONB.steps[ONB.i],n=ONB.steps.length;
   const body=st.render?st.render():`<h2>${st.q}</h2>${st.sub?`<p class="lead">${st.sub}</p>`:''}<div class="onbopts">${st.opts.map((o,k)=>`<button class="onbopt" data-k="${k}" aria-pressed="${st.multi?ONB.a.goals.includes(o[1]):'false'}"><span class="em">${o[0]}</span>${o[1]}</button>`).join('')}</div>`;
   const btn=typeof st.btn==='function'?st.btn():st.btn;
   $('onb').innerHTML=`<div class="onbtop">${ONB.i?'<button class="iconbtn" id="onb-back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>':''}<div class="onbbar"><i style="width:${Math.round((ONB.i+1)/n*100)}%"></i></div>${st.id!=='go'&&st.id!=='pay'?'<button class="onbskip" id="onb-skip">Skip</button>':st.id==='pay'?'<button class="onbskip" id="onb-skip">Not now</button>':''}</div>
-    <div class="onbbody">${body}</div><div class="onbfoot">${btn||st.multi?`<button class="btn primary" id="onb-next">${btn||'Continue'}</button>`:''}${st.fine?`<p class="fine">${st.fine()}</p>`:''}</div>`;
+    <div class="onbbody">${body}</div><div class="onbfoot">${btn||st.multi?`<button class="btn primary" id="onb-next">${/^(Show me|Play)$/.test(btn||'')?'<svg class="onbplay" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>':''}${btn||'Continue'}</button>`:''}${st.fine?`<p class="fine">${st.fine()}</p>`:''}</div>`;
   st.on&&st.on();
   if(st.multi)$('onb-next').disabled=!ONB.a.goals.length}
 function onbNext(){if(ONB.i<ONB.steps.length-1){ONB.i++;onbRender()}else onbClose(true)}
@@ -4129,7 +4132,7 @@ $('onb').addEventListener('click',e=>{const st=ONB.steps[ONB.i];
   const pb=e.target.closest('#onb-price button');if(pb){document.querySelectorAll('#onb-price button').forEach(b=>b.setAttribute('aria-pressed',b===pb));ONB.a.plan=pb.dataset.p;$('onb-next').textContent=pb.dataset.p==='life'?'Buy lifetime: €25.99':`Start ${PAYWALL.trial}-day free trial`;return}
   const tb=e.target.closest('#onb-test button');
   if(tb){if(!ONB.t)return onbTest();if(ONB.t.done)return;const o=+tb.dataset.o;ONB.t.done=o===ONB.t.o;
-    if(ONB.t.done){tb.classList.add('ok');$('onb-tfb').innerHTML=`<b>Yes, the ${lab(o)}.</b> You just named a note by ear. That's the whole skill, and it grows fast.`;$('onb-next').textContent='Continue';walkHome(resolution(ONB.t.m),0.2)}
+    if(ONB.t.done){tb.classList.add('ok');$('onb-tfb').innerHTML=`<b>Yes! That's the ${lab(o)}!</b> You just named a note by ear. That's the whole skill, and it grows fast!`;$('onb-next').textContent='Continue';walkHome(resolution(ONB.t.m),0.2)}
     else{tb.classList.add('no');$('onb-tfb').innerHTML=`Not the ${lab(o)}. Listen again: does it feel settled (1), sweet (3) or open (5)?`;const t=ctx.currentTime+0.05;pluck(ONB.t.m,t,1.4,0.6)}
     return}
   if(e.target.closest('#onb-next')){
@@ -4220,7 +4223,7 @@ function nextSing(){if(!MIC.on)$('mic-toggle').click();
 function singIn(m){if(!SQ||SQ.done||!$('sing-num').textContent)return;const got=offOf(m);
   if(pc(got)===pc(SQ.o)){SQ.done=true;record('sing',SQ.o,SQ.tries===0);stopAll();ensure();
     const t=ctx.currentTime+0.15;pluck(m,t,1.2,0.5);lightAt(150,keyFor(m));unlightAt(1200);
-    $('sing-fb').innerHTML=`<span class="tag ok">${lab(SQ.o)}</span> ${SQ.tries?'Got it.':'Right, first time.'}`;$('sing-prompt').textContent='Well heard.';
+    $('sing-fb').innerHTML=`<span class="tag ok">${lab(SQ.o)}</span> <b class="cheer">${SQ.tries?'Got it!':cheer(SESS.sing.streak)}</b>`;$('sing-prompt').textContent='Well heard.';
     $('sing-score').textContent=`This session ${SESS.sing.c}/${SESS.sing.n} first try`;
     if(S.auto)later(2200,()=>{if(S.tab==='sing'&&SQ&&SQ.done)nextSing()});return}
   SQ.tries++;$('sing-fb').innerHTML=`<span class="tag no">That was ${lab(got)}</span> ${SQ.tries>=2?'Press <b>Hear the note</b> if you need it.':'Hear home again in your head, and try once more.'}`}
@@ -4427,6 +4430,17 @@ $('ab-intro').addEventListener('click',()=>onbOpen());
 $('scr-more').addEventListener('click',e=>{const b=e.target.closest('.morerow');if(!b)return;const g=b.dataset.go;
   if(g==='settings')return openSheet();if(g==='intro')return onbOpen();
   goScreen(g)});
+
+
+/* encouragement: four tiers that grow with your streak; some with a jazz accent */
+const CHEER=[
+ ['Nice!','Yes!','That’s it!','Got it!','Right on!','Spot on!','Good ear!','There it is!','Clean!','Nailed it!','Lovely!','Sweet!','You heard it!','Bang on!','Exactly!','Well heard!','Perfect pitch on that one!','Easy!','That’s the one!','Yep!'],
+ ['On a roll!','That’s a groove!','Smooth!','Locked in!','Now we’re cooking!','Sounding good!','Your ears are opening up!','Hearing like a pro!','Ooh, tasty!','That’s the sound!','Right in the pocket!','Feeling it!','In the zone!','Like clockwork!','Great listening!','Ears on fire!','That one sang!','Dig it!','Groovy!','Now you’re swinging!'],
+ ['That’s a serious ear!','Somebody call the band!','Swinging!','You could sit in at any jam!','That’s jazz, baby!','Pure feel!','The numbers are singing to you!','Real musician’s ears!','Your ears just levelled up!','Now you’re hearing the changes!','Hearing the whole map!','Hot streak! Keep blowing!','Now that’s big ears!','The room is with you!','Crowd’s on its feet!','Encore-worthy!','Smokin’!','Bebop ears!','Smooth as a late-night ballad!','That’s a blue note, caught clean!'],
+ ['Big Ears Club material!','Legendary! The whole band is grinning!','Unstoppable! Pass the hat!','That’s Late Set level!','Somebody record this!','The drummer just threw a stick in the air!','You’re hearing in technicolour!','Pure magic! The tonal map is yours!','Standing ovation!','Master class!','That’s how legends practise!','Golden ears!','Elephant ears, officially!','Off the charts!','The record label is calling!','Every number in its place!','Absolute flow!','This is what freedom sounds like!','Take a bow!','The whole club is on its feet!']];
+let lastCheer='';
+function cheer(streak){const n=streak||1,t=n>=10?3:n>=6?2:n>=3?1:0,pool=CHEER[t];let c;do{c=pool[Math.floor(Math.random()*pool.length)]}while(c===lastCheer&&pool.length>1);lastCheer=c;
+  return (n>=3?`${n} in a row! `:'')+c}
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
