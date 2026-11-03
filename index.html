@@ -490,6 +490,13 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+.btn.primary.cue{position:relative;animation:cue 1.8s ease-in-out infinite}
+.btn.primary.cue::after{content:"Press to start";position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--brass);color:var(--on-brass);font:600 13px var(--font-body);padding:5px 12px;border-radius:999px;pointer-events:none;box-shadow:0 6px 16px -8px rgba(0,0,0,.6)}
+.actions:has(> .btn.primary.cue) > :not(.btn.primary){display:none!important}
+.actions:has(> .btn.primary.cue){padding-right:130px}
+@keyframes cue{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--brass) 55%,transparent)}50%{box-shadow:0 0 0 14px color-mix(in srgb,var(--brass) 0%,transparent)}}
+@media (prefers-reduced-motion: reduce){.btn.primary.cue{animation:none}}
+
 .rowplay{flex:none;width:34px;height:34px;margin-left:4px;border-radius:50%;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
 .rowplay svg{width:22px;height:22px}.rowplay:active{color:var(--brass)}
 .phrase.mini{margin:4px 0 8px}.phrase.mini .slot{min-width:46px}
@@ -1313,10 +1320,9 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="howto"><p class="why"><b>Why:</b> most songs move through the same few chords. Hearing 1, 4, 5 and 6m change is how you work out songs by ear.</p><p>The key is set, then a few chords play.</p><p>Tap them in order.</p><p>Start with 1 4 5 6m. Add more chords under the options below.</p></div>
     <p class="prompt" id="pg-prompt">Press Start. After the cadence, a short progression plays. Tap its chords in order.</p>
     <ol class="pglist keep" id="pg-steps">
-      <li data-i="0"><b>1</b><span>Press ▶ to start.<small></small></span></li>
-      <li data-i="1"><b>2</b><span>Listen: first the key, then the chords.<small></small></span></li>
-      <li data-i="2"><b>3</b><span>Tap the chords in order, using the buttons below.<small></small></span></li>
-      <li data-i="3"><b>4</b><span>Check your answer, then press → for the next one.<small></small></span></li>
+      <li data-i="1"><b>1</b><span>Listen: first the key, then the chords.<small></small></span></li>
+      <li data-i="2"><b>2</b><span>Tap the chords in order, using the buttons below.<small></small></span></li>
+      <li data-i="3"><b>3</b><span>Check your answer, then press → for the next one.<small></small></span></li>
     </ol>
     <div class="phrase" id="pg-slots"></div>
     <div class="chordbtns" id="pg-answers"></div>
@@ -2062,10 +2068,10 @@ function renderPhrase(lit=-1,litRow='answer'){
   if(!P.done){el.innerHTML=slotRow('You',P.seq.map((m,i)=>P.ans[i]!==undefined?[labK(P.ans[i]),'']:['·','empty']));return}
   el.innerHTML=slotRow('You',P.seq.map((m,i)=>[labK(P.ans[i]),(isRight(P.ans[i],m)?'ok':'no')+(litRow==='mine'&&i===lit?' lit':'')]),'p-you')
     +slotRow('Answer',P.seq.map((m,i)=>[labM(m),'ok'+(litRow==='answer'&&i===lit?' lit':'')]),'p-ans')}
-const PSTEPS={imagine:['Press ▶, then listen to the key (chords only).','Read the numbers and hear them in your head.','Sing them out loud.','Press Check to hear the real phrase.','Play it on your instrument, then press → for the next one.'],
-  hear:['Press ▶, then listen to the key (chords only).','Listen to the phrase.','Sing it back.','Tap its numbers in order.','Play it on your instrument, then press → for the next one.']};
+const PSTEPS={imagine:['Listen to the key (chords only).','Read the numbers and hear them in your head.','Sing them out loud.','Press Check to hear the real phrase.','Play it on your instrument, then press → for the next one.'],
+  hear:['Listen to the key (chords only).','Listen to the phrase.','Sing it back.','Tap its numbers in order.','Play it on your instrument, then press → for the next one.']};
 // stage: which step is current (0-based); several steps can be current at once
-function setStage(on){const done=Math.min(...on);P&&(P.stage=on);
+function setStage(on){const done=Math.min(...on);P&&(P.stage=on);$('psteps').hidden=!P;if(typeof startCue==='function')startCue('phr',!P);
   $('psteps').innerHTML=PSTEPS[S.pmode].map((t,i)=>`<li class="${on.includes(i)?'on':i<done?'done':''}"><b>${i+1}</b><span>${t}<small></small></span></li>`).join('')}
 function renderPSteps(){setStage([0]);
   $('p-play').textContent=S.pmode==='imagine'?'Check: hear the phrase':'Replay phrase';$('p-clear').hidden=S.pmode!=='hear';$('p-mine').hidden=true;$('p-cad').textContent='Hear the key again'}
@@ -2406,7 +2412,7 @@ function playProg(seq,start,quiet,row){
   seq.forEach((c,i)=>{chord(c[0],c[2],t+start+i*st,1.1*PACE(),0.22,quiet);later((start+i*st)*1000,()=>pgSlots(i,row==='none'?'listen':row))});
   const end=start+seq.length*st+0.3;later(end*1000,()=>pgSlots());return end}
 const ORD=['1st','2nd','3rd','4th','5th','6th'];
-function pgPhase(){const st=$('pg-steps');if(!st)return;const ph=PG?PG.phase:null,cur=!PG?0:{key:1,listen:1,answer:2,result:3}[ph]??1;
+function pgPhase(){const st=$('pg-steps');if(!st)return;const ph=PG?PG.phase:null,cur=!PG?0:{key:1,listen:1,answer:2,result:3}[ph]??1;st.hidden=!PG;if(typeof startCue==='function')startCue('prog',!PG);
   st.querySelectorAll('li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('on',i===cur);li.classList.toggle('done',i<cur);li.querySelector('small').textContent=i===cur&&PG?$('pg-prompt').textContent:''});
   $('pg-answers').classList.toggle('ready',!!PG&&ph==='answer');$('pg-next').classList.toggle('pulse',!!PG&&ph==='result')}
 new MutationObserver(()=>pgPhase()).observe($('pg-prompt'),{childList:true,characterData:true,subtree:true});pgPhase();
@@ -2847,7 +2853,7 @@ document.addEventListener('keydown',e=>{
 syncSettings();renderPSteps();renderPad();renderScore();renderLoop();renderAnchors();showTab(S.tab);libInit();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)r.update()})}).catch(()=>{});
 {let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()})}
-$('p-fb').textContent='Press ▶ to start. You\'ll hear the key, then get a short phrase of numbers to sing.';
+$('p-fb').textContent='';
 
 
 /* ---------- game layer: paths and gems, XP, ranks, badges, weekly challenge ---------- */
@@ -4058,13 +4064,15 @@ const GUIDE={
     cur:()=>!VQ?[0]:VQ.done?[3]:[1,2]},
   duel:{prompt:'duel-prompt',lines:['Press ▶ to start.','Listen: home, then the notes so far plus one new one.','Play them all back, in order.','One slip ends the duel. Press ▶ to go again.'],
     cur:()=>typeof DUEL==='undefined'||!DUEL||!DUEL.seq||!DUEL.seq.length?[0]:DUEL.over?[3]:DUEL.listen?[1]:[2]}};
+function startCue(t,on){const b=document.querySelector(`#panel-${t} .btn.primary`);if(b)b.classList.toggle('cue',!!on)}
 function guideBuild(t){const g=GUIDE[t],pr=$(g.prompt);if(!pr||g.el)return;
   const ol=document.createElement('ol');ol.className='pglist keep';ol.id=t+'-guide';
-  ol.innerHTML=g.lines.map((l,i)=>`<li data-i="${i}"><b>${i+1}</b><span>${l}<small></small></span></li>`).join('');
+  ol.innerHTML=g.lines.map((l,i)=>i?`<li data-i="${i}"><b>${i}</b><span>${l}<small></small></span></li>`:'').join('');
   const host=pr.closest('.actions')||pr;host.after(ol);pr.classList.add('mirrored');g.el=ol;
   new MutationObserver(()=>guideSync(t)).observe(pr,{childList:true,characterData:true,subtree:true});guideSync(t)}
 function guideSync(t){const g=GUIDE[t];if(!g||!g.el)return;const show=!g.only||g.only();g.el.hidden=!show;$(g.prompt).classList.toggle('mirrored',show);if(!show)return;
   let on=[0];try{on=g.cur()}catch(e){}const first=Math.min(...on),txt=$(g.prompt).textContent.trim();
+  const notStarted=on.length===1&&on[0]===0;g.el.hidden=notStarted;startCue(t,notStarted);if(notStarted)return;
   g.el.querySelectorAll('li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('on',on.includes(i));li.classList.toggle('done',i<first);
     li.querySelector('small').textContent=i===Math.max(...on)&&first>0?txt:''})}
 Object.keys(GUIDE).forEach(guideBuild);

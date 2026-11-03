@@ -24,7 +24,7 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 ## Design rules
 - Dark "Late Set" look (midnight and brass). Clean and spacious, with a slower, airy sound. The Ethereal voice is the default.
 - Transport controls are symbol buttons: ▶ start, → next, ↻ replay, pause, ‹ previous, drone.
-- Every game shows the same numbered guide: "Press ▶ to start." … "Press → for the next one.", with the current line lit (see `GUIDE`, `#pg-steps`, `#psteps`).
+- Before a game starts, only the big ▶ shows, pulsing, with "Press to start" beside it (`startCue`, `.cue`). After that, every game shows the same numbered guide ending "Press → for the next one.", with the current line lit (see `GUIDE`, `#pg-steps`, `#psteps`).
 - Short, plain instructions, one per line. No jargon without an example.
 - Instrument (guitar, ukulele, piano) is chosen only in Settings.
 - Minimal first: Sonofield is the reference. Show as little as possible; extras go into the options sheet.
