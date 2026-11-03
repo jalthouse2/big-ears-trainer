@@ -395,7 +395,7 @@ body:not([data-screen="game"]) #back{visibility:hidden}
 .menu button[aria-selected="true"]{background:var(--brass-soft)}
 
 .screen{display:flex;flex-direction:column;gap:12px}
-#scr-home,#scr-tools,#scr-songs,#scr-stats,#scr-guide{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.screen:not(#scr-game){padding-bottom:calc(130px + env(safe-area-inset-bottom,0px))}
 body[data-screen="home"]{background:radial-gradient(120% 60% at 15% 0%,color-mix(in srgb,var(--home) 14%,transparent),transparent 60%),radial-gradient(120% 70% at 100% 100%,color-mix(in srgb,var(--brass) 12%,transparent),transparent 60%),var(--bg);background-attachment:fixed}
 body[data-screen="home"] .appbar{background:transparent}
 .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:min(38vh,340px);padding:8px 0 20px}
