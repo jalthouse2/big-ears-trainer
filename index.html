@@ -490,6 +490,9 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+.setsec>summary .seticon{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--brass-soft);color:var(--brass);flex:none}
+.setsec>summary .seticon svg{width:18px;height:18px}
+
 .cheer{color:var(--home);font-weight:700}
 .onbplay{width:18px;height:18px;vertical-align:-3px;margin-right:8px}
 .about{display:flex;flex-direction:column;gap:12px;padding:4px 2px}
@@ -1674,15 +1677,19 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="field" id="fb-nums-f"><span>Neck shows</span><div class="seg" id="fb-nums"><button data-v="all">Notes in play</button><button data-v="home">Home only</button><button data-v="none">Only what lights up</button></div></div>
       <div class="micopts">
         <span class="micopts-h">Microphone</span>
-        <label class="check big"><input type="checkbox" id="mic-auto"> <span><b>Microphone on</b>: play or sing to answer in every game and the tuner. Same as the mic button at the top of a game; it stays as you leave it.</span></label>
-        <label class="check big"><input type="checkbox" id="hands-free"><span><b>Hands-free mode</b>: answer by playing or singing, two muted strums for the next question, three to hear it again, and games move on by themselves after an answer.</span></label>
-        
         <label class="field"><span>Mic sensitivity: how quiet a note can be and still count</span><input type="range" id="mic-sens" min="1" max="10" step="1"><p class="hint" id="mic-sens-txt" style="margin:2px 0 0">How quiet a note can be and still count.</p></label>
+        <label class="check big"><input type="checkbox" id="mic-auto"> <span><b>Microphone on</b>: play or sing to answer in every game and the tuner. Same as the mic button at the top of a game; it stays as you leave it.</span></label>
+        <label class="check big"><input type="checkbox" id="hands-free"><span><b>Hands-free</b>: keep both hands on the guitar. Two muted strums = next question, three = hear it again, and games move on by themselves.</span></label>
+        <input type="checkbox" id="mic-next" hidden>
+        
+        
+        
+        
         <input type="checkbox" id="mic-phones" hidden>
         <label class="check"><input type="checkbox" id="mic-oct"> Strict octave: count a note only in the same octave the app played it (normally any octave counts)</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
-        <label class="check"><input type="checkbox" id="mic-next"> Two muted strums = Next</label>
-        <span class="hint">The mic pauses while the app plays, and ignores the drone's note unless you start it yourself. Use headphones so it only hears you. Answer any question by playing or singing the note; chord questions take the chord's root.</span>
+        
+        <span class="hint">The mic pauses while the app plays, so it only hears you. For chord questions, play the chord's root.</span>
       </div>
       <div class="drawer-folds">
       <details class="more"><summary>Pick notes yourself</summary>
@@ -2863,7 +2870,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause()
 setTimeout(micLabel,0);
 $('mic-sens').value=S.micSens;const sensTxt=()=>{const v=S.micSens;$('mic-sens-txt').textContent=(v<=3?'Low: only clear, strong notes count. Good in a noisy room.':v<=7?'Medium: normal playing and singing count, soft room noise doesn\'t.':'High: soft playing and quiet singing count, but so might room noise.')};sensTxt();
 $('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist();sensTxt()});
-$('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{persist();micLabel()}});
+$('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{S.micNext=false;$('mic-next').checked=false;persist();micLabel()}});
 $('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
 [['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
 
@@ -4366,14 +4373,15 @@ new MutationObserver(()=>applyBrief()).observe(document.body,{childList:true,sub
   const SECS=[['inst','Instrument'],['nums','Key and numbers'],['key','Hearing the key'],['sound','Sound'],['drone','Drone'],['mic','Microphone'],['rem','Practice reminder'],['prog','Progress and levels'],['help','Help']];
   const anchor={inst:'inst','fb-nums-f':'inst',remind:'rem','onb-again':'help','opt-colours':'nums',range:'nums',labels:'nums',ctxmode:'key',every:'key','opt-autopace':'prog','opt-unlock':'prog',
     drone:'drone','drone-idle':'drone','drone-fifth':'drone',voice:'sound',room:'sound',audition:'sound',vol:'sound'};
-  const box={};SECS.forEach(([k,t])=>{const d=document.createElement('details');d.className='setsec';d.dataset.k=k;d.innerHTML=`<summary><span>${t}</span><small class="setval"></small></summary><div class="setbody"></div>`;box[k]=d});
+  const SICON={"inst": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 3l2 2-6.5 6.5\"/><path d=\"M14 9.5a3 3 0 0 0-4.2 0l-.6.6a2 2 0 0 1-2.5.3 3.5 3.5 0 0 0-4.2 4.6l1.5 1.5a3.5 3.5 0 0 0 4.6.6 2 2 0 0 1 2.6.3\"/><circle cx=\"9.5\" cy=\"14.5\" r=\"1.4\"/></svg>", "nums": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9h16M4 15h16M10 3L8 21M16 3l-2 18\"/></svg>", "key": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 18a4 4 0 0 0 6-1.5c.8-1.6 2.2-2.1 3-3.5A5 5 0 1 0 7 9\"/><path d=\"M10 9.5a2 2 0 1 1 3 1.7\"/></svg>", "sound": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9v6h4l5 4V5L8 9z\"/><path d=\"M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11\"/></svg>", "drone": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12c2.5-4 4.5-4 6 0s3.5 4 6 0 3.5-4 6 0\"/><path d=\"M3 18h18\" opacity=\".5\"/></svg>", "mic": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"9\" y=\"3\" width=\"6\" height=\"11\" rx=\"3\"/><path d=\"M5 11a7 7 0 0 0 14 0M12 18v3\"/></svg>", "rem": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z\"/><path d=\"M10 20.5a2 2 0 0 0 4 0\"/></svg>", "prog": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>"};
+  const box={};SECS.forEach(([k,t])=>{const d=document.createElement('details');d.className='setsec';d.dataset.k=k;d.innerHTML=`<summary><i class="seticon">${SICON[k]||''}</i><span>${t}</span><small class="setval"></small></summary><div class="setbody"></div>`;box[k]=d});
   // home (world) for free practice lives with the key settings
   const hl=document.createElement('label');hl.className='field';hl.innerHTML='<span>Home (world) when you practise outside the world tour</span>';hl.appendChild($('home-sel'));box.nums.querySelector('.setbody').appendChild(hl);
   let cur='inst';
   [...dr.children].forEach(ch=>{let k=null;if(ch.classList.contains('micopts'))k='mic';else if(ch.classList.contains('drawer-folds'))k='prog';
     else{const ids=[ch.id,...[...ch.querySelectorAll('[id]')].map(x=>x.id)];for(const id of ids){if(anchor[id]){k=anchor[id];break}}}
     if(k)cur=k;box[cur].querySelector('.setbody').appendChild(ch)});
-  SECS.forEach(([k])=>{if(box[k].querySelector('.setbody').children.length)dr.appendChild(box[k])});
+  SECS.forEach(([k])=>{if(k==='help'){box[k].hidden=true;dr.appendChild(box[k]);return}if(box[k].querySelector('.setbody').children.length)dr.appendChild(box[k])});
   const mh=box.mic.querySelector('.micopts-h');if(mh)mh.remove();
   const val={inst:()=>({guitar:'Guitar',uke:'Ukulele',piano:'Piano'})[S.inst]||'',nums:()=>`${NAMES[S.key]} · ${S.range==='two'?'2 octaves':'1 octave'}`,key:()=>($('ctxmode').selectedOptions[0]||{}).textContent.split(' (')[0],
     sound:()=>(VOICES[S.voice]||{}).name||'',drone:()=>$('drone').getAttribute('aria-pressed')==='true'?'On':'Off',mic:()=>S.micAuto?'On':'Off',rem:()=>S.rem?S.rem.time:'',prog:()=>'',help:()=>''};
