@@ -431,7 +431,7 @@ body[data-screen="home"] .appbar{background:transparent}
 #scr-stats .foot{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
 
 .bottomnav{position:fixed;z-index:15;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(560px,calc(100% - 24px));
-  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:6px;border-radius:26px;border:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:6px;border-radius:26px;border:1px solid var(--line);
   background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 32px -14px rgba(0,0,0,.55)}
 .bottomnav button{border:0;background:none;border-radius:20px;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);min-width:0}
 .bottomnav svg{width:22px;height:22px}
@@ -490,6 +490,27 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+body:not([data-screen="game"]) #set-toggle{display:none}
+.morelist{display:flex;flex-direction:column;border-radius:16px;background:var(--surface);border:1px solid var(--line);overflow:hidden;margin-bottom:18px}
+.morerow{display:flex;align-items:center;gap:14px;padding:14px 16px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--fg);text-align:left}
+.morerow:last-child{border-bottom:0}
+.morerow>svg:first-child{width:22px;height:22px;color:var(--brass);flex:none}
+.morerow>span{flex:1;display:flex;flex-direction:column;gap:2px}.morerow b{font-weight:600;font-size:16px}.morerow small{color:var(--muted);font-size:13px}
+.morerow>svg:last-child{width:18px;height:18px;color:var(--muted)}
+.profile{display:flex;flex-direction:column;gap:12px;padding:8px 2px}
+.pf-top{display:flex;align-items:center;gap:16px}
+.pf-av{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:700 28px var(--font-display);background:var(--brass-soft);color:var(--brass);border:2px solid var(--brass)}
+.pf-id{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.pf-name{font:600 22px var(--font-display);background:none;border:0;border-bottom:1px dashed var(--line);color:var(--fg);padding:2px 0;width:100%}
+.pf-name:focus{outline:none;border-bottom-color:var(--brass)}
+.pf-rank{color:var(--brass);font-weight:600}
+.pf-bar{height:6px;border-radius:6px;background:var(--sunk);overflow:hidden}.pf-bar i{display:block;height:100%;background:var(--brass)}
+.pf-next{margin:0;color:var(--muted);font-size:13px}
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pf-grid div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 4px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.pf-grid b{font:700 20px var(--font-body)}.pf-grid span{font-size:12px;color:var(--muted)}
+.pf-since{margin:4px 0 0;color:var(--muted);font-size:13px;text-align:center}
+
 .pathcard{display:flex;flex-direction:row;align-items:center;gap:14px;text-align:left;border-color:color-mix(in srgb,var(--home) 45%,var(--line))}
 .pathcard .pc-txt{flex:1;display:flex;flex-direction:column;gap:4px}.pathcard>svg:first-child{color:var(--home)}
 .pathcard .pc-k{font:600 11px var(--font-body);letter-spacing:.1em;text-transform:uppercase;color:var(--home)}
@@ -1096,6 +1117,12 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="seg pathgame" id="path-game"><button data-v="deg">Name the number</button><button data-v="chord">Note over chord</button></div>
     <div id="path-list"></div>
   </section>
+  <section class="screen" id="scr-more" hidden>
+    <p class="sechead">You</p><div class="morelist"><button class="morerow" data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span><b>Profile</b><small>Your rank, streak and rings</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button class="morerow" data-go="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span><b>Stats and badges</b><small>Accuracy by number, badges</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button class="morerow" data-go="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span><b>Settings</b><small>Instrument, sound, mic, reminders</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+    <p class="sechead">Learn</p><div class="morelist"><button class="morerow" data-go="guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2zM22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg><span><b>Guide</b><small>Why Big Ears, the tonal map, how to use it</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button class="morerow" data-go="intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg><span><b>Welcome intro</b><small>The short tour from the start</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+    <p class="sechead">Help</p><div class="morelist"><button class="morerow" data-go="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span><b>About Big Ears</b><small>Version, what's free, your data</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
+  </section>
+  <section class="screen" id="scr-profile" hidden><div class="profile" id="profile"></div></section>
   <section class="screen" id="scr-stats" hidden>
     <div class="cards">
       <div class="panelcard" id="rankcard"></div>
@@ -1554,7 +1581,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </div>
   </div>
 
-  <nav class="bottomnav" id="bottomnav" aria-label="Sections"><button data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button><button data-s="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="17.8" cy="13.8" r=".9" fill="currentColor"/></svg><span>Games</span></button><button data-s="path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span>Path</span></button><button data-s="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9.7h18M3 14.3h18M9 5v14M15 5v14"/></svg><span>Tools</span></button><button data-s="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V11M10 20V5M16 20v-6M21 20H3"/></svg><span>Stats</span></button><button data-s="guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2zM22 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg><span>Guide</span></button></nav>
+  <nav class="bottomnav" id="bottomnav" aria-label="Sections"><button data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button><button data-s="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="17.8" cy="13.8" r=".9" fill="currentColor"/></svg><span>Games</span></button><button data-s="path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span>Path</span></button><button data-s="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9.7h18M3 14.3h18M9 5v14M15 5v14"/></svg><span>Tools</span></button><button data-s="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></nav>
 
   <div class="sheet" id="lvsheet" hidden role="dialog" aria-modal="true" aria-labelledby="lv-title">
     <div class="sheet-in">
@@ -4322,14 +4349,32 @@ $('scr-path').addEventListener('click',e=>{const g=e.target.closest('.ph-go');if
   const n=e.target.closest('.pnode');if(!n)return;const h=+n.dataset.h,i=+n.dataset.i;if(!unlocked(h,i)){toast(`Earn a ring at ${lvName(h,i-1)} to book this gig`);return}playGig(h,i)});
 renderPathCard();
 
+
+/* ---------- More: profile, stats, settings, guide, help ---------- */
+if(!S.since){S.since=today();persist()}
+function renderProfile(){const x=GAME.xp,r=rankOf(x),nx=RANKS[r+1],days=Object.keys(GAME.days||{}).length,badges=Object.keys(GAME.badges||{}).length;
+  const rings=Object.values(GAME.gems||{}).reduce((a,b)=>a+b,0),name=S.pname||'',ini=(name.trim()[0]||'♪').toUpperCase();
+  const pct=nx?Math.round(100*(x-RANKS[r][0])/(nx[0]-RANKS[r][0])):100;
+  const d=new Date(S.since+'T12:00');const since=isNaN(d)?'':d.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  $('profile').innerHTML=`<div class="pf-top"><span class="pf-av">${ini}</span><div class="pf-id"><input id="pf-name" class="pf-name" placeholder="Your name" value="${name.replace(/"/g,'&quot;')}" maxlength="24" aria-label="Your name"><span class="pf-rank">${RANKS[r][1]}${r>=CLUB?' · Big Ears Club':''}</span></div></div>
+    <div class="pf-bar"><i style="width:${pct}%"></i></div><p class="pf-next">${nx?`${nx[0]-x} XP to ${nx[1]}`:'Top rank'}</p>
+    <div class="pf-grid"><div><b>${GAME.streak||0}</b><span>day streak</span></div><div><b>${days}</b><span>days practised</span></div><div><b>${rings}</b><span>rings</span></div>
+      <div><b>${badges}</b><span>badges</span></div><div><b>${x}</b><span>XP</span></div><div><b>${({guitar:'Guitar',uke:'Ukulele',piano:'Piano'})[S.inst]||''}</b><span>instrument</span></div></div>
+    ${since?`<p class="pf-since">Practising since ${since}</p>`:''}`;
+  $('pf-name').addEventListener('change',e=>{S.pname=e.target.value.trim();persist();renderProfile()})}
+$('scr-more').addEventListener('click',e=>{const b=e.target.closest('.morerow');if(!b)return;const g=b.dataset.go;
+  if(g==='settings')return openSheet();if(g==='intro')return onbOpen();
+  if(g==='about'){toast('Big Ears · free while in early access · everything stays on your phone','big');return}
+  goScreen(g)});
+
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
   document.body.dataset.screen=sc;
-  ['home','games','tools','songs','path','stats','guide','game'].forEach(k=>$('scr-'+k).hidden=k!==sc);
-  document.querySelectorAll('#bottomnav button').forEach(b=>{if(b.dataset.s===sc)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'Your path',games:'Games',stats:'Stats',guide:'Guide'}[sc]||'';
-  if(sc==='path'&&typeof renderPath==='function')renderPath();if(sc==='home'&&typeof renderPathCard==='function')renderPathCard();
+  ['home','games','tools','songs','path','more','profile','stats','guide','game'].forEach(k=>$('scr-'+k).hidden=k!==sc);
+  const navOf=['profile','stats','guide'].includes(sc)?'more':sc;document.querySelectorAll('#bottomnav button').forEach(b=>{if(b.dataset.s===navOf)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'Your path',games:'Games',more:'More',profile:'Profile',stats:'Stats',guide:'Guide'}[sc]||'';
+  if(sc==='path'&&typeof renderPath==='function')renderPath();if(sc==='profile'&&typeof renderProfile==='function')renderProfile();if(sc==='home'&&typeof renderPathCard==='function')renderPathCard();
   if(sc==='stats'){renderStats();renderRank()}if(sc==='home')renderHomeStats();if(sc!=='game'&&CHAL.on)chalStop();
   if(sc!=='game'){S.scr=sc;persist()}
   if(sc==='game'&&!fromPop)try{history.pushState({bet:'game'},'')}catch(e){}
