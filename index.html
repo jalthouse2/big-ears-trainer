@@ -794,6 +794,55 @@ body.paused .circgo{opacity:.5}
 .dectab .dn{font:800 24px/1 var(--font-display)}
 .dectab .dn.out{color:var(--bad)} .dectab .dn.hm{color:var(--home)}
 .dectab .rl{font-size:12px;color:var(--muted)}
+/* ===== Key finder ===== */
+.kfin{display:flex;flex-direction:column;gap:8px}
+.kfin textarea{width:100%;min-height:64px;max-height:220px;resize:vertical;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);font:500 14px/1.35 var(--font-mono);color:var(--fg);white-space:pre;overflow-x:auto}
+.kfin textarea:focus{outline:2px solid var(--brass);outline-offset:1px}
+.kfin .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.kfin .row .btn{min-height:40px;border-radius:12px}
+.kfread{font-size:12px;color:var(--muted);min-height:1em}
+.kfstrip{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px;align-items:end}
+.kfstrip .c{display:flex;flex-direction:column;align-items:center;gap:3px}
+.kfstrip .bar{width:100%;height:44px;border-radius:6px;background:var(--sunk);border:1px solid var(--line);position:relative;overflow:hidden}
+.kfstrip .bar i{position:absolute;left:0;right:0;bottom:0;background:var(--brass);transition:height .2s}
+.kfstrip .c.out .bar i{background:var(--bad)}
+.kfstrip .c.home .bar{border:2px solid var(--home)}
+.kfstrip .c.flash .bar{box-shadow:0 0 0 3px var(--brass)}
+.kfstrip .nt{font:600 12px var(--font-body)}
+.kfstrip .dg{font:700 13px/1 var(--font-display);color:var(--muted)}
+.kfstrip .c.in .dg{color:var(--fg)} .kfstrip .c.out .dg{color:var(--bad)} .kfstrip .c.home .dg{color:var(--home)}
+.kfbest{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
+.kfbest .hd{display:flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap}
+.kfbest .hd .nm{font:800 34px/1 var(--font-display);letter-spacing:.02em}
+.kfbest .hd .q{font-size:13px;color:var(--muted)}
+.kfbest .hd .pc{margin-left:auto;font:700 20px/1 var(--font-display);color:var(--brass)}
+.kfcands{display:flex;flex-direction:column;gap:6px}
+.kfcand{display:grid;grid-template-columns:minmax(0,1fr) 56px 36px 40px;gap:8px;align-items:center}
+.kfcand .k{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;text-align:left;color:var(--fg);font:600 15px var(--font-body);min-height:40px}
+.kfcand .k small{display:block;font:500 11px var(--font-mono);color:var(--muted)}
+.kfcand .k[aria-pressed="true"]{border:2px solid var(--home)}
+.kfcand .b{height:8px;border-radius:99px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.kfcand .b i{display:block;height:100%;background:var(--brass)}
+.kfcand .p{font:600 13px var(--font-mono);color:var(--muted);text-align:right}
+.kfcand .play{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center}
+.kfcand .play svg{width:12px;height:12px;fill:currentColor}
+.kfask{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:16px;border:2px dashed var(--brass);background:var(--brass-soft)}
+.kfask .eb{font:600 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+.kfask p{margin:0;font-size:15px;line-height:1.4}
+.kfask .opts{display:flex;flex-wrap:wrap;gap:8px}
+.kfask .opt{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.kfask .opt button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--fg);padding:8px 12px;min-height:44px;font:600 16px var(--font-body)}
+.kfask .opt button.h{border-left:1px solid var(--line);padding:8px 10px;color:var(--muted)}
+.kfask .opt button svg{width:12px;height:12px;fill:currentColor}
+.kfask .skip{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;align-self:flex-start;padding:4px 0}
+.kfdone{font-size:14px;color:var(--muted);margin:0}
+.kfdone b{color:var(--home)}
+.kffollow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.key.kfh{opacity:1}
+.key.kfh::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--kw,0) * 100%);background:var(--brass);opacity:.22;pointer-events:none}
+.key.kfo{border:2px solid var(--bad);opacity:1}
+.key.kfo .big{color:var(--bad)}
+.key.kfq{box-shadow:0 0 0 3px var(--brass);opacity:1}
 .dectab .rl.root{color:var(--brass);font-weight:600}
 .decnote{margin:0;font-size:14px}
 .decnote b{color:var(--fg)}
@@ -946,7 +995,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
   </header>
   <div class="menu" id="game-menu" hidden><nav id="tabs" role="menu" aria-label="Choose a game"><h4>Practice</h4><button role="menuitem" data-t="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Today</span></button><button role="menuitem" data-t="deg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/></svg><span>Name the number</span></button><button role="menuitem" data-t="chord"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h12M3 16h12M3 12h12"/><path d="M19 13V3l3 1.5"/><circle cx="17" cy="13" r="2"/></svg><span>Note over chord</span></button><button role="menuitem" data-t="phr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0 2 3 2 3"/></svg><span>Phrases</span></button><button role="menuitem" data-t="duel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l8-8M20 20l-8-8"/><path d="M14 4h6v6M10 4H4v6"/><path d="M20 4l-6 6M4 4l6 6"/></svg><span>Duel</span></button><button role="menuitem" data-t="prog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="8" width="5" height="8" rx="1.2"/><rect x="9.5" y="8" width="5" height="8" rx="1.2"/><rect x="17" y="8" width="5" height="8" rx="1.2"/></svg><span>Progressions</span></button>
-<h4>Tools</h4><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span>Rhythm</span></button><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button><h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button></nav></div>
+<h4>Tools</h4><button role="menuitem" data-t="tune"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a8 8 0 1 1 8-8"/><path d="M12 13l4-6"/><circle cx="12" cy="13" r="1.4" fill="currentColor" stroke="none"/></svg><span>Tuner</span></button><button role="menuitem" data-t="beat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8l-1.5-17h-5z"/><path d="M12 15l5-9"/><circle cx="17.5" cy="5" r="1.3" fill="currentColor" stroke="none"/></svg><span>Rhythm</span></button><button role="menuitem" data-t="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span>Find it</span></button><button role="menuitem" data-t="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span>Chords on the neck</span></button><button role="menuitem" data-t="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span>Chord decoder</span></button><button role="menuitem" data-t="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14 9l2 2"/></svg><span>Key finder</span></button><button role="menuitem" data-t="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span>Chord chart</span></button><button role="menuitem" data-t="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Jam</span></button><button role="menuitem" data-t="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span>Write a melody</span></button><h4>Songs</h4><button role="menuitem" data-t="songs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h12a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17a2 2 0 0 1 2-2h12"/><path d="M11 12V6l4-1"/><circle cx="9.6" cy="12" r="1.6"/></svg><span>Song log</span></button></nav></div>
 
   <section class="screen" id="scr-home">
     <div class="hero"><svg class="mark big" viewBox="0 0 96 96" aria-hidden="true"><g transform="translate(4 0)"><path d="M53.4 38.0 C58.2 31.6 58.2 21.2 48.6 18.8 C37.4 16.4 26.2 22.8 24.6 35.6 C23.0 46.8 29.4 54.0 32.6 60.4 C35.8 66.8 32.6 74.8 39.0 79.6 C45.4 83.6 51.8 79.6 51.8 73.2 L51.8 73.2 C50.9 79.0 45.4 82.0 40.2 77.9 C35.1 74.2 38.8 66.8 35.6 58.9 C32.4 51.9 26.8 45.8 28.6 36.1 C29.5 25.0 38.1 20.1 47.8 22.2 C55.9 22.9 56.3 31.0 53.4 38.0 Z" fill="var(--brass)"></path><path d="M52.4 35.3 C46.2 34.0 40.1 37.5 39.2 44.6 C38.3 50.7 41.8 54.7 43.6 58.2 C45.3 61.7 43.6 66.1 47.1 68.8 C50.6 71.0 54.1 68.8 54.1 65.3 L54.1 65.3 C53.5 68.4 50.6 69.7 48.1 67.3 C45.6 65.6 47.6 61.7 45.6 57.2 C43.6 53.4 40.3 50.2 40.9 44.8 C41.2 38.3 46.4 34.8 52.4 35.3 Z" fill="var(--brass)" opacity=".62"></path><path d="M57.6 42.5 C61 45.2 62 47.6 62 50 C62 52.4 61 54.8 57.6 57.5 C59.3 54.8 59.8 52.4 59.8 50 C59.8 47.6 59.3 45.2 57.6 42.5 Z" fill="var(--brass)" opacity=".7"></path><circle cx="52" cy="50" r="4.4" fill="var(--home)"></circle></g></svg>
@@ -965,6 +1014,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="find"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20.5 20.5l-4.8-4.8"/><circle cx="11" cy="11" r="1.6" fill="currentColor" stroke="none"/></svg><span><span class="t">Find it</span><span class="s">Every place a number lives on the neck</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span><span class="t">Chords on the neck</span><span class="s">Shapes, inversions and triads</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span><span class="t">Chord decoder</span><span class="s">Tab, notes, numbers or a name: what chord is it?</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+<button class="card" data-open="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14 9l2 2"/></svg><span><span class="t">Key finder</span><span class="s">Paste a tab, type notes or play along: what key is it?</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span><span class="t">Chord chart</span><span class="s">Every chord in the key and its numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span><span class="t">Jam</span><span class="s">Loop a progression and play over it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="mel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span><span class="t">Write a melody</span><span class="s">Compose in numbers over chords</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div></section>
@@ -1313,6 +1363,20 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="actions" id="dec-acts" hidden><button class="btn" id="dec-play">Play</button><button class="btn" id="dec-arp">One by one</button><button class="btn" id="dec-clear">Clear</button></div>
   </section>
 
+  <section class="stage" id="panel-key" hidden>
+    <p class="eyebrow">Key finder</p>
+    <p class="hint" id="kf-hint">Paste a tab, type notes, play along with the mic on, or tap notes on the map or neck. The map follows the best guess as you go.</p>
+    <div class="kfin">
+      <textarea id="kf-in" rows="3" placeholder="e|---8--5-----  (paste a whole tab)&#10;or notes: E♭ B♭ G D A F" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Tab or notes"></textarea>
+      <div class="row"><button class="btn primary" id="kf-add">Add these notes</button><button class="btn" id="kf-undo">Undo</button><button class="btn" id="kf-clear">Clear</button></div>
+      <div class="decex" id="kf-ex"><span>Try</span><button data-x="E♭ B♭ G D A F D E♭">E♭ B♭ G D A F</button><button data-x="A C D E G E D C A">A C D E G</button><button data-x="D F# A B G E A C#">D F♯ A B G E</button></div>
+      <p class="kfread" id="kf-read" aria-live="polite"></p>
+    </div>
+    <div class="kfstrip" id="kf-strip" aria-label="Notes heard so far"></div>
+    <div id="kf-ask" aria-live="polite"></div>
+    <div id="kf-out" aria-live="polite"></div>
+  </section>
+
   <section class="stage tuner" id="panel-tune" hidden>
     <div class="tunetop"><label class="pill"><span class="sr">Tuning</span><select id="tune-set" aria-label="Tuning"></select></label>
       <span class="tbtns"><button class="tauto" id="tune-drone" aria-pressed="false" title="Hold the string's note so you can tune by ear">Drone</button><button class="tauto" id="tune-auto" aria-pressed="true" title="Auto: the tuner works out which string you're playing. Off: it stays on the string you tapped.">Auto</button></span></div>
@@ -1472,7 +1536,7 @@ const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
 var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'My songs',anc:'Interval anchors',dec:'Chord decoder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
+const TABNAME={today:'Today',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'My songs',anc:'Interval anchors',dec:'Chord decoder',key:'Key finder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
@@ -1662,7 +1726,7 @@ function renderPad(){
   const DR=DIATONIC.map(p=>[p,idOfDeg(p)]).sort((a,b)=>a[1]-b[1]),col={};
   DR.forEach(([p,off],i)=>col[p]=2*i+1);
   OUTSIDE.forEach(p=>{const off=idOfDeg(p);let j=0;DR.forEach(([q,o2],i)=>{if(o2<off)j=i});col[p]=2*j+2});col[12]=15;
-  const VC=voxChordNow(),CN=chordNow||VC,inPlay=VC?VC.tones:S.pool;
+  const VC=voxChordNow(),CN=chordNow||VC,KFON=S.tab==='key'&&KF,inPlay=KFON?DIATONIC:VC?VC.tones:S.pool;
   padKeys().forEach(({k:o,o:base,r})=>{const b=document.createElement('button');
     const isD=base===12||DIATONIC.includes(base);
     b.className='key '+(isD?'diat':'out')+' r'+r;b.style.gridRow=String(2*r+(isD?2:1));
@@ -1673,6 +1737,7 @@ function renderPad(){
     if(toneSet().has(pc(o)))b.classList.add('ctone');
     if(CN&&!marks[o]){if(pc(o)===CN.root)b.classList.add('croot');else if(CN.tones.includes(pc(o)))b.classList.add('cton')}
     if(nowKey===o)b.classList.add('now');
+    if(KFON){const ap=(pc(o)+S.key)%12,w=KF.w[ap]/(KF.max||1);if(KF.w[ap]>0){b.classList.add('kfh');b.style.setProperty('--kw',Math.max(0.12,w).toFixed(2));if(!DIATONIC.includes(pc(o))&&w>0.15)b.classList.add('kfo')}if(KF.q&&KF.q.opts.includes(ap))b.classList.add('kfq')}
     b.style.gridColumn=`${col[base]} / span 2`;
     b.innerHTML=labHTML(o);
     const a=STATS[pc(o)];if(a&&a.n){const bar=document.createElement('span');bar.className='acc';bar.style.width=Math.round(100*a.c/a.n)+'%';b.appendChild(bar);
@@ -1698,6 +1763,7 @@ function lightAt(ms,o,extra){later(ms,()=>{nowKey=o;if(extra)extra();renderPad()
 function unlightAt(ms){later(ms,()=>{nowKey=null;renderPad()})}
 function preview(o){if(!JAM.on)stopAll();ensure();const t=ctx.currentTime+0.02;pluck(H()+o,t,1.2,0.5);lightAt(0,o);unlightAt(600)}
 function padPress(o){
+  if(S.tab==='key')return kfTapDeg(pc(o));
   if(S.tab==='mel')return melInput(o);
   if(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')return duelInput(pc(o));
   if(S.tab==='deg'&&Q&&!Q.done)return answer(o);
@@ -2014,6 +2080,7 @@ $('fb').addEventListener('click',e=>{const b=e.target.closest('.fc');if(!b)retur
 function fbPress(s,f){
   if(S.tab==='find'&&S.findMode==='home'&&IQ&&!IQ.done)return answerIQ(s,f);
   if(S.tab==='dec')return decFret(s,f);
+  if(S.tab==='key'){cellNow=s+'-'+f;setTimeout(()=>{if(cellNow===s+'-'+f){cellNow=null;renderFB()}},600);return kfTapMidi(OPEN[s]+f)}
   if(S.tab==='find'&&FQ&&!FQ.done)return answerFind(s,f);
   // any game waiting for a number accepts a tap on the neck: the tapped pitch is turned into its map key
   const k=keyFor(OPEN[s]+f),waiting=(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')||S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
@@ -2517,6 +2584,7 @@ function micNote(m,cents){
   micHeard(m,cents);lastAct=Date.now();const t=S.tab;
   if(t==='duel'){if(!DUEL.listen)return;if(S.duelMode==='chords'){const c=rootChord(m,duelChordSet());if(c)return duelInput(c[1]);return}return duelInput(offOf(m))}
   if(t==='dec')return decAddMidi(m);
+  if(t==='key')return kfMic(m);
   if(t==='deg'&&Q&&!Q.done)return padPress(micKey(m,Q.m));
   if(t==='chord'&&CQ&&!CQ.done)return padPress(micKey(m,CQ.m));
   if(t==='phr'&&P&&!P.done&&S.pmode==='hear')return padPress(micKey(m,P.seq[P.ans.length]));
@@ -2547,17 +2615,18 @@ function micFrame(){
   if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=jump||(MIC.cur===null&&MIC.quietAt!=null&&now-MIC.quietAt<0.25&&now-MIC.quietAt>=0&&MIC.quietAt>busyUntil+0.15);MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
   if(strong)MIC.strong=true;
   if(S.micSing)micHeard(MIC.cur,(mf-MIC.cur)*100);
+  if(S.tab==='key'&&MIC.emitted&&!busy)kfHold(MIC.cur,0.03);
   if(!MIC.emitted&&now-MIC.since>(MIC.strong?0.08:0.22)&&!busy){
     const echo=echoOf(MIC.cur,now);
     if(MIC.since>=MIC.gate){if(echo&&!MIC.onset)return;MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100)}
     else if(!echo){ // began while the app was playing, and it isn't the app's own note: a voice singing along
       if(MIC.gRms==null&&now>=MIC.gate)MIC.gRms=r.rms;
       if(MIC.gRms!=null&&now-MIC.gate>0.45){MIC.emitted=true;if(r.rms>=0.75*MIC.gRms)micNote(MIC.cur,(mf-MIC.cur)*100)}}}}
-const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec'];
+const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec','key'];
 function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone: tap to allow':MIC.muted?'Microphone muted: tap to listen':on?'Listening: tap to mute':'Microphone ready';
   b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
   $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn();
-  const hf=$('hfbar');if(hf){hf.hidden=!(on&&!['tune','dec'].includes(S.tab));if(!hf.hidden)$('mic-pill').hidden=true;$('hf-g').textContent=S.micNext?'2 muted strums: next · 3: replay':'';$('hf-strums').hidden=!S.micNext;
+  const hf=$('hfbar');if(hf){hf.hidden=!(on&&!['tune','dec','key'].includes(S.tab));if(!hf.hidden)$('mic-pill').hidden=true;$('hf-g').textContent=S.micNext?'2 muted strums: next · 3: replay':'';$('hf-strums').hidden=!S.micNext;
     $('hf-txt').textContent={deg:'Play or sing the note',chord:'Play or sing the top note',phr:'Play or sing the notes in order',prog:'Play each chord\u2019s root',find:'Play each spot on the neck',duel:'Play the notes back',mel:'Play notes to write them',vox:'Play the chord\u2019s root'}[S.tab]||'Play or sing your answer'}}
 async function micStart(){ensure();
   const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
@@ -2616,10 +2685,10 @@ function applyDock(){const t=S.tab;
   }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.v==='map'){if(S.tab==='vox')S.voxMap=!S.voxMap;else S.showMap=!S.showMap}else if(b.dataset.v==='circle')S.showCircle=!S.showCircle;else S.showNeck=!S.showNeck;persist();applyDock();if(S.showNeck)renderFB();renderCirc()});
-function showTab(t){if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
+function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','tune','duel','beat'].forEach(k=>$('panel-'+k).hidden=k!==t);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
   applyDock();
@@ -2844,7 +2913,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat'||S.tab==='key';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -3020,6 +3089,143 @@ $('dec-play').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)re
 $('dec-arp').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>{pluck(m,t+i*0.45,1.2,0.48);lightAt(i*450,keyFor(m))});unlightAt(ms.length*450+300)});
 $('dec-clear').addEventListener('click',()=>{$('dec-in').value='';DEC.frets=Array(OPEN.length).fill(null);DEC.kb=null;DEC.cur=null;DEC.res=null;cellMarks={};chordNow=null;$('dec-out').innerHTML='';$('dec-acts').hidden=true;renderPad();$('dec-in').focus()});
 
+/* ---------- key finder: which key is this song in? ----------
+   Notes come from a pasted tab, typed names, the mic (held notes weigh more) or taps on the map, neck and keys.
+   The weights are compared with the Krumhansl–Kessler profiles for all 24 major and minor keys.
+   When two keys stay close, it asks for the one note that tells them apart, or for the note that feels like home. */
+var KF=null;
+const KK_MAJ=[6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88],KK_MIN=[6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17];
+const SC_MAJ=[0,2,4,5,7,9,11],SC_MIN=[0,2,3,5,7,8,10];
+function kfInit(){KF={ev:[],g:0,w:Array(12).fill(0),max:0,yes:new Set(),no:new Set(),home:null,notHome:new Set(),q:null,skipped:new Set(),follow:true,prev:null,keep:false,shown:null,flash:null,tm:null,holdP:null,holdT:0,R:[]}}
+kfInit();
+const kfName=k=>`${NAMES[k.t]} ${k.mn?'minor':'major'}`;
+const kfKey1=k=>k.mn?(k.t+3)%12:k.t;
+const kfScale=k=>(k.mn?SC_MIN:SC_MAJ).map(i=>(i+k.t)%12);
+const kfDistinct=()=>KF.w.filter(x=>x>0).length;
+function kfRecalc(){const w=Array(12).fill(0);KF.ev.forEach(e=>w[e.p]+=e.w);KF.yes.forEach(p=>w[p]+=3);KF.w=w;KF.max=Math.max(0,...w)}
+function kfRank(){const w=KF.w,tot=w.reduce((a,b)=>a+b,0);if(tot<=0)return [];
+  const mw=tot/12,out=[];
+  for(let t=0;t<12;t++)for(const mn of [false,true]){const prof=mn?KK_MIN:KK_MAJ,mp=prof.reduce((a,b)=>a+b,0)/12;
+    let sxy=0,sxx=0,syy=0;for(let i=0;i<12;i++){const x=w[(t+i)%12]-mw,y=prof[i]-mp;sxy+=x*y;sxx+=x*x;syy+=y*y}
+    let sc=sxx&&syy?sxy/Math.sqrt(sxx*syy):0;const k={t,mn,id:t+(mn?'m':'M')},scl=kfScale(k);
+    if(KF.home!==null)sc+=KF.home===t?0.3:-0.05;
+    if(KF.notHome.has(t))sc-=0.3;
+    KF.no.forEach(p=>{if(scl.includes(p))sc-=0.2});
+    k.sc=sc;out.push(k)}
+  out.sort((a,b)=>b.sc-a.sc);const top=out[0].sc,ex=out.map(k=>Math.exp(10*(k.sc-top))),z=ex.reduce((a,b)=>a+b,0);
+  out.forEach((k,i)=>k.pct=Math.round(100*ex[i]/z));return out}
+function kfApplyKey(k){if(!k)return;const key=kfKey1(k),home=k.mn?9:0;if(S.key===key&&S.home===home)return;
+  S.key=key;S.home=home;syncSettings();warmCache();renderCirc();if(S.showNeck||S.inst==='piano')renderFB()}
+// which question tells the top two keys apart?
+function kfQuestion(R){if(kfDistinct()<3||R.length<2)return null;const A=R[0],B=R[1];
+  if(A.pct>=85&&KF.home===A.t)return null;
+  const sa=kfScale(A),sb=kfScale(B),onlyA=sa.filter(p=>!sb.includes(p)),onlyB=sb.filter(p=>!sa.includes(p));
+  if(onlyA.length&&B.pct>=12){const pairs=[];onlyA.forEach(a=>onlyB.forEach(b=>{const d=Math.min((a-b+12)%12,(b-a+12)%12);pairs.push({a,b,d,heard:(KF.w[a]>0)+(KF.w[b]>0)})}));
+    pairs.sort((x,y)=>x.heard-y.heard||x.d-y.d);
+    const pr=pairs.find(x=>x.heard<2&&!KF.skipped.has('pick:'+[x.a,x.b].sort().join('-'))&&!KF.yes.has(x.a)&&!KF.yes.has(x.b));
+    if(pr)return {type:'pick',key:'pick:'+[pr.a,pr.b].sort().join('-'),opts:[pr.a,pr.b],A,B}}
+  if(!onlyA.length&&KF.home===null&&B.pct>=10&&!KF.skipped.has('home:'+A.id+B.id))return {type:'home',key:'home:'+A.id+B.id,opts:[A.t,B.t],A,B};
+  if(KF.home===null&&!KF.notHome.has(A.t)&&kfDistinct()>=4&&!KF.skipped.has('conf:'+A.t))return {type:'conf',key:'conf:'+A.t,opts:[A.t],A};
+  return null}
+function kfUpdate(){if(!KF)return;kfRecalc();const R=kfRank();KF.R=R;const best=R[0];
+  if(best&&kfDistinct()>=3){
+    if(KF.follow&&KF.shown!==best.id){const cur=R.find(r=>r.id===KF.shown);if(!cur||best.sc-cur.sc>0.02){KF.shown=best.id;kfApplyKey(best)}}
+    else if(!KF.follow){const cur=R.find(r=>r.id===KF.shown);if(cur)kfApplyKey(cur)}}
+  if(!KF.q||!KF.q.keep)KF.q=kfQuestion(R);
+  kfRender();renderPad();if(S.showNeck||S.inst==='piano')renderFB()}
+function kfSoon(){if(KF.tm)return;KF.tm=setTimeout(()=>{KF.tm=null;kfUpdate()},220)}
+const kfPlayIcon='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>';
+function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
+  const cur=R.find(r=>r.id===KF.shown)||null,scl=cur?kfScale(cur):null;
+  // strip: twelve notes from the 1 of the key on the map
+  $('kf-strip').innerHTML=Array.from({length:12},(_,d)=>{const ap=(S.key+d)%12,w=KF.w[ap],h=KF.max?Math.round(100*w/KF.max):0,inK=DIATONIC.includes(d);
+    const cls=['c',w>0?(inK?'in':'out'):'',d===S.home?'home':'',KF.flash===ap?'flash':''].filter(Boolean).join(' ');
+    return `<div class="${cls}" title="${NAMES[ap]}: ${w?Math.round(w*10)/10:'not heard'}"><span class="bar"><i style="height:${h}%"></i></span><span class="nt">${NAMES[ap]}</span><span class="dg">${lab(d)}</span></div>`}).join('');
+  // question
+  const q=KF.q;let a='';
+  if(q){const opt=(p,i)=>`<span class="opt"><button data-kfa="${p}">${NAMES[p]}</button><button class="h" data-kfh="${i}" aria-label="Hear ${NAMES[p]}">${kfPlayIcon}</button></span>`;
+    if(q.type==='pick')a=`<div class="kfask"><span class="eb">One note decides it</span><p><b>${kfName(q.A)}</b> or <b>${kfName(q.B)}</b>? They differ by one note: <b>${NAMES[q.opts[0]]}</b> or <b>${NAMES[q.opts[1]]}</b>. Play along with the song, try both, then play the one that fits. Or tap it.</p><div class="opts">${q.opts.map(opt).join('')}</div><button class="skip" data-kfs="1">Can't tell, ask something else</button></div>`;
+    else if(q.type==='home')a=`<div class="kfask"><span class="eb">Where's home?</span><p>Same notes, two possible homes: <b>${NAMES[q.A.t]}</b> (${kfName(q.A)}) or <b>${NAMES[q.B.t]}</b> (${kfName(q.B)}). Which note does the song come to rest on, at the end of a phrase or the very end? Hold it for a second on the guitar, or tap it. Play to hear each key's cadence.</p><div class="opts">${q.opts.map(opt).join('')}</div><button class="skip" data-kfs="1">Not sure, skip</button></div>`;
+    else a=`<div class="kfask"><span class="eb">Check home</span><p>Hold <b>${NAMES[q.A.t]}</b> under the song (play to hear it). Does it sound settled, like nothing is left to resolve?</p><div class="opts"><span class="opt"><button data-kfc="1">Yes, that's home</button></span><span class="opt"><button data-kfc="0">No</button></span><span class="opt"><button data-kfh="0">${kfPlayIcon}&nbsp;${NAMES[q.A.t]}</button></span></div></div>`}
+  $('kf-ask').innerHTML=a;
+  // result
+  let o='';
+  if(n<3)o=`<p class="kfdone">${n?`${n} different note${n>1?'s':''} so far. `:''}Three or more different notes give a first guess; a whole riff or phrase gives a good one.</p>`;
+  else{const top=R.slice(0,4),best=R[0],settled=best.pct>=85&&KF.home===best.t;
+    const outs=scl?KF.w.map((w,p)=>w>0&&!scl.includes(p)?p:null).filter(p=>p!==null):[];
+    o=`<div class="kfbest"><div class="hd"><span class="nm">${kfName(best)}</span><span class="q">home ${best.mn?'6':'1'} · ${NAMES[kfKey1(best)]} = 1</span><span class="pc">${best.pct}%</span></div>`
+      +(settled?`<p class="kfdone"><b>Settled.</b> The notes fit and you confirmed ${NAMES[best.t]} as home.</p>`:'')
+      +(outs.length&&cur?`<p class="kfdone">Outside ${kfName(cur)}: ${outs.map(p=>`<b style="color:var(--bad)">${NAMES[p]}</b> (${lab((p-S.key+12)%12)})`).join(', ')}. ${outs.length===1?'One borrowed note is normal; a whole section of them can mean the key changes there.':'Several outside notes can mean a key change, or a section in another key.'}</p>`:'')
+      +`<div class="kfcands">${top.map(k=>`<div class="kfcand"><button class="k" data-kfk="${k.id}" aria-pressed="${KF.shown===k.id}">${kfName(k)}<small>home ${k.mn?'6':'1'} · ${NAMES[kfKey1(k)]} = 1</small></button><span class="b"><i style="width:${k.pct}%"></i></span><span class="p">${k.pct}%</span><button class="play" data-kfp="${k.id}" aria-label="Hear ${kfName(k)}">${kfPlayIcon}</button></div>`).join('')}</div>`
+      +`<label class="kffollow"><input type="checkbox" id="kf-follow" ${KF.follow?'checked':''}> The map follows the best guess</label>`
+      +`<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn${KF.keep?'':' primary'}" id="kf-keep">${KF.keep?'Kept for every game':'Practise in '+(cur?kfName(cur):kfName(best))}</button></div></div>`}
+  $('kf-out').innerHTML=o}
+// adding notes
+function kfAdd(ps,w=1,src='tap'){if(!ps.length)return;KF.g++;ps.forEach(p=>KF.ev.push({p:((p%12)+12)%12,w,src,g:KF.g}));
+  const last=ps[ps.length-1];KF.flash=((last%12)+12)%12;setTimeout(()=>{if(KF.flash===((last%12)+12)%12){KF.flash=null;kfRender()}},450);kfUpdate()}
+function kfAnswer(p){const q=KF.q;if(!q)return;
+  if(q.type==='pick'){const o=q.opts.find(x=>x!==p);KF.yes.add(p);KF.no.delete(p);KF.no.add(o);KF.yes.delete(o);toast(`${NAMES[p]} it is`)}
+  else if(q.type==='home'){KF.home=p;KF.notHome.delete(p);KF.g++;KF.ev.push({p,w:2,src:'ans',g:KF.g});toast(`Home: ${NAMES[p]}`)}
+  KF.q=null;kfUpdate()}
+function kfMic(m){if(!KF)return;const p=m%12;KF.holdP=p;KF.holdT=0;
+  if(KF.q&&KF.q.type==='pick'&&KF.q.opts.includes(p))return kfAnswer(p);
+  kfAdd([p],1,'mic')}
+function kfHold(m,dt){if(!KF)return;const p=m%12,e=KF.ev[KF.ev.length-1];
+  if(KF.holdP===p){KF.holdT+=dt;if(KF.q&&KF.q.type==='home'&&KF.q.opts.includes(p)&&KF.holdT>=1){KF.holdP=null;return kfAnswer(p)}}
+  if(e&&e.src==='mic'&&e.p===p&&e.w<4){e.w=Math.min(4,e.w+dt*2);kfSoon()}}
+function kfTapMidi(m){stopAll();ensure();pluck(m,ctx.currentTime+0.02,1.2,0.5);const p=m%12;
+  if(KF.q&&KF.q.type!=='conf'&&KF.q.opts.includes(p))return kfAnswer(p);
+  kfAdd([p],1,'tap')}
+function kfTapDeg(d){kfTapMidi(H()+((d-S.home+12)%12))}
+function kfHearKey(k){const sk=S.key,sh=S.home;S.key=kfKey1(k);S.home=k.mn?9:0;stopAll();ensure();try{cadence(ctx.currentTime+0.05)}finally{S.key=sk;S.home=sh}}
+function kfHearNote(p,low){stopAll();ensure();const m=(low?40:52)+((p-4+12)%12);pluck(m,ctx.currentTime+0.03,low?3:1.6,0.5);KF.flash=p;kfRender();setTimeout(()=>{if(KF.flash===p){KF.flash=null;kfRender()}},700)}
+// reading a pasted tab or typed note names
+function kfParse(str){const lines=str.replace(/\r/g,'').split('\n'),LBL=/^\s*([eEbBgGdDaA])\s*[)|:\]]?\s*(?=[-—–|])/;
+  const body=l=>{const m=l.match(LBL),b=l.replace(LBL,'').trim();if(b.length<4)return null;const dash=(b.match(/[-—–]/g)||[]).length;
+    if(dash<3||dash<b.length*0.3||!/^[-—–|0-9hpbrstvxHPBRSTVX\/\\~^().*<>=+\s]+$/.test(b))return null;return {b,lab:m?m[1]:null}};
+  const blocks=[];let cur=null,text=[];
+  lines.forEach(l=>{const t=body(l);if(t){if(!cur){cur=[];blocks.push(cur)}cur.push(t)}else{cur=null;if(l.trim())text.push(l)}});
+  const STD={e:64,b:59,B:59,g:55,G:55,d:50,D:50,a:45,A:45,E:40};
+  // systems printed back to back with no blank line: cut into 6-line (or 4-line) groups
+  for(let i=blocks.length-1;i>=0;i--){const bl=blocks[i],n=bl.length,sz=n>7&&n%6===0?6:n>4&&n%4===0&&!(n%6===0)?4:0;if(sz){const parts=[];for(let j=0;j<n;j+=sz)parts.push(bl.slice(j,j+sz));blocks.splice(i,1,...parts)}}
+  const ps=[];let used=0;
+  blocks.forEach(bl=>{let open=null;
+    if(bl.length===6)open=[64,59,55,50,45,40];else if(bl.length===7)open=[64,59,55,50,45,40,35];
+    else if(bl.length===4)open=S.inst==='uke'?[69,64,60,67]:[43,38,33,28];
+    else if(bl.every(x=>x.lab))open=bl.map((x,i)=>x.lab==='E'&&i===0?64:STD[x.lab]);
+    if(!open)return;if(bl.length>=6&&bl[0].lab==='E'&&bl[bl.length-1].lab==='e')open=open.slice().reverse();used++;
+    bl.forEach((x,s)=>{(x.b.match(/\d+/g)||[]).forEach(tok=>{const n=Number(tok);
+      const frets=tok.length===1?[n]:tok.length===2&&n<=24&&tok[0]!==tok[1]?[n]:tok.split('').map(Number);
+      frets.forEach(f=>ps.push((open[s]+f)%12))})})});
+  let typed=0,bad=[];
+  text.join(' ').split(/[\s,;\-–—|/]+/).filter(Boolean).forEach(tok=>{const m=tok.match(/^([A-Ga-g])([#♯b♭]?)(\d)?$/);
+    if(m){ps.push((LET[m[1].toUpperCase()]+accOf(m[2])+12)%12);typed++}else bad.push(tok)});
+  return {ps,blocks:used,tabN:ps.length-typed,typed,bad}}
+function kfAddText(){const v=$('kf-in').value;if(!v.trim())return;const r=kfParse(v);
+  if(!r.ps.length){$('kf-read').textContent=`I couldn't read that. Paste tab lines (like e|---3-5---) or type note names (like E♭ B♭ G).`;return}
+  const parts=[];if(r.tabN)parts.push(`${r.tabN} note${r.tabN>1?'s':''} from ${r.blocks>1?r.blocks+' tab blocks':'the tab'}`);if(r.typed)parts.push(`${r.typed} typed note${r.typed>1?'s':''}`);
+  $('kf-read').textContent=`Added ${parts.join(' and ')}.${r.bad.length&&r.typed?` Skipped: ${r.bad.slice(0,4).join(' ')}${r.bad.length>4?'…':''}`:''}`;
+  $('kf-in').value='';kfAdd(r.ps,1,'text')}
+function kfEnter(){if(!KF)kfInit();if(S.tab!=='key')return;if(!KF.prev)KF.prev={key:S.key,home:S.home};KF.keep=false;
+  const cur=KF.R.find(r=>r.id===KF.shown);if(cur)kfApplyKey(cur);kfUpdate()}
+function kfLeave(){if(!KF||!KF.prev)return;const p=KF.prev;KF.prev=null;
+  if(!KF.keep&&(S.key!==p.key||S.home!==p.home)){S.key=p.key;S.home=p.home;if(gameReady)resetKeyContext();else syncSettings()}
+  else if(KF.keep&&gameReady)resetKeyContext()}
+$('kf-add').addEventListener('click',kfAddText);
+$('kf-in').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();kfAddText()}});
+$('kf-undo').addEventListener('click',()=>{if(!KF.ev.length)return;const g=KF.ev[KF.ev.length-1].g;KF.ev=KF.ev.filter(e=>e.g!==g);KF.q=null;$('kf-read').textContent='Undone.';kfUpdate()});
+$('kf-clear').addEventListener('click',()=>{const prev=KF.prev,keep=KF.keep;kfInit();KF.prev=prev;KF.keep=keep;$('kf-read').textContent='';$('kf-in').value='';
+  if(prev){S.key=prev.key;S.home=prev.home;syncSettings();renderCirc()}kfUpdate()});
+$('kf-ex').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('kf-in').value=b.dataset.x;kfAddText()});
+$('panel-key').addEventListener('click',e=>{const t=e.target.closest('button,input');if(!t)return;const d=t.dataset;
+  if(d.kfa!==undefined)return kfAnswer(Number(d.kfa));
+  if(d.kfh!==undefined){const q=KF.q;if(!q)return;const i=Number(d.kfh);if(q.type==='home')return kfHearKey(i?q.B:q.A);return kfHearNote(q.opts[i],q.type==='conf')}
+  if(d.kfs!==undefined){if(KF.q)KF.skipped.add(KF.q.key);KF.q=null;return kfUpdate()}
+  if(d.kfc!==undefined){const q=KF.q;if(!q)return;if(d.kfc==='1'){KF.home=q.A.t;toast(`Home: ${NAMES[q.A.t]}`)}else KF.notHome.add(q.A.t);KF.q=null;return kfUpdate()}
+  if(d.kfk){const k=KF.R.find(r=>r.id===d.kfk);if(!k)return;KF.follow=false;KF.shown=k.id;kfApplyKey(k);return kfUpdate()}
+  if(d.kfp){const k=KF.R.find(r=>r.id===d.kfp);if(k)kfHearKey(k);return}
+  if(t.id==='kf-follow'){KF.follow=t.checked;if(KF.follow)KF.shown=null;return kfUpdate()}
+  if(t.id==='kf-keep'){const k=KF.R.find(r=>r.id===KF.shown)||KF.R[0];if(!k)return;kfApplyKey(k);KF.keep=true;persist();toast(`Every game now uses ${kfName(k)}`);kfRender()}});
 
 /* ---------- instruments: guitar, ukulele or piano shape how notes are shown ---------- */
 function applyInst(){const g=S.inst==='uke'?INST.uke:INST.guitar;OPEN=g.open;FRETS=g.frets;STR=g.str;
@@ -3055,6 +3261,7 @@ function renderKB(){const el=$('kb');if(!el||!instReady)return;const c0=H()-(((H
     else h+=`<button class="kbk" data-m="${m}" style="left:calc(${wi*ww}% - ${ww*0.3}%);width:${ww*0.6}%" aria-label="${NAMES[m%12]} ${Math.floor(m/12)-1}">${dot(m)}</button>`});
   el.innerHTML=h}
 function kbPress(m){
+  if(S.tab==='key'){kbNow=m;setTimeout(()=>{if(kbNow===m){kbNow=null;renderKB()}},600);return kfTapMidi(m)}
   if(S.tab==='dec'){DEC.kb=DEC.kb||new Set();DEC.kb.has(m)?DEC.kb.delete(m):DEC.kb.add(m);const ms=[...DEC.kb].sort((a,b)=>a-b);$('dec-in').value=ms.map(x=>NAMES[x%12]).join(' ');
     stopAll();ensure();pluck(m,ctx.currentTime+0.02,1.2,0.5);if(!ms.length){$('dec-out').innerHTML='';$('dec-acts').hidden=true;DEC.cur=null;renderPad();return}decode();return}
   const waiting=(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')||S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
@@ -3344,6 +3551,7 @@ var TOURS={
   vox:[['#vox-mode','Triads: three-note chords and their inversions. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
   prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
   duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
+  key:[['#kf-in','Paste a tab (straight from a tab site) or type note names.'],['#kf-strip','Every note heard so far, with its number in the best-guess key. Red ones sit outside it.'],['#kf-out','The likeliest keys. Tap one to see it on the map, or press play to hear it.'],['#mapwrap','The map follows the best guess live. Turn the mic on and play along to keep feeding it.']],
   dec:[['#dec-in','Type a chord: a tab like x32010, notes like C E G, numbers like 2 4 6, or a name like Am7.'],['#dec-voice','Or say it.'],['#fbwrap','Or tap it on the neck (or the keys).']],
   tune:[['#tune-set','Pick your tuning.'],['#hs','Tap a string to hear it. With the mic on, Auto follows the string you play.'],['#tune-drone','Drone holds the note so you can tune by ear.'],['.tmeter','The dot moves toward the centre as you get closer. Teal means in tune.']],
   beat:[['.bpmrow','Set the tempo, or tap it.'],['#beat-play','Start and stop.'],['#beat-style','Pick a beat: a click, or a groove to play over.']],
@@ -3524,15 +3732,23 @@ function nextIQ(){stopAll();ensure();marks={};trail=new Set();cellMarks={};
   showIQ({st,hf,hm,o,tm,lap})}
 var IQH=[];
 function showIQ(q){stopAll();ensure();marks={};trail=new Set();cellMarks={};const n=OPEN.length,{st,hf,o,lap}=q;
-  IQ=Object.assign(q,{done:false,tries:0});cellMarks[st+'-'+hf]='vox';cellNow=null;$('iq-back').hidden=!IQH.length;
+  IQ=Object.assign(q,{done:false,tries:0,homeOk:false});cellMarks[st+'-'+hf]='vox';cellNow=null;$('iq-back').hidden=!IQH.length;
   $('find-num').textContent=lab(o);
-  $('find-prompt').innerHTML=`Find the <b class="gold">${lab(o)}</b> above home. Home is the gold <span class="homedot">${lab(S.home)}</span> on the ${STR[st]} string (fret ${hf}). Stay within ${REACH} frets.`;
+  $('find-prompt').innerHTML=`First play home, the gold <span class="homedot">${lab(S.home)}</span> on the ${STR[st]} string (fret ${hf}). Then find the <b class="gold">${lab(o)}</b> above it, within ${REACH} frets.`;
   $('find-fb').textContent=`String ${lap+1} of ${n}: same jump, starting from home on the ${STR[st]} string.`;
   $('find-reveal').hidden=false;$('find-next').textContent='Skip';renderFB();hearIQ(true)}
 function backIQ(){if(!IQH.length)return;const p=IQH.pop(),hf=iqHomeOn(p.st),hm=OPEN[p.st]+hf,tm=hm+(((p.o-S.home)%12+12)%12||12);showIQ({st:p.st,hf,hm,o:p.o,tm,lap:p.lap})}
 function hearIQ(first){if(!IQ)return;stopAll();ensure();const t=ctx.currentTime+0.05;pluck(IQ.hm,t,1.2,0.55);if(!first||IQ.done)pluck(IQ.tm,t+0.7,1.4,0.55)}
 function iqCells(){const out=[];for(let s2=0;s2<OPEN.length;s2++){const f=IQ.tm-OPEN[s2];if(f>=0&&f<=FRETS&&Math.abs(f-IQ.hf)<=REACH)out.push([s2,f])}return out}
-function answerIQ(s2,f){const m=OPEN[s2]+f,id=s2+'-'+f;IQ.tries++;stopAll();ensure();const t=ctx.currentTime+0.03;
+function answerIQ(s2,f){const m=OPEN[s2]+f,id=s2+'-'+f;stopAll();ensure();const t=ctx.currentTime+0.03;
+  // home first: play the gold note, then the jump from it
+  if(!IQ.homeOk){pluck(m,t,1,0.5);
+    if(m===IQ.hm){IQ.homeOk=true;cellNow=id;setTimeout(()=>{if(cellNow===id){cellNow=null;renderFB()}},600);renderFB();
+      $('find-fb').innerHTML=`<span class="tag ok">Home</span> Now hear the jump in your head and find the <b class="gold">${lab(IQ.o)}</b> above it.`;return}
+    cellMarks[id]='no';renderFB();
+    $('find-fb').innerHTML=`<span class="tag no">Home first</span> Play the gold <b>${lab(S.home)}</b> on the ${STR[IQ.st]} string, fret ${IQ.hf}, before the ${lab(IQ.o)}.`;
+    setTimeout(()=>{if(cellMarks[id]==='no'&&IQ&&!IQ.done){delete cellMarks[id];renderFB()}},1200);return}
+  IQ.tries++;
   if(m===IQ.tm&&Math.abs(f-IQ.hf)<=REACH){IQ.done=true;cellMarks[id]='ok';pluck(IQ.hm,t,0.9,0.5);pluck(IQ.tm,t+0.6,1.3,0.55);
     const others=iqCells().filter(([a,b])=>a!==s2||b!==f);others.forEach(([a,b])=>{cellMarks[a+'-'+b]='tone'});
     const fd=f-IQ.hf,sd=IQ.st-s2;
@@ -3546,7 +3762,7 @@ $('find-reveal').addEventListener('click',()=>{if(S.findMode!=='home'||!IQ||IQ.d
 $('iq-back').addEventListener('click',backIQ);
 function syncFindMode(){$('iq-back').hidden=S.findMode!=='home'||!IQH.length;document.querySelectorAll('#find-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findMode))}
 $('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;IQH=[];FQ=null;cellMarks={};syncFindMode();
-  $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears; find a number above it, then the same jump from every string.':'Press start, then tap every place that number lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
+  $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears: play it first, then find a number above it, then the same jump from every string.':'Press start, then tap every place that number lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
 syncFindMode();
 
 
