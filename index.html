@@ -1674,11 +1674,12 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="field" id="fb-nums-f"><span>Neck shows</span><div class="seg" id="fb-nums"><button data-v="all">Notes in play</button><button data-v="home">Home only</button><button data-v="none">Only what lights up</button></div></div>
       <div class="micopts">
         <span class="micopts-h">Microphone</span>
+        <label class="check big"><input type="checkbox" id="mic-auto"> <span><b>Microphone on</b>: play or sing to answer in every game and the tuner. Same as the mic button at the top of a game; it stays as you leave it.</span></label>
         <label class="check big"><input type="checkbox" id="hands-free"><span><b>Hands-free mode</b>: answer by playing or singing, two muted strums for the next question, three to hear it again, and games move on by themselves after an answer.</span></label>
-        <label class="check big"><input type="checkbox" id="mic-auto"> Listen with the microphone in the games and the tuner. You allow it once; it only listens while a game or the tuner is open.</label>
-        <label class="field"><span>Mic sensitivity</span><input type="range" id="mic-sens" min="1" max="10" step="1"><p class="hint" id="mic-sens-txt" style="margin:2px 0 0">How quiet a note can be and still count.</p></label>
-        <label class="check big"><input type="checkbox" id="mic-phones"> I use headphones (turns off the phone's echo cancelling for the cleanest pitch). Leave this off when the app plays through the speaker.</label>
-        <label class="check"><input type="checkbox" id="mic-oct"> Octave must match</label>
+        
+        <label class="field"><span>Mic sensitivity: how quiet a note can be and still count</span><input type="range" id="mic-sens" min="1" max="10" step="1"><p class="hint" id="mic-sens-txt" style="margin:2px 0 0">How quiet a note can be and still count.</p></label>
+        <input type="checkbox" id="mic-phones" hidden>
+        <label class="check"><input type="checkbox" id="mic-oct"> Strict octave: count a note only in the same octave the app played it (normally any octave counts)</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
         <label class="check"><input type="checkbox" id="mic-next"> Two muted strums = Next</label>
         <span class="hint">The mic pauses while the app plays, and ignores the drone's note unless you start it yourself. Use headphones so it only hears you. Answer any question by playing or singing the note; chord questions take the chord's root.</span>
@@ -2776,7 +2777,7 @@ const RECENT=[];
 function micRecent(m,t,dur){const tail=SPACEY()?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
 const echoOf=(m,now)=>(droneNodes&&[0,7].includes((((m-(droneNodes.root??bass(S.home)))%12)+12)%12))||RECENT.some(x=>now<x.until&&[0,7].includes((((m-x.m)%12)+12)%12));   // the drone's note is the app's too
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
-const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
+const micThr=()=>0.0045*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
 function micKey(m,ref){
   if(ref!=null&&!S.micOct)m=ref+((((m-ref)%12)+18)%12)-6;                 // same number in any octave
   if(ref==null){while(m<H())m+=12;while(m>H()+(two()?24:12))m-=12}           // writing: fold into the map
@@ -2834,14 +2835,14 @@ function micFrame(){
       if(MIC.gRms==null&&now>=MIC.gate)MIC.gRms=r.rms;
       if(MIC.gRms!=null&&now-MIC.gate>0.45){MIC.emitted=true;if(r.rms>=0.75*MIC.gRms)micNote(MIC.cur,(mf-MIC.cur)*100)}}}}
 const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec','key','sing'];
-function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone: tap to allow':MIC.muted?'Microphone muted: tap to listen':on?'Listening: tap to mute':'Microphone ready';
+function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone off: tap to turn on':on?'Listening: tap to turn the mic off':'Microphone on';
   b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
   $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn();
   const hf=$('hfbar');if(hf){hf.hidden=!(on&&!['tune','dec','key'].includes(S.tab));if(!hf.hidden)$('mic-pill').hidden=true;$('hf-g').textContent=S.micNext?'2 muted strums: next · 3: replay':'';$('hf-strums').hidden=!S.micNext;
     $('hf-txt').textContent={sing:'Sing or play the number',deg:'Play or sing the note',chord:'Play or sing the top note',phr:'Play or sing the notes in order',prog:'Play each chord\u2019s root',find:'Play each spot on the neck',duel:'Play the notes back',mel:'Play notes to write them',vox:'Play the chord\u2019s root'}[S.tab]||'Play or sing your answer'}}
 async function micStart(){ensure();
   const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
-  if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:!S.micPhones,noiseSuppression:false,autoGainControl:false}})}
+  if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:false}})}
     catch(e){S.micAuto=false;persist();$('mic-auto').checked=false;$('mic-pill').hidden=false;$('mic-pill').classList.remove('live');$('mic-heard').textContent='Mic blocked: allow it in your browser settings';setTimeout(()=>{if(!MIC.on)$('mic-pill').hidden=true},3500);micLabel();return}
     MIC.src=ctx.createMediaStreamSource(MIC.stream);MIC.an=ctx.createAnalyser();MIC.an.fftSize=2048;MIC.buf=new Float32Array(2048);MIC.src.connect(MIC.an)}
   clearTimeout(MIC.relT);if(MIC.on)return;if(!micWanted()){micRelSoon();return}
@@ -2854,13 +2855,13 @@ function micStop(){micPause()}
 const micWanted=()=>S.micAuto&&!MIC.muted&&!document.hidden&&document.body.dataset.screen==='game'&&LISTEN_TABS.includes(S.tab)&&(typeof PAUSE==='undefined'||!PAUSE.on);
 function micSync(){if(micWanted()){if(!MIC.on)micStart()}else if(MIC.on)micPause();else micLabel()}
 function micEnable(){S.micAuto=true;MIC.muted=false;persist();$('mic-auto').checked=true;micSync()}
-$('mic-toggle').addEventListener('click',()=>{if(!S.micAuto){micEnable();toast('Mic on: play or sing to answer · 2 muted strums = next');return}MIC.muted=!MIC.muted;micSync()});
+$('mic-toggle').addEventListener('click',()=>{MIC.muted=false;if(!S.micAuto){micEnable();toast('Mic on. It stays on until you tap it again.');return}S.micAuto=false;persist();$('mic-auto').checked=false;micPause();micRelease();toast('Mic off')});
 $('mic-auto').checked=S.micAuto;$('mic-auto').addEventListener('change',e=>{if(e.target.checked)micEnable();else{S.micAuto=false;persist();micPause();micRelease()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){micPause();micRelease()}else micSync()});
 {const _st=showTab;showTab=function(t){_st(t);micSync()};const _gs=goScreen;goScreen=function(a,b){_gs(a,b);micSync()};
  const _pa=pauseAll,_ra=resumeAll;pauseAll=function(){_pa();micSync()};resumeAll=function(){_ra();micSync()}}
 setTimeout(micLabel,0);
-$('mic-sens').value=S.micSens;const sensTxt=()=>{const v=S.micSens;$('mic-sens-txt').textContent=(v<=3?'Low: only clear, strong notes count. Good in a noisy room.':v<=7?'Medium: normal playing and singing count.':'High: soft playing and quiet singing count, but so might room noise.')+' (How quiet a note can be and still count.)'};sensTxt();
+$('mic-sens').value=S.micSens;const sensTxt=()=>{const v=S.micSens;$('mic-sens-txt').textContent=(v<=3?'Low: only clear, strong notes count. Good in a noisy room.':v<=7?'Medium: normal playing and singing count, soft room noise doesn\'t.':'High: soft playing and quiet singing count, but so might room noise.')};sensTxt();
 $('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist();sensTxt()});
 $('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{persist();micLabel()}});
 $('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
