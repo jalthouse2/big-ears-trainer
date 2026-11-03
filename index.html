@@ -3088,7 +3088,7 @@ function chalEnd(){const dk=dayId(),D=dayCfg(),best=GAME.best[dk]||0,score=CHAL.
   CHAL.review=log;
   const slots=log.map((x,i)=>`<button class="rv ${x.ok?'ok':'no'}" data-rv="${i}" aria-label="Question ${i+1}">${lab(x.o)}</button>`).join('');
   const misses=log.map((x,i)=>[x,i]).filter(([x])=>!x.ok);
-  const missTxt=misses.length?`<div class="rvmiss">${misses.map(([x,i])=>`<button class="rvline" data-rv="${i}"><b class="no">${labK(x.guess)}</b><span>you said, it was</span><b class="ok">${lab(x.o)}</b><span class="spk">▶</span></button>`).join('')}</div>`:'<p class="note">Every note right. Superb.</p>';
+  const missTxt=misses.length?`<div class="rvmiss">${misses.map(([x,i])=>`<button class="rvline" data-rv="${i}"><span>You said</span><b class="no">${labK(x.guess)}</b><span>· it was</span><b class="ok">${lab(x.o)}</b><span class="spk">▶</span></button>`).join('')}</div>`:'<p class="note">Every note right. Superb.</p>';
   showResult(`${score>best&&best>0?confetti():''}<h3>${D.d}'s challenge</h3><p class="rsub">${starsTxt(D.stars)} · ${first}/${CHAL_N} right · ${keyName}</p>
     <span class="rscore">${score}</span><p class="note">${score>best?(best?`New best today (was ${best}).`:'Your score for today.'):`Your best today: ${best}.`} Tap any note to hear it again.</p>
     <div class="rvgrid">${slots}</div>${missTxt}
