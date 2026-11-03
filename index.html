@@ -490,6 +490,13 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+.rvgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:6px 0}
+.rv{aspect-ratio:1;border-radius:8px;border:0;font:700 13px var(--font-body);color:var(--bg)}
+.rv.ok{background:var(--home)}.rv.no{background:#d9707f}
+.rvmiss{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px;max-height:30vh;overflow:auto}
+.rvline{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--sunk);color:var(--fg);font-size:14px}
+.rvline b{font-size:17px}.rvline b.no{color:#e08a96}.rvline b.ok{color:var(--home)}.rvline span{color:var(--muted)}.rvline .spk{margin-left:auto;color:var(--brass)}
+
 body:not([data-screen="game"]) #set-toggle{display:none}
 .morelist{display:flex;flex-direction:column;border-radius:16px;background:var(--surface);border:1px solid var(--line);overflow:hidden;margin-bottom:18px}
 .morerow{display:flex;align-items:center;gap:14px;padding:14px 16px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--fg);text-align:left}
@@ -2941,7 +2948,7 @@ const BADGES=[['first','1','First note','Answer your first question'],['row10','
   ['gem1','◎','First ring','Earn a ring at any gig'],['gem3','★★★','Encore','Three rings at one gig'],['path','✓','Full tour','A ring at every gig of a tour'],
   ['goal','★','Daily dose','Reach your daily goal'],['streak3','3','Three days','3-day streak'],['streak7','7','Full week','7-day streak'],['streak30','30','Habit','30-day streak'],
   ['outside','♭♯','Outsider','Name 25 outside notes'],['worlds','3W','World tour','Rings in 3 different tours'],['fast','⚡','Quick ears','Perfect run at Quick pace or faster'],
-  ['chal','🏆','Challenger','Finish a weekly challenge'],['club','BE','Big Ears Club','Reach the Big Ears rank']];
+  ['chal','🏆','Challenger','Finish a daily challenge'],['club','BE','Big Ears Club','Reach the Big Ears rank']];
 // rings: a dot with three sound rings around it, like the logo. Each ring earned lights up.
 const RING_ARCS=['M8 6.8A6 6 0 0 1 8 17.2','M10 3.3A10 10 0 0 1 10 20.7','M11.5 .7A13 13 0 0 1 11.5 23.3'];
 const ringsSVG=(n,big)=>`<svg class="rings${big?' big':''}" viewBox="-1 -1 16 26" aria-hidden="true"><circle cx="5" cy="12" r="2.6" class="${n?'on':''}"/>${RING_ARCS.map((d,i)=>`<path d="${d}" class="${i<n?'on':''}"${big?` style="animation-delay:${(0.2+i*0.25).toFixed(2)}s"`:''}/>`).join('')}</svg>`;
@@ -3050,35 +3057,57 @@ function isoWeek(){const d=new Date(Date.UTC(new Date().getFullYear(),new Date()
 const weekId=()=>{const [y,w]=isoWeek();return `${y}-W${String(w).padStart(2,'0')}`};
 function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const hashStr=x=>{let h=2166136261;for(const c of x){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
-const chalPool=i=>{const L=pathLevels(0);return i<5?L[1]:i<10?L[3]:i<15?L[5]:L[6]};
+const DAILY=[
+  {d:'Monday',stars:1,what:'1 3 5 6',pool:[0,4,7,9],home:0,pace:1.3,every:3,range:'one'},
+  {d:'Tuesday',stars:2,what:'the five-note scale: 1 2 3 5 6',pool:[0,2,4,7,9],home:0,pace:1.15,every:4,range:'one'},
+  {d:'Wednesday',stars:3,what:'all seven numbers',pool:[0,2,4,5,7,9,11],home:0,pace:1,every:5,range:'one'},
+  {d:'Thursday',stars:4,what:'all seven, minor home (6)',pool:[0,2,4,5,7,9,11],home:9,pace:1,every:6,range:'one'},
+  {d:'Friday',stars:5,what:'all seven, over two octaves',pool:[0,2,4,5,7,9,11],home:0,pace:0.9,every:8,range:'two'},
+  {d:'Saturday',stars:6,what:'all seven plus ♭3 and ♭7',pool:[0,2,3,4,5,7,9,10,11],home:0,pace:0.8,every:10,range:'one'},
+  {d:'Sunday',stars:7,what:'all twelve, in a surprise world',pool:[0,1,2,3,4,5,6,7,8,9,10,11],home:-1,pace:0.7,every:20,range:'two'}];
+const dayIdx=()=>(new Date().getDay()+6)%7;
+const dayId=()=>today();
+const dayCfg=()=>DAILY[dayIdx()];
+const starsTxt=n=>'★'.repeat(n)+'☆'.repeat(7-n);
+const chalPool=i=>CHAL.pool||[0,4,7];
 function chalStart(){
   if(!CHAL.on)CHAL.saved={key:S.key,home:S.home,pool:S.pool.slice(),every:S.every,auto:S.auto,retry:S.retry,pace:S.pace,autoPace:S.autoPace,range:S.range};
-  const rng=mulberry(hashStr('bigears-'+weekId()));
-  S.key=Math.floor(rng()*12);S.home=0;S.every=5;S.auto=true;S.retry=false;S.pace=1;S.autoPace=false;S.range='one';AUTOF=1;$('pace').value='1';
-  Object.assign(CHAL,{on:true,i:0,score:0,rng,first:0});sinceCad=Infinity;resetKeyContext();
+  const rng=mulberry(hashStr('bigears-day-'+dayId())),D=dayCfg();
+  S.key=Math.floor(rng()*12);S.home=D.home<0?WORLDS[Math.floor(rng()*WORLDS.length)]:D.home;S.every=D.every;S.auto=true;S.retry=false;S.pace=D.pace;S.autoPace=false;S.range=D.range;AUTOF=1;$('pace').value=String(D.pace);
+  Object.assign(CHAL,{on:true,i:0,score:0,rng,first:0,log:[],pool:D.pool.slice()});sinceCad=Infinity;resetKeyContext();
   if(S.tab!=='deg'){goScreen('game');showTab('deg')}renderRun();
-  $('deg-fb').innerHTML=`<b>Big Ears Challenge, ${weekId()}.</b> ${CHAL_N} questions in ${homeName()}. Quick and right scores more: up to 150 a note.`;
+  $('deg-fb').innerHTML=`<b>${D.d}'s challenge</b> ${starsTxt(D.stars)}<br>${CHAL_N} notes: ${D.what}, in ${homeName()}. One try each. Quick and right scores more.`;
   setTimeout(nextDeg,300)}
 function chalAnswer(first){const dt=Math.max(0,(performance.now()-(Q.at||performance.now()))/1000);
   const pts=first?100+Math.max(0,Math.round(50-12*Math.max(0,dt-0.8))):0;CHAL.score+=pts;if(first)CHAL.first++;CHAL.i++;
   if(pts)toast(`+${pts}`,'xp');renderRun()}
 function chalStop(){if(!CHAL.on)return;CHAL.on=false;if(CHAL.saved){Object.assign(S,CHAL.saved);CHAL.saved=null}AUTOF=1;$('pace').value=String(S.pace);resetKeyContext();renderRun()}
-function chalEnd(){const wk=weekId(),best=GAME.best[wk]||0,score=CHAL.score,first=CHAL.first;chalStop();
-  if(score>best){GAME.best[wk]=score}badge('chal');saveGame();addXP(Math.round(score/20),'challenge');renderHomeStats();
-  showResult(`${score>best&&best>0?confetti():''}<h3>Challenge done</h3><p class="rsub">${wk} · ${first}/${CHAL_N} right first try</p>
-    <span class="rscore">${score}</span><p class="note">${score>best?(best?`New personal best (was ${best}).`:'Your first score this week.'):`Your best this week: ${best}.`} Same questions for everyone until Sunday.</p>
-    <div class="acts"><button class="btn" data-r="chal-again">Try again</button><button class="btn primary" data-r="chal-share">Share score</button><button class="btn" data-r="home">Home</button></div>`)}
-function chalShare(){const wk=weekId(),best=GAME.best[wk]||0,txt=`Big Ears Challenge ${wk}: ${best} points. Same 20 notes for everyone this week. Can you beat it? https://jalthouse2.github.io/big-ears-trainer/`;
+function chalEnd(){const dk=dayId(),D=dayCfg(),best=GAME.best[dk]||0,score=CHAL.score,first=CHAL.first,log=CHAL.log||[],keyName=homeName();
+  GAME.dlog=GAME.dlog||{};if(!GAME.dlog[dk])GAME.dlog[dk]=log.map(x=>x.ok?1:0);   // your first go is the one that counts for sharing
+  chalStop();if(score>best){GAME.best[dk]=score}badge('chal');saveGame();addXP(Math.round(score/20),'challenge');renderHomeStats();
+  CHAL.review=log;
+  const slots=log.map((x,i)=>`<button class="rv ${x.ok?'ok':'no'}" data-rv="${i}" aria-label="Question ${i+1}">${lab(x.o)}</button>`).join('');
+  const misses=log.map((x,i)=>[x,i]).filter(([x])=>!x.ok);
+  const missTxt=misses.length?`<div class="rvmiss">${misses.map(([x,i])=>`<button class="rvline" data-rv="${i}"><b class="no">${labK(x.guess)}</b><span>you said, it was</span><b class="ok">${lab(x.o)}</b><span class="spk">▶</span></button>`).join('')}</div>`:'<p class="note">Every note right. Superb.</p>';
+  showResult(`${score>best&&best>0?confetti():''}<h3>${D.d}'s challenge</h3><p class="rsub">${starsTxt(D.stars)} · ${first}/${CHAL_N} right · ${keyName}</p>
+    <span class="rscore">${score}</span><p class="note">${score>best?(best?`New best today (was ${best}).`:'Your score for today.'):`Your best today: ${best}.`} Tap any note to hear it again.</p>
+    <div class="rvgrid">${slots}</div>${missTxt}
+    <div class="acts"><button class="btn" data-r="chal-again">Try again</button><button class="btn primary" data-r="chal-share">Share</button><button class="btn" data-r="home">Home</button></div>`)}
+function chalShare(){const dk=dayId(),D=dayCfg(),best=GAME.best[dk]||0,g=(GAME.dlog||{})[dk]||[],grid=g.map(v=>v?'🟩':'🟥').join('').replace(/(.{20})/g,'$1'),
+  txt=`Big Ears ${D.d} ${starsTxt(D.stars)}\n${g.filter(Boolean).length}/${g.length} · ${best} pts\n${grid}\nhttps://jalthouse2.github.io/big-ears-trainer/`;
   if(navigator.share)navigator.share({text:txt}).catch(()=>{});else{try{navigator.clipboard.writeText(txt);toast('Score copied: paste it to a friend')}catch(e){toast(txt)}}}
 $('chal-card').addEventListener('click',()=>{goScreen('game');showTab('deg');chalStart()});
+{const _ans=answer;answer=function(o){const q=Q,firstTry=q&&!q.done&&q.tries===0;_ans(o);if(CHAL.on&&firstTry&&CHAL.log&&q.done)CHAL.log.push({o:q.o,m:q.m,guess:o,ok:isRight(o,q.m)})}}
+$('rescard').addEventListener('click',e=>{const b=e.target.closest('[data-rv]');if(!b||!CHAL.review)return;e.stopPropagation();const x=CHAL.review[+b.dataset.rv];if(!x)return;
+  stopAll();ensure();const t=ctx.currentTime+0.05;if(!x.ok){pluck(pitchOfKey(x.guess,x.m),t,0.9,0.45);pluck(x.m,t+1.1,1.2,0.55)}else pluck(x.m,t,1.2,0.55)},true);
 
 function renderHomeStats(){
   const x=GAME.xp,r=rankOf(x),t=GAME.days[today()]||0,g=GOAL(),pct=Math.min(1,t/g),C=2*Math.PI*12;
   $('statstrip').innerHTML=`<div class="sst fire">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4 0 7-2.8 7-7 0-3.5-2.2-6.3-4-8 .2 2.3-.8 4-2.3 4.6C13 8 11.5 5 8.5 2.5 9 6.5 5 9.5 5 15c0 4.2 3 7 7 7z"/></svg>'}<div><b>${streakNow()}</b><span>day streak</span></div></div>
    <div class="sst"><svg class="ring" viewBox="0 0 30 30"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12" stroke-dasharray="${(C*pct).toFixed(1)} ${C.toFixed(1)}"/></svg><div><b>${t}</b><span>of ${g} XP today</span></div></div>
    <div class="sst">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>'}<div><b>${x.toLocaleString()}</b><span>${RANKS[r][1]}${r>=CLUB?'<span class="club">CLUB</span>':''}</span></div></div>`;
-  const wk=weekId(),best=GAME.best[wk];$('chal-week').textContent=`Weekly challenge · ${wk.split('-')[1]}`;
-  $('chal-sub').textContent=best?`Your best this week: ${best}. Same 20 notes for everyone.`:'20 notes, the same for everyone this week';
+  const D=dayCfg(),best=GAME.best[dayId()];$('chal-week').textContent=`Daily challenge · ${D.d} ${starsTxt(D.stars)}`;
+  $('chal-sub').textContent=best?`Done: ${best} points. Try again, or come back tomorrow.`:`20 notes: ${D.what}. Harder every day until Sunday.`;
   $('today-sub').textContent=`Your ${S.daily}-minute session, block by block`}
 function renderRank(){const x=GAME.xp,r=rankOf(x),nx=RANKS[r+1];
   $('rankcard').innerHTML=`<p class="sechead2">Your rank</p><div class="rankrow"><span class="big">${RANKS[r][1]}</span>${r>=CLUB?'<span class="club">BIG EARS CLUB</span>':''}</div>
