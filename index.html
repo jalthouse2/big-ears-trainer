@@ -489,7 +489,11 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
-#pg-prompt{display:none}
+#pg-prompt{display:none}.stars{display:inline-flex;gap:1px;vertical-align:-1px;font-style:normal}
+.stars i{font-style:normal}.stars i.e{color:color-mix(in srgb,var(--muted) 40%,transparent)!important}
+.stars i.f{color:var(--brass)!important}
+.stars i.h{background:linear-gradient(90deg,var(--brass) 50%,color-mix(in srgb,var(--muted) 45%,transparent) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
 .rvgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:6px 0}
 .rv{aspect-ratio:1;border-radius:8px;border:0;font:700 13px var(--font-body);color:var(--bg)}
 .rv.ok{background:var(--home)}.rv.no{background:#d9707f}
@@ -3059,16 +3063,17 @@ function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1
 const hashStr=x=>{let h=2166136261;for(const c of x){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
 const DAILY=[
   {d:'Monday',stars:1,what:'1 3 5 6',pool:[0,4,7,9],home:0,pace:1.3,every:3,range:'one'},
-  {d:'Tuesday',stars:2,what:'the five-note scale: 1 2 3 5 6',pool:[0,2,4,7,9],home:0,pace:1.15,every:4,range:'one'},
-  {d:'Wednesday',stars:3,what:'all seven numbers',pool:[0,2,4,5,7,9,11],home:0,pace:1,every:5,range:'one'},
-  {d:'Thursday',stars:4,what:'all seven, minor home (6)',pool:[0,2,4,5,7,9,11],home:9,pace:1,every:6,range:'one'},
-  {d:'Friday',stars:5,what:'all seven, over two octaves',pool:[0,2,4,5,7,9,11],home:0,pace:0.9,every:8,range:'two'},
-  {d:'Saturday',stars:6,what:'all seven plus ♭3 and ♭7',pool:[0,2,3,4,5,7,9,10,11],home:0,pace:0.8,every:10,range:'one'},
-  {d:'Sunday',stars:7,what:'all twelve, in a surprise world',pool:[0,1,2,3,4,5,6,7,8,9,10,11],home:-1,pace:0.7,every:20,range:'two'}];
+  {d:'Tuesday',stars:1.5,what:'the five-note scale: 1 2 3 5 6',pool:[0,2,4,7,9],home:0,pace:1.15,every:4,range:'one'},
+  {d:'Wednesday',stars:2.5,what:'all seven numbers',pool:[0,2,4,5,7,9,11],home:0,pace:1,every:5,range:'one'},
+  {d:'Thursday',stars:3,what:'all seven, minor home (6)',pool:[0,2,4,5,7,9,11],home:9,pace:1,every:6,range:'one'},
+  {d:'Friday',stars:3.5,what:'all seven, over two octaves',pool:[0,2,4,5,7,9,11],home:0,pace:0.9,every:8,range:'two'},
+  {d:'Saturday',stars:4.5,what:'all seven plus ♭3 and ♭7',pool:[0,2,3,4,5,7,9,10,11],home:0,pace:0.8,every:10,range:'one'},
+  {d:'Sunday',stars:5,what:'all twelve, in a surprise world',pool:[0,1,2,3,4,5,6,7,8,9,10,11],home:-1,pace:0.7,every:20,range:'two'}];
 const dayIdx=()=>(new Date().getDay()+6)%7;
 const dayId=()=>today();
 const dayCfg=()=>DAILY[dayIdx()];
-const starsTxt=n=>'★'.repeat(n)+'☆'.repeat(7-n);
+const starsTxt=n=>'★'.repeat(Math.floor(n))+(n%1?'½':'')+'☆'.repeat(5-Math.ceil(n))+` (${n}/5)`;
+const starsHTML=n=>`<span class="stars" aria-label="${n} out of 5 stars">${[1,2,3,4,5].map(i=>`<i class="${n>=i?'f':n>=i-0.5?'h':'e'}">★</i>`).join('')}</span>`;
 const chalPool=i=>CHAL.pool||[0,4,7];
 function chalStart(){
   if(!CHAL.on)CHAL.saved={key:S.key,home:S.home,pool:S.pool.slice(),every:S.every,auto:S.auto,retry:S.retry,pace:S.pace,autoPace:S.autoPace,range:S.range};
@@ -3076,7 +3081,7 @@ function chalStart(){
   S.key=Math.floor(rng()*12);S.home=D.home<0?WORLDS[Math.floor(rng()*WORLDS.length)]:D.home;S.every=D.every;S.auto=true;S.retry=false;S.pace=D.pace;S.autoPace=false;S.range=D.range;AUTOF=1;$('pace').value=String(D.pace);
   Object.assign(CHAL,{on:true,i:0,score:0,rng,first:0,log:[],pool:D.pool.slice()});sinceCad=Infinity;resetKeyContext();
   if(S.tab!=='deg'){goScreen('game');showTab('deg')}renderRun();
-  $('deg-fb').innerHTML=`<b>${D.d}'s challenge</b> ${starsTxt(D.stars)}<br>${CHAL_N} notes: ${D.what}, in ${homeName()}. One try each. Quick and right scores more.`;
+  $('deg-fb').innerHTML=`<b>${D.d}'s challenge</b> ${starsHTML(D.stars)}<br>${CHAL_N} notes: ${D.what}, in ${homeName()}. One try each. Quick and right scores more.`;
   setTimeout(nextDeg,300)}
 function chalAnswer(first){const dt=Math.max(0,(performance.now()-(Q.at||performance.now()))/1000);
   const pts=first?100+Math.max(0,Math.round(50-12*Math.max(0,dt-0.8))):0;CHAL.score+=pts;if(first)CHAL.first++;CHAL.i++;
@@ -3089,7 +3094,7 @@ function chalEnd(){const dk=dayId(),D=dayCfg(),best=GAME.best[dk]||0,score=CHAL.
   const slots=log.map((x,i)=>`<button class="rv ${x.ok?'ok':'no'}" data-rv="${i}" aria-label="Question ${i+1}">${lab(x.o)}</button>`).join('');
   const misses=log.map((x,i)=>[x,i]).filter(([x])=>!x.ok);
   const missTxt=misses.length?`<div class="rvmiss">${misses.map(([x,i])=>`<button class="rvline" data-rv="${i}"><span>You said</span><b class="no">${labK(x.guess)}</b><span>· it was</span><b class="ok">${lab(x.o)}</b><span class="spk">▶</span></button>`).join('')}</div>`:'<p class="note">Every note right. Superb.</p>';
-  showResult(`${score>best&&best>0?confetti():''}<h3>${D.d}'s challenge</h3><p class="rsub">${starsTxt(D.stars)} · ${first}/${CHAL_N} right · ${keyName}</p>
+  showResult(`${score>best&&best>0?confetti():''}<h3>${D.d}'s challenge</h3><p class="rsub">${starsHTML(D.stars)} · ${first}/${CHAL_N} right · ${keyName}</p>
     <span class="rscore">${score}</span><p class="note">${score>best?(best?`New best today (was ${best}).`:'Your score for today.'):`Your best today: ${best}.`} Tap any note to hear it again.</p>
     <div class="rvgrid">${slots}</div>${missTxt}
     <div class="acts"><button class="btn" data-r="chal-again">Try again</button><button class="btn primary" data-r="chal-share">Share</button><button class="btn" data-r="home">Home</button></div>`)}
@@ -3106,7 +3111,7 @@ function renderHomeStats(){
   $('statstrip').innerHTML=`<div class="sst fire">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22c4 0 7-2.8 7-7 0-3.5-2.2-6.3-4-8 .2 2.3-.8 4-2.3 4.6C13 8 11.5 5 8.5 2.5 9 6.5 5 9.5 5 15c0 4.2 3 7 7 7z"/></svg>'}<div><b>${streakNow()}</b><span>day streak</span></div></div>
    <div class="sst"><svg class="ring" viewBox="0 0 30 30"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12" stroke-dasharray="${(C*pct).toFixed(1)} ${C.toFixed(1)}"/></svg><div><b>${t}</b><span>of ${g} XP today</span></div></div>
    <div class="sst">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>'}<div><b>${x.toLocaleString()}</b><span>${RANKS[r][1]}${r>=CLUB?'<span class="club">CLUB</span>':''}</span></div></div>`;
-  const D=dayCfg(),best=GAME.best[dayId()];$('chal-week').textContent=`Daily challenge · ${D.d} ${starsTxt(D.stars)}`;
+  const D=dayCfg(),best=GAME.best[dayId()];$('chal-week').innerHTML=`Daily challenge · ${D.d} ${starsHTML(D.stars)}`;
   $('chal-sub').textContent=best?`Done: ${best} points. Try again, or come back tomorrow.`:`20 notes: ${D.what}. Harder every day until Sunday.`;
   $('today-sub').textContent=`Your ${S.daily}-minute session, block by block`}
 function renderRank(){const x=GAME.xp,r=rankOf(x),nx=RANKS[r+1];
