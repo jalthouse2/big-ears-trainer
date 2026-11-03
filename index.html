@@ -1209,18 +1209,18 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
     <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
-      <p class="prompt" id="vox-prompt">Pick a chord. The arrows move the same chord up the neck.</p>
+      <p class="prompt" id="vox-prompt">Pick a chord. The arrows move it up the neck.</p>
       <div class="chordbtns" id="vox-chords"></div>
-      <div class="actions keep"><label class="field"><span>On strings</span><select id="vx-strings">
+      <div class="actions"><label class="check"><input type="checkbox" id="vx-all"> Show every place this chord lives</label><label class="field"><span>On strings</span><select id="vx-strings">
         <option value="all">All string groups</option><option value="0">G B e (top three)</option><option value="1">D G B</option><option value="2">A D G</option><option value="3">E A D (bottom three)</option></select></label></div>
       <div class="actions"><button class="btn" id="vox-prev">Previous shape</button><button class="btn primary same" id="vox-nextshape">Next shape</button><button class="btn" id="vox-play">Play it</button></div>
       <p class="feedback" id="vox-info"></p>
     </div>
     <div id="vox-shell" class="sub" style="border-top:0;padding-top:0" hidden>
-      <p class="prompt" id="sh-prompt">Pick a chord. Its shell (1, 3, 7) lights up: three fingers, movable anywhere.</p>
+      <p class="prompt" id="sh-prompt">Pick a chord. Three notes: root, 3rd, 7th.</p>
       <div class="chordbtns" id="sh-chords"></div>
       <div class="actions keep"><div class="field"><span>Root on</span><div class="seg" id="sh-root"><button data-v="6">6th string</button><button data-v="5">5th string</button></div></div></div>
-      <div class="actions keep"><div class="field"><span>The four shapes: move one finger to change the colour</span><div class="seg shq" id="sh-q"><button data-v="maj7">maj7</button><button data-v="7">7</button><button data-v="m7">m7</button><button data-v="dim">dim / m6</button></div></div></div>
+      <div class="actions"><div class="field"><span>The four shapes: move one finger to change the colour</span><div class="seg shq" id="sh-q"><button data-v="maj7">maj7</button><button data-v="7">7</button><button data-v="m7">m7</button><button data-v="dim">dim / m6</button></div></div></div>
       <div class="actions"><button class="btn primary same" id="sh-play">Play it</button><button class="btn" id="sh-arp">One by one</button></div>
       <p class="feedback" id="sh-info"></p>
     </div>
@@ -1599,6 +1599,7 @@ const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
+if(!S.v9){S.v9=true;S.cc7=false;S.csz='3';if(S.voxMode==='shell')S.voxMode='explore'}
 if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
 if(!S.v6){S.v6=true;if(S.vxStr==='all')S.vxStr='0';S.duelMode='notes'}
@@ -2107,7 +2108,7 @@ function renderFB(){
   FRETLIST=zoom?Array.from({length:W.hi-W.lo+1},(_,i)=>W.lo+i):Array.from({length:FRETS+1},(_,i)=>i);
   const hasNut=FRETLIST[0]===0,nf=FRETLIST.length-(hasNut?1:0);
   [el,$('fnums')].forEach(x=>{x.style.setProperty('--n',nf);x.classList.toggle('zoom',zoom)});
-  const show=S.tab==='find'?(S.findMode==='home'?'none':S.findShow):S.tab==='vox'||S.tab==='dec'||S.tab==='key'?'home':S.fbNums;
+  const show=S.tab==='find'?(S.findMode==='home'?'none':S.findShow):S.tab==='vox'?'none':S.tab==='dec'||S.tab==='key'?'home':S.fbNums;
   const markPc={};Object.entries(marks).forEach(([k,v])=>{const p=pc(Number(k));if(!markPc[p]||v==='ok')markPc[p]=v});
   const trailPc=new Set([...trail].map(k=>pc(k))),nowPc=nowKey==null?null:pc(nowKey);
   const ch=VCH[S.voxChord],shape=VX.shapes[VX.i];const shapeIds=new Set(S.tab==='vox'&&S.voxMode==='explore'&&shape?shape.ids:S.tab==='vox'&&S.voxMode==='shell'&&typeof SHL!=='undefined'&&SHL.ids?SHL.ids:[]);
@@ -2123,11 +2124,11 @@ function renderFB(){
     if(S.tab==='chord'&&iw&&!st&&toneSet().has(o)){vis=true;extra='tone pip'}
     if(chordNow&&iw&&!st&&S.tab!=='vox'&&!(S.tab==='dec'&&DEC.src==='tab')&&chordNow.tones.includes(o)){vis=true;extra=(o===chordNow.root?'vox':'tone')+' pip'}
     if(S.tab==='vox'){
-      if(S.voxMode==='explore'&&ch[2].includes(o)){vis=true;extra=shapeIds.has(id)?'vox':'tone pip'}
+      if(S.voxMode==='explore'&&ch[2].includes(o)&&(shapeIds.has(id)||S.voxAll)){vis=true;extra=shapeIds.has(id)?'vox':'tone pip'}
       if(S.voxMode==='shell'&&shapeIds.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='quiz'&&quizIds.has(id)){vis=true;extra=st?'':'vox';if(!VQ.done)label=''}}
     if(!vis){if(show==='all'&&S.pool.includes(o)){vis=true;if(o!==S.home)extra='pool pip'}else if(show==='home'&&o===S.home)vis=true}
-    const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
+    const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra&&(vis||S.tab!=='vox')?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
     if(f===FRETLIST[0]&&f>0)h+=`<span class="fc sname">${STR[s]}</span>`;
     h+=`<button class="fc${f===0?' nut':''}${!whole&&!iw&&!shapeIds.has(id)&&!quizIds.has(id)?' ow':''}" data-c="${id}" aria-label="String ${s+1} fret ${f}"><span class="${cls}">${vis?label:''}</span></button>`}
   el.innerHTML=h;
@@ -2226,7 +2227,7 @@ $('vx-strings').addEventListener('change',e=>{S.vxStr=e.target.value;persist();r
 function voiceText(ms){const sorted=ms.slice().sort((a,b)=>a-b);return sorted.map(m=>lab(offOf(m))).join(' · ')}
 function showShapeInfo(){
   const sh=VX.shapes[VX.i],c=VCH[S.voxChord];
-  $('vox-info').innerHTML=sh?`<b>${c[1]}</b> chord (${c[2].map(lab).join(' ')}) · shape ${VX.i+1} of ${VX.shapes.length}<br><b>${invOf(sh,c[2]).split(' (')[0][0].toUpperCase()+invOf(sh,c[2]).split(' (')[0].slice(1)}</b>: ${voiceText(sh.ms)} from low to high, on the ${setName(sh)}`
+  $('vox-info').innerHTML=sh?`<b>${c[1]}</b> · shape ${VX.i+1} of ${VX.shapes.length} · ${invOf(sh,c[2]).split(' (')[0]} <span class="path">${voiceText(sh.ms)}</span>`
     :`No three-string shapes for this chord in ${WINDOWS[S.win].name.toLowerCase()}. Pick Whole neck.`;renderPad()}
 function playShape(ms,delay=0){if(!delay)stopAll();ensure();const t=ctx.currentTime+0.05+delay,sorted=ms.slice().sort((a,b)=>a-b);
   sorted.forEach((m,i)=>pluck(m,t+i*0.22,1,0.45));sorted.forEach((m,i)=>pluck(m,t+0.9+i*0.025,1.8,0.38));}
@@ -2568,7 +2569,7 @@ const TD=load('tmt-today',{done:0,days:[]});
 const SESS2={on:false,i:0,end:0,timer:null};
 function setupBlock(i){const w=S.week,P=planFor(w);
   jamStop();S.home=P.home;S.pool=LEVELS[P.notes].pool();S.every=P.every;S.win=P.win;S.range=P.range||'one';
-  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;if(P.cc7!==undefined)S.cc7=P.cc7;if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.findMode=P.findMode||'all';
+  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;S.cc7=!!P.cc7;S.csz=P.cc7?'4':'3';if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.findMode=P.findMode||'all';
   persist();resetKeyContext();
   const drone=$('drone'),wantDrone=i===0;if((drone.getAttribute('aria-pressed')==='true')!==wantDrone)drone.click();
   if(i===0){showTab('today');ensure();cadence(ctx.currentTime+0.1)}
@@ -3769,7 +3770,7 @@ function shRender(){if(S.inst!=='guitar'){$('sh-info').textContent='Shell shapes
   const fr=shCompute();document.querySelectorAll('#sh-q button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SHL.q));
   const nat=shQual(SHL.d),nm=DEG[SHL.d].n+{maj7:'maj7','7':'(7)',m7:'m7',dim:'°7 / m6'}[SHL.q];
   const roles=[['root',SHL.ms[0]],[SHL.q==='dim'?'6 / °7':'7th',SHL.ms[1]],['3rd',SHL.ms[2]]];
-  $('sh-info').innerHTML=`<b>${nm}</b> shell · tab <span class="path">${shTab(fr)}</span><br>`+roles.map(([r,m])=>`${r} <b>${lab(offOf(m))}</b>`).join(' · ')+
+  $('sh-info').innerHTML=`<b>${nm}</b> · tab <span class="path">${shTab(fr)}</span>`+
     (SHL.q!==nat?`<br><span class="hint">Not this key’s own ${DEG[SHL.d].n} chord (that’s ${nat}): try it to hear the colour change.</span>`:'')+
     (SHL.q==='dim'?`<br><span class="hint">The middle note works as a 6 as well as a diminished 7th, so the same shape is also a minor 6 chord (think Summertime).</span>`:'');
   renderPad()}
@@ -4116,6 +4117,7 @@ function practiseWeak(){const w=weakPool();if(!w.length){toast('Not enough answe
   toast('Practising '+pool.map(lab).join(', '),'big')}
 
 $('deg-weak').addEventListener('click',practiseWeak);
+$('vx-all').checked=!!S.voxAll;$('vx-all').addEventListener('change',e=>{S.voxAll=e.target.checked;persist();renderFB()});
 $('opt-colours').checked=!!S.colours;document.documentElement.classList.toggle('cnum',!!S.colours);$('opt-colours').addEventListener('change',e=>{S.colours=e.target.checked;persist();document.documentElement.classList.toggle('cnum',S.colours)});
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
