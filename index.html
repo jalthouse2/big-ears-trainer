@@ -489,7 +489,14 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
-#pg-prompt{display:none}.ptag{display:inline-block;margin-top:2px;font:600 11px var(--font-body);letter-spacing:.04em;color:var(--muted)}
+#pg-prompt{display:none}.about{display:flex;flex-direction:column;gap:12px;padding:4px 2px}
+.ab-head{display:flex;align-items:center;gap:14px;margin-bottom:4px}.ab-head .mark{width:60px;height:60px}
+.ab-head h2{margin:0;font:600 26px var(--font-display)}.ab-head p{margin:2px 0 0;color:var(--muted)}
+.ab-card{padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.ab-card h3{margin:0 0 6px;font:600 15px var(--font-body);color:var(--brass)}
+.ab-card p{margin:0 0 6px;line-height:1.45;font-size:15px}.ab-card p:last-child{margin:0}
+.ab-acts{display:flex;gap:8px;flex-wrap:wrap}.ab-ver{color:var(--muted);font-size:12px;text-align:center;margin:6px 0 0}
+.ptag{display:inline-block;margin-top:2px;font:600 11px var(--font-body);letter-spacing:.04em;color:var(--muted)}
 .pathhero .ptag{margin-top:4px}
 .ptour .pmode{margin-left:8px;color:var(--muted);font-weight:400;font-size:12px}
 .stars{display:inline-flex;gap:1px;vertical-align:-1px;font-style:normal}
@@ -1135,6 +1142,15 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <p class="sechead">Learn</p><div class="morelist"><button class="morerow" data-go="guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2zM22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg><span><b>Guide</b><small>Why Big Ears, the tonal map, how to use it</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button class="morerow" data-go="intro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg><span><b>Welcome intro</b><small>The short tour from the start</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
     <p class="sechead">Help</p><div class="morelist"><button class="morerow" data-go="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span><b>About Big Ears</b><small>Version, what's free, your data</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>
   </section>
+  <section class="screen" id="scr-about" hidden><div class="about">
+    <div class="ab-head"><span class="ab-mark" id="ab-mark"></span><div><h2>Big Ears</h2><p>Ear training on the tonal map</p></div></div>
+    <div class="ab-card"><h3>What it is</h3><p>Big Ears teaches you to hear every note as a number from home, the 1, and to find it straight away on your instrument.</p><p>Hear it, sing it, play it: a few minutes a day, on a path of gigs across seven worlds.</p></div>
+    <div class="ab-card"><h3>What's free</h3><p>Everything, while Big Ears is in early access.</p><p>Later, the tuner, rhythm, chord decoder, key finder, the guide and the first gigs stay free. The rest comes with a 7-day free trial, then €9.99 a year or €25.99 once.</p></div>
+    <div class="ab-card"><h3>Your data</h3><p>Your progress, songs and settings stay on this phone. There's no account.</p><p>The microphone only listens while a game or the tuner is open, and the sound never leaves your phone.</p><p>If you turn on daily nudges, the nudge server keeps only an anonymous address for your phone, your reminder time and the days you practised.</p></div>
+    <div class="ab-card"><h3>Tips</h3><p>Headphones help the mic hear only you.</p><p>Add Big Ears to your home screen: it works offline and can send nudges.</p></div>
+    <div class="ab-acts"><button class="btn primary" id="ab-share">Share Big Ears</button><button class="btn" id="ab-intro">Welcome intro</button></div>
+    <p class="ab-ver" id="ab-ver"></p>
+  </div></section>
   <section class="screen" id="scr-profile" hidden><div class="profile" id="profile"></div></section>
   <section class="screen" id="scr-stats" hidden>
     <div class="cards">
@@ -4403,18 +4419,22 @@ function renderProfile(){const x=GAME.xp,r=rankOf(x),nx=RANKS[r+1],days=Object.k
       <div><b>${badges}</b><span>badges</span></div><div><b>${x}</b><span>XP</span></div><div><b>${({guitar:'Guitar',uke:'Ukulele',piano:'Piano'})[S.inst]||''}</b><span>instrument</span></div></div>
     ${since?`<p class="pf-since">Practising since ${since}</p>`:''}`;
   $('pf-name').addEventListener('change',e=>{S.pname=e.target.value.trim();persist();renderProfile()})}
+$('ab-mark').innerHTML=(document.querySelector('.hero .mark')||{outerHTML:''}).outerHTML;
+$('ab-ver').textContent='Version '+(document.lastModified?new Date(document.lastModified).toISOString().slice(0,10):'')+' · Made with care for musicians who want to play by ear';
+$('ab-share').addEventListener('click',()=>{const txt='Big Ears: ear training on the tonal map. Hear it, sing it, play it. https://jalthouse2.github.io/big-ears-trainer/';
+  if(navigator.share)navigator.share({text:txt}).catch(()=>{});else{try{navigator.clipboard.writeText(txt);toast('Link copied')}catch(e){toast(txt)}}});
+$('ab-intro').addEventListener('click',()=>onbOpen());
 $('scr-more').addEventListener('click',e=>{const b=e.target.closest('.morerow');if(!b)return;const g=b.dataset.go;
   if(g==='settings')return openSheet();if(g==='intro')return onbOpen();
-  if(g==='about'){toast('Big Ears · free while in early access · everything stays on your phone','big');return}
   goScreen(g)});
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
   document.body.dataset.screen=sc;
-  ['home','games','tools','songs','path','more','profile','stats','guide','game'].forEach(k=>$('scr-'+k).hidden=k!==sc);
-  const navOf=['profile','stats','guide'].includes(sc)?'more':sc;document.querySelectorAll('#bottomnav button').forEach(b=>{if(b.dataset.s===navOf)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'Your path',games:'Games',more:'More',profile:'Profile',stats:'Stats',guide:'Guide'}[sc]||'';
+  ['home','games','tools','songs','path','more','profile','about','stats','guide','game'].forEach(k=>$('scr-'+k).hidden=k!==sc);
+  const navOf=['profile','stats','guide','about'].includes(sc)?'more':sc;document.querySelectorAll('#bottomnav button').forEach(b=>{if(b.dataset.s===navOf)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'Your path',games:'Games',more:'More',profile:'Profile',about:'About',stats:'Stats',guide:'Guide'}[sc]||'';
   if(sc==='path'&&typeof renderPath==='function')renderPath();if(sc==='profile'&&typeof renderProfile==='function')renderProfile();if(sc==='home'&&typeof renderPathCard==='function')renderPathCard();
   if(sc==='stats'){renderStats();renderRank()}if(sc==='home')renderHomeStats();if(sc!=='game'&&CHAL.on)chalStop();
   if(sc!=='game'){S.scr=sc;persist()}
