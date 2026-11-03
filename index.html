@@ -1114,7 +1114,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <label class="pill" id="pace-pill"><span class="sr">Pace</span><select id="pace" aria-label="Pace"><option value="1.7">Spacious</option><option value="1.3">Relaxed</option><option value="1">Steady</option><option value="0.8">Quick</option><option value="0.62">Fast</option></select></label>
     <span class="runinfo" id="runinfo" hidden></span>
     <p class="keyline" id="keyline"></p>
-    <label class="pill" id="csize-pill"><span class="sr">Chords</span><select id="csize" aria-label="Chord size"><option value="3">Triads</option><option value="4">7ths</option><option value="sh">Shells</option></select></label>
+    <label class="pill" id="csize-pill"><span class="sr">Chords</span><select id="csize" aria-label="Chord notes" title="Basic chords (1 3 5) or 7th chords (1 3 5 7)"><option value="3">1 3 5</option><option value="4">1 3 5 7</option></select></label>
     <button class="stagebtn" id="stage-mode" aria-label="How it works and options"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="16.9" r=".6" fill="currentColor"/></svg><span id="stage-lab">How to</span></button>
   </div>
   <div class="hfbar" id="hfbar" hidden><span class="hfmic"><i></i><span id="hf-heard">Listening</span></span><span class="hftxt" id="hf-txt">Play or sing your answer</span><span class="hfg"><span class="strums" id="hf-strums"><b></b><b></b><b></b></span><span id="hf-g">2 muted strums: next · 3: replay</span></span></div>
@@ -1222,15 +1222,15 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
     <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
-    <div class="seg keep voxmode" id="vox-mode"><button data-v="std">Chords</button><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
+    <div class="seg keep voxmode" id="vox-mode"><button data-v="std">Standard</button><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
     <div id="vox-std" class="sub" style="border-top:0;padding-top:0" hidden>
-      <p class="prompt" id="std-prompt">Pick a chord. The arrows show its other shapes.</p>
+      <p class="prompt" id="std-prompt">1 3 5, the full shapes you strum. The arrows show its other shapes.</p>
       <div class="chordbtns" id="std-chords"></div>
       <div class="actions"><button class="btn" id="std-prev">Previous shape</button><button class="btn primary same" id="std-next">Next shape</button><button class="btn" id="std-play">Play it</button></div>
       <p class="feedback" id="std-info"></p>
     </div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
-      <p class="prompt" id="vox-prompt">Pick a chord. The arrows move it up the neck.</p>
+      <p class="prompt" id="vox-prompt">1 3 5 on three strings. The arrows move it up the neck.</p>
       <div class="chordbtns" id="vox-chords"></div>
       <div class="actions"><label class="check"><input type="checkbox" id="vx-all"> Show every place this chord lives</label><label class="field"><span>On strings</span><select id="vx-strings">
         <option value="all">All string groups</option><option value="0">G B e (top three)</option><option value="1">D G B</option><option value="2">A D G</option><option value="3">E A D (bottom three)</option></select></label></div>
@@ -1238,7 +1238,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <p class="feedback" id="vox-info"></p>
     </div>
     <div id="vox-shell" class="sub" style="border-top:0;padding-top:0" hidden>
-      <p class="prompt" id="sh-prompt">Pick a chord. Three notes: root, 3rd, 7th.</p>
+      <p class="prompt" id="sh-prompt">1 3 7: three notes for a 7th chord.</p>
       <div class="chordbtns" id="sh-chords"></div>
       <div class="actions keep"><div class="field"><span>Root on</span><div class="seg" id="sh-root"><button data-v="6">6th string</button><button data-v="5">5th string</button></div></div></div>
       <div class="actions"><div class="field"><span>The four shapes: move one finger to change the colour</span><div class="seg shq" id="sh-q"><button data-v="maj7">maj7</button><button data-v="7">7</button><button data-v="m7">m7</button><button data-v="dim">dim / m6</button></div></div></div>
@@ -1337,7 +1337,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
     <details class="more"><summary>Options and tips</summary>
       <div class="actions" style="margin-top:8px">
-        <div class="field"><span>Chords</span><div class="seg" id="pg-set"><button data-v="basic">1 4 5 6m</button><button data-v="all">All seven</button><button data-v="outside">Outside chords</button><button data-v="jazz">Jazz 7ths</button></div></div>
+        <div class="field"><span>Chords</span><div class="seg" id="pg-set"><button data-v="basic">1 4 5 6m</button><button data-v="all">All seven</button><button data-v="outside">Outside chords</button><button data-v="jazz">2–5–1 (jazz)</button></div></div>
         <label class="field"><span>Length</span><select id="pg-len"><option>3</option><option>4</option></select></label>
         <label class="check"><input type="checkbox" id="pg-home"> Start on home</label>
       </div>
@@ -1621,6 +1621,7 @@ const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
 if(!S.v10){S.v10=true;S.showMap=true;S.showCircle=false;S.showNeck=false}
 if(!S.v9){S.v9=true;S.cc7=false;S.csz='3';if(S.voxMode==='shell')S.voxMode='explore'}
+if(S.csz==='sh')S.csz='4';
 if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
 if(!S.v6){S.v6=true;if(S.vxStr==='all')S.vxStr='0';S.duelMode='notes'}
@@ -3663,7 +3664,7 @@ var TOURS={
   chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circ','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
   phr:[['#p-new','Press play for a new short phrase.'],['#p-play','In Imagine first, the eye reveals the phrase so you can check your singing.'],['#circ','In Hear and name, you tap its numbers in order here.'],['#stage-mode','Switch between the two ways under How to.']],
   find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
-  vox:[['#vox-mode','Chords: the shapes you strum, open and barre. Triads: three-note chords and their inversions. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
+  vox:[['#vox-mode','Standard: 1 3 5, the full shapes you strum (open and barre). Triads: 1 3 5 on three strings, every inversion. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
   prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
   duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
   key:[['#kf-in','Paste a tab (straight from a tab site) or type note names.'],['#kf-strip','Every note heard so far, with its number in the best-guess key. Red ones sit outside it.'],['#kf-out','The likeliest keys. Tap one to see it on the map, or press play to hear it.'],['#mapwrap','The map follows the best guess live. Turn the mic on and play along to keep feeding it.'],['#fbwrap','The neck shows every note you\'ve played. Tap frets here to add notes too.']],
