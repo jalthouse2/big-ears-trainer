@@ -585,9 +585,9 @@ body[data-screen="game"] .bottomnav{display:none}
 .btn.pulse{animation:curpulse 1.4s ease-in-out infinite}
 @media (prefers-reduced-motion: reduce){.slot.cur,.btn.pulse{animation:none}}
 
-#vox-chords,#sh-chords,#vq-answers{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+#std-chords,#vox-chords,#sh-chords,#vq-answers{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
 #vq-answers:has(> :nth-child(4):last-child){grid-template-columns:repeat(4,minmax(0,1fr))}
-#vox-chords>*,#sh-chords>*,#vq-answers>*{min-width:0;padding-left:0;padding-right:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip}
+#std-chords>*,#vox-chords>*,#sh-chords>*,#vq-answers>*{min-width:0;padding-left:0;padding-right:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:clip}
 #sh-chords>*{font-size:clamp(11px,3.3vw,15px);letter-spacing:-.02em}
 .shq button{min-width:52px}
 .cc .d.gone{opacity:.28;border-style:dashed;background:transparent}
@@ -1207,7 +1207,13 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
     <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
-    <div class="seg keep voxmode" id="vox-mode"><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
+    <div class="seg keep voxmode" id="vox-mode"><button data-v="std">Chords</button><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
+    <div id="vox-std" class="sub" style="border-top:0;padding-top:0" hidden>
+      <p class="prompt" id="std-prompt">Pick a chord. The arrows show its other shapes.</p>
+      <div class="chordbtns" id="std-chords"></div>
+      <div class="actions"><button class="btn" id="std-prev">Previous shape</button><button class="btn primary same" id="std-next">Next shape</button><button class="btn" id="std-play">Play it</button></div>
+      <p class="feedback" id="std-info"></p>
+    </div>
     <div id="vox-explore" class="sub" style="border-top:0;padding-top:0">
       <p class="prompt" id="vox-prompt">Pick a chord. The arrows move it up the neck.</p>
       <div class="chordbtns" id="vox-chords"></div>
@@ -1809,6 +1815,7 @@ function renderPad(){
     c.addEventListener('click',()=>{if(S.pool.includes(o)){if(S.pool.length>2)S.pool=S.pool.filter(x=>x!==o)}else S.pool.push(o);persist();renderPad()});pr.appendChild(c)});
   renderFB();renderCirc();renderLvlBtn()}
 function voxChordNow(){if(S.tab!=='vox'||!gameReady)return null;
+  if(S.voxMode==='std'){const c=VCH[S.stdChord||0];return c?{root:c[0],tones:c[2].slice()}:null}
   if(S.voxMode==='explore'){const c=VCH[S.voxChord];return c?{root:c[0],tones:c[2].slice()}:null}
   if(S.voxMode==='shell'&&typeof SHL!=='undefined'&&SHL.ms&&SHL.ms.length)return {root:SHL.d,tones:SHL.ms.map(offOf)};
   return null}
@@ -2104,7 +2111,7 @@ const inWin=(f,W)=>f>=W.lo&&f<=W.hi;
 function renderFB(){
   if(S.inst==='piano')return renderKB();
   const el=$('fb');if(!el)return;const W0=curWin(),W={lo:Math.min(W0.lo,FRETS),hi:Math.min(W0.hi,FRETS),name:W0.name},whole=W.lo===0&&W.hi>=FRETS;
-  const zoom=!whole&&!(S.tab==='vox'&&(S.vxStr!=='all'||S.voxMode==='shell'));
+  const zoom=!whole&&!(S.tab==='vox'&&(S.vxStr!=='all'||S.voxMode==='shell'||S.voxMode==='std'));
   FRETLIST=zoom?Array.from({length:W.hi-W.lo+1},(_,i)=>W.lo+i):Array.from({length:FRETS+1},(_,i)=>i);
   const hasNut=FRETLIST[0]===0,nf=FRETLIST.length-(hasNut?1:0);
   [el,$('fnums')].forEach(x=>{x.style.setProperty('--n',nf);x.classList.toggle('zoom',zoom)});
@@ -2126,6 +2133,7 @@ function renderFB(){
     if(S.tab==='vox'){
       if(S.voxMode==='explore'&&ch[2].includes(o)&&(shapeIds.has(id)||S.voxAll)){vis=true;extra=shapeIds.has(id)?'vox':'tone pip'}
       if(S.voxMode==='shell'&&shapeIds.has(id)){vis=true;extra='vox'}
+      if(S.voxMode==='std'&&typeof STD!=='undefined'&&STD.ids.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='quiz'&&quizIds.has(id)){vis=true;extra=st?'':'vox';if(!VQ.done)label=''}}
     if(!vis){if(show==='all'&&S.pool.includes(o)){vis=true;if(o!==S.home)extra='pool pip'}else if(show==='home'&&o===S.home)vis=true}
     const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra&&(vis||S.tab!=='vox')?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
@@ -2273,7 +2281,7 @@ $('vq-next').addEventListener('click',nextVQ);$('vq-cad').addEventListener('clic
 function syncVox(){document.querySelectorAll('#vox-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.voxMode));
   document.querySelectorAll('#vox-set button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.voxSet));
   document.querySelectorAll('#vq-ask button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.vqAsk));$('vx-strings').value=S.vxStr;
-  $('vox-explore').hidden=S.voxMode!=='explore';$('vox-quiz').hidden=S.voxMode!=='quiz';$('vox-shell').hidden=S.voxMode!=='shell';renderVoxChords();if(S.voxMode==='shell'&&gameReady&&typeof SHAPE_READY!=='undefined')shRender()}
+  $('vox-std').hidden=S.voxMode!=='std';if(S.voxMode==='std'&&typeof stdRender==='function')stdRender(false);$('vox-explore').hidden=S.voxMode!=='explore';$('vox-quiz').hidden=S.voxMode!=='quiz';$('vox-shell').hidden=S.voxMode!=='shell';renderVoxChords();if(S.voxMode==='shell'&&gameReady&&typeof SHAPE_READY!=='undefined')shRender()}
 $('vox-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.voxMode=b.dataset.v;persist();VQ=null;cellMarks={};syncVox();renderFB()});
 $('vox-set').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.voxSet=b.dataset.v;persist();syncVox()});
 
@@ -3592,7 +3600,7 @@ document.querySelectorAll('#panel-beat .btn').forEach(b=>{iconize(b);icObs.obser
 
 
 /* drone at hand: the same drone as in Settings, from the game's button row */
-[...['deg','chord','phr','duel','prog','find','sing'].map(t=>document.querySelector(`#panel-${t} .primary-row`)),$('vox-prev')&&$('vox-prev').parentNode,$('sh-play')&&$('sh-play').parentNode,$('vq-next')&&$('vq-next').parentNode].forEach(row=>{if(!row||row.querySelector('.dronebtn'))return;const t='';;if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
+[...['deg','chord','phr','duel','prog','find','sing'].map(t=>document.querySelector(`#panel-${t} .primary-row`)),$('std-play')&&$('std-play').parentNode,$('vox-prev')&&$('vox-prev').parentNode,$('sh-play')&&$('sh-play').parentNode,$('vq-next')&&$('vq-next').parentNode].forEach(row=>{if(!row||row.querySelector('.dronebtn'))return;const t='';;if(!row)return;const b=document.createElement('button');b.className='btn dronebtn';b.textContent='Drone';
   row.appendChild(b);iconize(b)});
 function syncDroneBtns(){const on=$('drone').getAttribute('aria-pressed')==='true';document.querySelectorAll('.dronebtn').forEach(b=>{b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.title=on?`Drone on (home, ${lab(S.home)}): tap to stop`:`Drone: hold home (${lab(S.home)}) underneath`})}
 document.addEventListener('click',e=>{if(e.target.closest('.dronebtn'))$('drone').click()});
@@ -3615,7 +3623,7 @@ var TOURS={
   chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circ','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
   phr:[['#p-new','Press play for a new short phrase.'],['#p-play','In Imagine first, the eye reveals the phrase so you can check your singing.'],['#circ','In Hear and name, you tap its numbers in order here.'],['#stage-mode','Switch between the two ways under How to.']],
   find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
-  vox:[['#vox-mode','Triads: three-note chords and their inversions. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
+  vox:[['#vox-mode','Chords: the shapes you strum, open and barre. Triads: three-note chords and their inversions. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
   prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
   duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
   key:[['#kf-in','Paste a tab (straight from a tab site) or type note names.'],['#kf-strip','Every note heard so far, with its number in the best-guess key. Red ones sit outside it.'],['#kf-out','The likeliest keys. Tap one to see it on the map, or press play to hear it.'],['#mapwrap','The map follows the best guess live. Turn the mic on and play along to keep feeding it.'],['#fbwrap','The neck shows every note you\'ve played. Tap frets here to add notes too.']],
@@ -4119,6 +4127,40 @@ function practiseWeak(){const w=weakPool();if(!w.length){toast('Not enough answe
 $('deg-weak').addEventListener('click',practiseWeak);
 $('vx-all').checked=!!S.voxAll;$('vx-all').addEventListener('change',e=>{S.voxAll=e.target.checked;persist();renderFB()});
 $('opt-colours').checked=!!S.colours;document.documentElement.classList.toggle('cnum',!!S.colours);$('opt-colours').addEventListener('change',e=>{S.colours=e.target.checked;persist();document.documentElement.classList.toggle('cnum',S.colours)});
+
+/* ---------- Chords on the neck, "Chords": the shapes you'd normally strum (open and barre) ---------- */
+var STD={i:0,shapes:[],ids:new Set()};
+const STD_OPEN={maj:{0:[-1,3,2,0,1,0],2:[-1,-1,0,2,3,2],4:[0,2,2,1,0,0],7:[3,2,0,0,0,3],9:[-1,0,2,2,2,0]},min:{2:[-1,-1,0,2,3,1],4:[0,2,2,0,0,0],9:[-1,0,2,2,1,0]}};
+const STD_T6={maj:[0,2,2,1,0,0],min:[0,2,2,0,0,0],dim:[0,1,2,0,-9,-9]},STD_T5={maj:[-9,0,2,2,2,0],min:[-9,0,2,2,1,0],dim:[-9,0,1,2,1,-9]};
+const stdStandard=()=>S.inst==='guitar'&&OPEN.join()==='64,59,55,50,45,40';
+function stdQual(c){return c[1].includes('°')?'dim':c[1].includes('m')?'min':'maj'}
+function stdShapes(c){const root=(S.key+c[0])%12,q=stdQual(c),L=[];
+  if(STD_OPEN[q]&&STD_OPEN[q][root])L.push(['Open chord',STD_OPEN[q][root]]);
+  const r6=(root-4+12)%12,r5=(root-9+12)%12,mk=(t,r)=>t.map(x=>x<0?-1:x+r);
+  L.push([r6?`Barre, root on the 6th string (fret ${r6})`:'Open chord',mk(STD_T6[q],r6)]);
+  L.push([r5?`Barre, root on the 5th string (fret ${r5})`:'Open chord',mk(STD_T5[q],r5)]);
+  const seen=new Set(),out=[];
+  L.forEach(([name,fr])=>{const k=fr.join();if(seen.has(k)||fr.some(f=>f>FRETS))return;seen.add(k);   // frets: low E string first
+    const cells=fr.map((f,i)=>f<0?null:[5-i,f]).filter(Boolean);
+    out.push({name,fr,ids:new Set(cells.map(([st,f])=>st+'-'+f)),ms:cells.map(([st,f])=>OPEN[st]+f)})});
+  return out}
+const stdTab=fr=>fr.some(f=>f>9)?fr.map(f=>f<0?'x':f).join(' '):fr.map(f=>f<0?'x':f).join('');
+function stdRender(play){const c=VCH[S.stdChord||0];
+  $('std-chords').innerHTML=VCH.map((x,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===(S.stdChord||0)}">${x[1]}</button>`).join('');
+  if(!stdStandard()){STD.shapes=[];STD.ids=new Set();$('std-info').textContent='These shapes are for guitar in standard tuning. Pick Triads for your instrument.';renderFB();return}
+  STD.shapes=stdShapes(c);STD.i=Math.min(STD.i,STD.shapes.length-1);const sh=STD.shapes[STD.i];STD.ids=sh?sh.ids:new Set();
+  const nm=NAMES[(S.key+c[0])%12]+({min:'m',dim:'°',maj:''}[stdQual(c)]);
+  $('std-info').innerHTML=sh?`<b>${c[1]}</b> (${nm}) · ${sh.name} · tab <span class="path">${stdTab(sh.fr)}</span> · ${STD.i+1} of ${STD.shapes.length}`:'';
+  renderFB();renderPad();if(play&&sh)playShape(sh.ms)}
+$('std-chords').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.stdChord=Number(b.dataset.i);persist();STD.i=0;stdRender(true)});
+$('std-next').addEventListener('click',()=>{if(!STD.shapes.length)return;STD.i=(STD.i+1)%STD.shapes.length;stdRender(true)});
+$('std-prev').addEventListener('click',()=>{if(!STD.shapes.length)return;STD.i=(STD.i-1+STD.shapes.length)%STD.shapes.length;stdRender(true)});
+$('std-play').addEventListener('click',()=>{const sh=STD.shapes[STD.i];if(sh)playShape(sh.ms)});
+// leaving Chords on the neck always brings it back to Chords next time
+{const _st=showTab;showTab=function(t){if(S.tab==='vox'&&t!=='vox'){S.voxMode='std';persist()}_st(t)}}
+if(S.tab!=='vox'){S.voxMode='std';persist()}
+{const _gs=goScreen;goScreen=function(sc,fromPop){if(sc!=='game'&&S.tab==='vox'&&document.body.dataset.screen==='game'){S.voxMode='std';persist();syncVox()}return _gs(sc,fromPop)}}
+
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
   if(sc!=='game'){stopAll();jamStop()}closeMenu();if(gameReady)closeOpts(true);
