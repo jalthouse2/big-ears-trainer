@@ -1599,7 +1599,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <div class="sheet" id="lvsheet" hidden role="dialog" aria-modal="true" aria-labelledby="lv-title">
     <div class="sheet-in">
       <header class="appbar sheetbar"><div class="abl"><button class="iconbtn" id="lv-back" aria-label="Close levels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button></div>
-        <div class="abtitle"><span id="lv-title">Your tours</span></div><div class="abr"></div></header>
+        <div class="abtitle"><span id="lv-title">Your world tour</span></div><div class="abr"></div></header>
       <div class="field lvdiff"><span>Difficulty: how much time you get</span><div class="seg" id="lv-pace"></div></div>
       <p class="hint lvhint" id="lv-hint"></p>
       <div id="lv-list"></div>
@@ -2951,9 +2951,9 @@ const RANKS=[[0,'Fresh Ears'],[300,'Open Ears'],[1000,'Keen Ears'],[2500,'Sharp 
 const rankOf=x=>{let i=0;RANKS.forEach((r,j)=>{if(x>=r[0])i=j});return i};
 const CLUB=4;
 const BADGES=[['first','1','First note','Answer your first question'],['row10','10','On a roll','10 right in a row'],['row25','25','Locked in','25 right in a row'],
-  ['gem1','◎','First ring','Earn a ring at any gig'],['gem3','★★★','Encore','Three rings at one gig'],['path','✓','Full tour','A ring at every gig of a tour'],
+  ['gem1','◎','First ring','Earn a ring at any gig'],['gem3','★★★','Encore','Three rings at one gig'],['path','✓','Full world','A ring at every gig in one world'],
   ['goal','★','Daily dose','Reach your daily goal'],['streak3','3','Three days','3-day streak'],['streak7','7','Full week','7-day streak'],['streak30','30','Habit','30-day streak'],
-  ['outside','♭♯','Outsider','Name 25 outside notes'],['worlds','3W','World tour','Rings in 3 different tours'],['fast','⚡','Quick ears','Perfect run at Quick pace or faster'],
+  ['outside','♭♯','Outsider','Name 25 outside notes'],['worlds','3W','World tour','Rings in 3 different worlds'],['fast','⚡','Quick ears','Perfect run at Quick pace or faster'],
   ['chal','🏆','Challenger','Finish a daily challenge'],['club','BE','Big Ears Club','Reach the Big Ears rank']];
 // rings: a dot with three sound rings around it, like the logo. Each ring earned lights up.
 const RING_ARCS=['M8 6.8A6 6 0 0 1 8 17.2','M10 3.3A10 10 0 0 1 10 20.7','M11.5 .7A13 13 0 0 1 11.5 23.3'];
@@ -2977,7 +2977,7 @@ function addXP(x,why){
 const WORLDS=[0,9,2,4,5,7,11];
 function pathLevels(h){const i=DIATONIC.indexOf(h),md=[0,1,2,3,4,5,6].map(k=>DIATONIC[(i+k)%7]),ord=[0,2,4,1,5,3,6];
   const out=[];for(let n=2;n<=7;n++)out.push(ord.slice(0,n).map(j=>md[j]));out.push(ALL.slice());return out}
-const pathName=h=>`Home ${DEG[h].n} · ${({0:'Bright',9:'Moody',2:'Soulful',4:'Spanish',5:'Dreamy',7:'Bluesy',11:'Edgy'})[h]||''} <span class="tn">${({0:'major',9:'minor'})[h]||WORLD[h][1]}</span>`;
+const pathName=h=>`World ${DEG[h].n} · ${({0:'Bright',9:'Moody',2:'Soulful',4:'Spanish',5:'Dreamy',7:'Bluesy',11:'Edgy'})[h]||''} <span class="tn">${({0:'major',9:'minor'})[h]||WORLD[h][1]}</span>`;
 const GIGS=['Open Mic','Busking','Coffee House','Corner Bar','Jazz Club','Festival','The Late Set'];
 const lvName=(h,i)=>GIGS[i]||`Gig ${i+1}`;
 const degHue=p=>(FIFTHS.indexOf(p)*29+168)%360;
@@ -4084,7 +4084,7 @@ const ONB_STEPS=[
   {id:'when',render:()=>`<h2>When should we nudge you?</h2><p class="lead">One reminder a day, at a time you'll actually play. None on days you've already practised.</p><input type="time" id="onb-time" value="${(S.rem&&S.rem.time)||'18:00'}">`,btn:'Set reminder'},
   {id:'plan',render:()=>{const a=ONB.a,m=a.mins||15,g=a.goals.length?a.goals:['Play what I hear in my head'];
     return `<h2>Your plan is ready</h2><p class="lead">${m} minutes a day. Here's what that builds.</p><div class="onbplan"><div><b>Week 1</b><span>Hear home, then name the 1, 3 and 5 in any key.</span></div><div><b>Weeks 2–6</b><span>All seven numbers. Hear them in your head, sing them, then find them on the ${a.inst==='piano'?'keys':'neck'}.</span></div><div><b>Weeks 7–9</b><span>Numbers over chords: hear the changes and land on the right notes.</span></div><div><b>Weeks 10–12</b><span>The seven worlds, outside notes, and playing what you hear. Toward: <b>${g[0].toLowerCase()}</b>.</span></div></div>`},btn:'Continue'},
-  {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and tour</li><li>Phrases, progressions and songs by ear</li><li>Chord shapes on the neck: triads and shells</li><li>Daily plan, streaks and reminders</li></ul><p class="lead" style="font-size:14px">Tuner, metronome and chord decoder stay free.</p><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
+  {id:'pay',show:()=>PAYWALL.on,render:()=>`<h2>Unlock Big Ears</h2><p class="onbquote">Know where you are on the neck, and play what you hear.</p><ul class="onbfeat"><li>Every game, gig and world</li><li>Phrases, progressions and songs by ear</li><li>Chord shapes on the neck: triads and shells</li><li>Daily plan, streaks and reminders</li></ul><p class="lead" style="font-size:14px">Tuner, metronome and chord decoder stay free.</p><div class="onbprice" id="onb-price">${PAYWALL.plans.map((p,i)=>`<button data-p="${p[0]}" aria-pressed="${i===0}"><span>${p[1]}<br><small>${p[3]}</small></span><span>${p[2]}</span></button>`).join('')}</div>`,
     btn:()=>`Start ${PAYWALL.trial}-day free trial`,fine:()=>`Yearly: free for ${PAYWALL.trial} days, then €9.99 a year. Cancel any time in your store settings. Lifetime is a one-time purchase. Restore purchases in Settings.`},
   {id:'go',render:()=>`<div class="onbmark">${document.querySelector('.hero .mark').outerHTML}</div><h2>You're in.</h2><p class="lead">${PAYWALL.on?'':'Big Ears is free while it\'s in early access. '}Your first gig is waiting: name the 1, 3 and 5.</p>`,btn:'Start my first gig'}];
 function onbOpen(){ONB.i=0;ONB.a={goals:[]};ONB.steps=ONB_STEPS.filter(x=>!x.show||x.show());$('onb').hidden=false;onbRender()}
@@ -4348,7 +4348,7 @@ new MutationObserver(()=>applyBrief()).observe(document.body,{childList:true,sub
     drone:'drone','drone-idle':'drone','drone-fifth':'drone',voice:'sound',room:'sound',audition:'sound',vol:'sound'};
   const box={};SECS.forEach(([k,t])=>{const d=document.createElement('details');d.className='setsec';d.dataset.k=k;d.innerHTML=`<summary><span>${t}</span><small class="setval"></small></summary><div class="setbody"></div>`;box[k]=d});
   // home (world) for free practice lives with the key settings
-  const hl=document.createElement('label');hl.className='field';hl.innerHTML='<span>Home (world) when you practise outside a tour</span>';hl.appendChild($('home-sel'));box.nums.querySelector('.setbody').appendChild(hl);
+  const hl=document.createElement('label');hl.className='field';hl.innerHTML='<span>Home (world) when you practise outside the world tour</span>';hl.appendChild($('home-sel'));box.nums.querySelector('.setbody').appendChild(hl);
   let cur='inst';
   [...dr.children].forEach(ch=>{let k=null;if(ch.classList.contains('micopts'))k='mic';else if(ch.classList.contains('drawer-folds'))k='prog';
     else{const ids=[ch.id,...[...ch.querySelectorAll('[id]')].map(x=>x.id)];for(const id of ids){if(anchor[id]){k=anchor[id];break}}}
@@ -4369,7 +4369,7 @@ const gigTag=i=>gigGame(i)==='chord'?'Notes over chords':'Single notes';
 const gigGems=(h,i)=>GAME.gems[gemKey(gigGame(i),h,i)]||0;
 // tours lead with their home number and a feel; the mode name is only a footnote
 const FEELW={0:'Bright',9:'Moody',2:'Soulful',4:'Spanish',5:'Dreamy',7:'Bluesy',11:'Edgy'};
-const tourName=h=>`Home ${DEG[h].n} · ${FEELW[h]||''}`;
+const tourName=h=>`World ${DEG[h].n} · ${FEELW[h]||''}`;
 const tourMode=h=>({0:'major',9:'minor'})[h]||WORLD[h][1];
 function pathNext(){const order=[S.home,...WORLDS.filter(h=>h!==S.home)];
   for(const h of order){const L=pathLevels(h);for(let i=0;i<L.length;i++){if(!gigGems(h,i)&&unlocked(h,i))return{h,i}}}return{h:S.home,i:Math.max(0,curLevel())}}
