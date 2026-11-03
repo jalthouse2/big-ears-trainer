@@ -42,5 +42,6 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 ## Product decisions
 - Free: Tuner, Rhythm, Chord decoder, Key finder, the Guide, and the first game levels. Paid: everything else, after a 7-day trial. €9.99 a year or €25.99 lifetime ("for as long as Big Ears is offered"). `PAYWALL.on` stays `false` until there's a store version.
 - Daily plan (`PLAN`): weeks 1–12 focus on singing, hearing notes in your head and finding them on the guitar. Shapes (triads, shells) and jazz come in weeks 13–16. Song anchors and My songs are optional extras, outside the daily minutes.
+- The path chooses the game: gigs alternate Single notes (Name the number) and Notes over chords (`gigGame`). Tours are named by home number and feel first (`tourName`: Home 1 · Bright, Home 6 · Moody, Home 2 · Soulful, Home 3 · Spanish, Home 4 · Dreamy, Home 5 · Bluesy, Home 7 · Edgy); the mode name (Dorian etc.) is only a small footnote.
 - Daily challenge (`DAILY`, `chalStart`): 20 notes, same for everyone each day (seeded by date), rated out of 5 stars with halves (Mon 1, Tue 1.5, Wed 2.5, Thu 3, Fri 3.5, Sat 4.5, Sun 5), harder from Monday (1 3 5 6, relaxed) to Sunday (all twelve, a surprise world, fast). One try per note. The end screen reviews every note and each miss, with replay, and shares a green/red grid.
 - No made-up testimonials anywhere.

@@ -489,7 +489,10 @@ body[data-screen="game"] .bottomnav{display:none}
 }
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
-#pg-prompt{display:none}.stars{display:inline-flex;gap:1px;vertical-align:-1px;font-style:normal}
+#pg-prompt{display:none}.ptag{display:inline-block;margin-top:2px;font:600 11px var(--font-body);letter-spacing:.04em;color:var(--muted)}
+.pathhero .ptag{margin-top:4px}
+.ptour .pmode{margin-left:8px;color:var(--muted);font-weight:400;font-size:12px}
+.stars{display:inline-flex;gap:1px;vertical-align:-1px;font-style:normal}
 .stars i{font-style:normal}.stars i.e{color:color-mix(in srgb,var(--muted) 40%,transparent)!important}
 .stars i.f{color:var(--brass)!important}
 .stars i.h{background:linear-gradient(90deg,var(--brass) 50%,color-mix(in srgb,var(--muted) 45%,transparent) 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -1125,7 +1128,6 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <section class="screen" id="scr-songs" hidden></section>
   <section class="screen" id="scr-path" hidden>
     <div class="pathhero" id="path-hero"></div>
-    <div class="seg pathgame" id="path-game"><button data-v="deg">Name the number</button><button data-v="chord">Note over chord</button></div>
     <div id="path-list"></div>
   </section>
   <section class="screen" id="scr-more" hidden>
@@ -2975,7 +2977,7 @@ function addXP(x,why){
 const WORLDS=[0,9,2,4,5,7,11];
 function pathLevels(h){const i=DIATONIC.indexOf(h),md=[0,1,2,3,4,5,6].map(k=>DIATONIC[(i+k)%7]),ord=[0,2,4,1,5,3,6];
   const out=[];for(let n=2;n<=7;n++)out.push(ord.slice(0,n).map(j=>md[j]));out.push(ALL.slice());return out}
-const pathName=h=>`The ${WORLD[h][1][0].toUpperCase()+WORLD[h][1].slice(1)} Tour <span class="tn">home ${DEG[h].n}</span>`;
+const pathName=h=>`Home ${DEG[h].n} · ${({0:'Bright',9:'Moody',2:'Soulful',4:'Spanish',5:'Dreamy',7:'Bluesy',11:'Edgy'})[h]||''} <span class="tn">${({0:'major',9:'minor'})[h]||WORLD[h][1]}</span>`;
 const GIGS=['Open Mic','Busking','Coffee House','Corner Bar','Jazz Club','Festival','The Late Set'];
 const lvName=(h,i)=>GIGS[i]||`Gig ${i+1}`;
 const degHue=p=>(FIFTHS.indexOf(p)*29+168)%360;
@@ -4361,24 +4363,29 @@ new MutationObserver(()=>applyBrief()).observe(document.body,{childList:true,sub
 
 
 /* ---------- the path: every tour and gig, your rings, and the next gig to play ---------- */
-function pathNext(tab){const order=[S.home,...WORLDS.filter(h=>h!==S.home)];
-  for(const h of order){const L=pathLevels(h);for(let i=0;i<L.length;i++){if(!(GAME.gems[gemKey(tab,h,i)]||0)&&unlocked(h,i))return{h,i}}}return{h:S.home,i:Math.max(0,curLevel())}}
-const tourName=h=>`The ${WORLD[h][1][0].toUpperCase()+WORLD[h][1].slice(1)} Tour`;
-function playGig(h,i,tab){pickLevel(h,i);openGame(tab||S.pathTab||'deg')}
-function renderPath(){const tab=S.pathTab||'deg',nx=pathNext(tab),L=pathLevels(nx.h);
-  document.querySelectorAll('#path-game button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===tab));
-  $('path-hero').innerHTML=`<span class="ph-k">Next gig · ${tourName(nx.h)}</span><span class="ph-n">${lvName(nx.h,nx.i)}</span>${digits(L[nx.i],nx.h)}
+// the path decides the game: gigs alternate single notes and notes over chords
+const gigGame=i=>i%2?'chord':'deg';
+const gigTag=i=>gigGame(i)==='chord'?'Notes over chords':'Single notes';
+const gigGems=(h,i)=>GAME.gems[gemKey(gigGame(i),h,i)]||0;
+// tours lead with their home number and a feel; the mode name is only a footnote
+const FEELW={0:'Bright',9:'Moody',2:'Soulful',4:'Spanish',5:'Dreamy',7:'Bluesy',11:'Edgy'};
+const tourName=h=>`Home ${DEG[h].n} · ${FEELW[h]||''}`;
+const tourMode=h=>({0:'major',9:'minor'})[h]||WORLD[h][1];
+function pathNext(){const order=[S.home,...WORLDS.filter(h=>h!==S.home)];
+  for(const h of order){const L=pathLevels(h);for(let i=0;i<L.length;i++){if(!gigGems(h,i)&&unlocked(h,i))return{h,i}}}return{h:S.home,i:Math.max(0,curLevel())}}
+function playGig(h,i){pickLevel(h,i);openGame(gigGame(i))}
+function renderPath(){const nx=pathNext(),L=pathLevels(nx.h);
+  $('path-hero').innerHTML=`<span class="ph-k">Next gig · ${tourName(nx.h)}</span><span class="ph-n">${lvName(nx.h,nx.i)}</span>${digits(L[nx.i],nx.h)}<span class="ptag">${gigTag(nx.i)}</span>
     <button class="btn primary ph-go" data-h="${nx.h}" data-i="${nx.i}">Play</button>`;
   const order=[S.home,...WORLDS.filter(h=>h!==S.home)];
-  $('path-list').innerHTML=order.map((h,j)=>{const L=pathLevels(h),earned=L.reduce((a,_,i)=>a+(GAME.gems[gemKey(tab,h,i)]||0),0);
-    const nodes=L.map((pcs,i)=>{const g=GAME.gems[gemKey(tab,h,i)]||0,ok=unlocked(h,i),isNext=h===nx.h&&i===nx.i;
-      return `<button class="pnode${ok?'':' locked'}${g?' done':''}${isNext?' next':''}" data-h="${h}" data-i="${i}"><i></i><span class="pn-t"><b>${lvName(h,i)}</b>${digits(pcs,h)}</span>${ok?gemsHTML(g):`<span class="lock">${LOCK}</span>`}</button>`}).join('');
-    return `<details class="ptour"${j===0?' open':''}><summary><span>${tourName(h)}<small> home ${DEG[h].n}</small></span><small>${earned}/${L.length*3} rings</small></summary><div class="ptrack">${nodes}</div></details>`}).join('')}
-function renderPathCard(){const c=$('path-card');if(!c)return;const tab='deg',nx=pathNext(tab),L=pathLevels(nx.h);
-  const tot=WORLDS.reduce((a,h)=>a+pathLevels(h).reduce((x,_,i)=>x+(GAME.gems[gemKey(tab,h,i)]||0),0),0);
-  c.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span class="pc-txt"><span class="pc-k">Your path · ${tourName(nx.h)}</span><span class="pc-n">Next: <b>${lvName(nx.h,nx.i)}</b> ${digits(L[nx.i],nx.h)}</span><span class="pc-r">${tot} rings so far</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`}
+  $('path-list').innerHTML=order.map((h,j)=>{const L=pathLevels(h),earned=L.reduce((a,_,i)=>a+gigGems(h,i),0);
+    const nodes=L.map((pcs,i)=>{const g=gigGems(h,i),ok=unlocked(h,i),isNext=h===nx.h&&i===nx.i;
+      return `<button class="pnode${ok?'':' locked'}${g?' done':''}${isNext?' next':''}" data-h="${h}" data-i="${i}"><i></i><span class="pn-t"><b>${lvName(h,i)}</b>${digits(pcs,h)}<small class="ptag">${gigTag(i)}</small></span>${ok?gemsHTML(g):`<span class="lock">${LOCK}</span>`}</button>`}).join('');
+    return `<details class="ptour"${j===0?' open':''}><summary><span>${tourName(h)}<small class="pmode">${tourMode(h)}</small></span><small>${earned}/${L.length*3} rings</small></summary><div class="ptrack">${nodes}</div></details>`}).join('')}
+function renderPathCard(){const c=$('path-card');if(!c)return;const nx=pathNext(),L=pathLevels(nx.h);
+  const tot=WORLDS.reduce((a,h)=>a+pathLevels(h).reduce((x,_,i)=>x+gigGems(h,i),0),0);
+  c.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span class="pc-txt"><span class="pc-k">Your path · ${tourName(nx.h)}</span><span class="pc-n">Next: <b>${lvName(nx.h,nx.i)}</b> ${digits(L[nx.i],nx.h)}</span><span class="pc-r">${gigTag(nx.i)} · ${tot} rings so far</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`}
 $('path-card').addEventListener('click',()=>goScreen('path'));
-$('path-game').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.pathTab=b.dataset.v;persist();renderPath()});
 $('scr-path').addEventListener('click',e=>{const g=e.target.closest('.ph-go');if(g)return playGig(+g.dataset.h,+g.dataset.i);
   const n=e.target.closest('.pnode');if(!n)return;const h=+n.dataset.h,i=+n.dataset.i;if(!unlocked(h,i)){toast(`Earn a ring at ${lvName(h,i-1)} to book this gig`);return}playGig(h,i)});
 renderPathCard();
