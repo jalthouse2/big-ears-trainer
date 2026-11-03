@@ -34,6 +34,7 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Chord words, the same everywhere: chords sound either as "1 3 5" (basic) or "1 3 5 7" (7ths), one top pill where chords play (`csize`, Chord chart, Note over chord, Progressions). Shells (1 3 7) and Triads (1 3 5 on three strings) are ways to play a chord, so they only appear in Chords on the neck, whose pill is Standard · Triads · Shells · Quiz.
 - Top bar in games: only the key, the gig pill (tour level plus difficulty) and, where chords play, the 1 3 5 / 1 3 5 7 pill. The tour decides home (major, minor, modes); difficulty (pace) is chosen in the gig sheet before you play.
 - Settings are grouped in sections that open and close (`.setsec`): Instrument, Key and numbers, Hearing the key, Sound, Drone, Microphone, Practice reminder, Progress and levels, Help. New settings go in the right section.
+- Bottom nav: Home · Path · Tools · Stats · Guide. Path (`scr-path`, `renderPath`) shows every tour and gig with rings and a big "Next gig" Play button; the home screen has a "Your path" card. Songs (My songs, Interval anchors) live at the end of Tools.
 - Leaving a game turns the drone off at once.
 - Audio runs through headroom, a gentle compressor and a limiter (`ensure()`), with `latencyHint:'playback'`, so it never crackles. Keep new voices quiet enough not to stack into clipping.
 - Sounds lean ethereal and spacey: Ethereal (default), Shimmer, Glass bells, Choir pad, Bowed strings (`PADS`, `SPACEY()`).
