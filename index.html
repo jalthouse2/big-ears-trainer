@@ -490,6 +490,19 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+#pace-pill.gone{display:none!important}
+.lvlbtn small.lvpace{margin-left:6px;color:var(--muted);font-weight:500}
+.lvdiff{padding:0 16px 8px}.lvdiff .seg{flex-wrap:wrap}
+.setsec{border-bottom:1px solid var(--line)}
+.setsec>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 2px;font:600 16px var(--font-body);cursor:pointer}
+.setsec>summary::-webkit-details-marker{display:none}
+.setsec>summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-left:4px;transition:transform .2s}
+.setsec[open]>summary::after{transform:rotate(225deg)}
+.setsec>summary span{flex:1}
+.setsec .setval{color:var(--muted);font-weight:500;font-size:14px}
+.setsec .setbody{display:flex;flex-direction:column;gap:12px;padding:0 2px 16px}
+#drawer{gap:0}
+
 .btn.primary.cue{position:relative;animation:cue 1.8s ease-in-out infinite}
 .btn.primary.cue::after{content:"Press to start";position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--brass);color:var(--on-brass);font:600 13px var(--font-body);padding:5px 12px;border-radius:999px;pointer-events:none;box-shadow:0 6px 16px -8px rgba(0,0,0,.6)}
 .actions:has(> .btn.primary.cue) > :not(.btn.primary){display:none!important}
@@ -1521,6 +1534,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="sheet-in">
       <header class="appbar sheetbar"><div class="abl"><button class="iconbtn" id="lv-back" aria-label="Close levels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button></div>
         <div class="abtitle"><span id="lv-title">Your tours</span></div><div class="abr"></div></header>
+      <div class="field lvdiff"><span>Difficulty: how much time you get</span><div class="seg" id="lv-pace"></div></div>
       <p class="hint lvhint" id="lv-hint"></p>
       <div id="lv-list"></div>
     </div>
@@ -1676,9 +1690,13 @@ let voiceIn=null,wet=null,conv=null;
 function makeIR(sec){const sr=ctx.sampleRate,n=Math.floor(sr*sec),b=ctx.createBuffer(2,n,sr);
   for(let c=0;c<2;c++){const d=b.getChannelData(c);let lp=0;for(let i=0;i<n;i++){lp=lp*0.6+(Math.random()*2-1)*0.4;d[i]=lp*Math.pow(1-i/n,3.2)}}return b}
 function ensure(){
-  if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;ctx=new AC();
-    const comp=ctx.createDynamicsCompressor();master=ctx.createGain();master.gain.value=S.vol;master.connect(comp);comp.connect(ctx.destination);
-    voiceIn=ctx.createGain();voiceIn.connect(master);setTimeout(warmCache,0);
+  if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;try{ctx=new AC({latencyHint:'playback'})}catch(e){ctx=new AC()}   // bigger buffers: no crackle when the phone is busy
+    // headroom, a gentle compressor, then a hard limiter, so stacked notes, drone and reverb never clip
+    const comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.knee.value=8;comp.ratio.value=3;comp.attack.value=0.01;comp.release.value=0.25;
+    const lim=ctx.createDynamicsCompressor();lim.threshold.value=-3;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=0.002;lim.release.value=0.1;
+    const out=ctx.createGain();out.gain.value=0.8;
+    master=ctx.createGain();master.gain.value=S.vol;master.connect(comp);comp.connect(lim);lim.connect(out);out.connect(ctx.destination);
+    voiceIn=ctx.createGain();voiceIn.gain.value=0.7;voiceIn.connect(master);setTimeout(warmCache,0);
     conv=ctx.createConvolver();conv.buffer=makeIR(S.room==='space'?5.5:2.2);wet=ctx.createGain();voiceIn.connect(conv);conv.connect(wet);wet.connect(master);setRoom()}
   if(ctx.state==='suspended')ctx.resume();return ctx}
 function setRoom(){if(!wet)return;wet.gain.value={off:0,small:0.12,hall:0.3,space:0.5}[S.room]||0;const want=S.room==='space'?5.5:2.2;if(conv&&Math.abs(conv.buffer.duration-want)>0.5)conv.buffer=makeIR(want)}
@@ -2904,7 +2922,7 @@ const gemKey=(tab,h,i)=>`${tab}|${h}|${i}`;
 const gemsFor=(h,i)=>Math.max(GAME.gems[gemKey('deg',h,i)]||0,GAME.gems[gemKey('chord',h,i)]||0);
 const unlocked=(h,i)=>S.unlockAll||i===0||gemsFor(h,i-1)>0||same(pathLevels(h)[i],S.pool)&&h===S.home;
 function renderLvlBtn(){const b=$('lvl-btn');if(!b||!gameReady)return;const i=curLevel();
-  b.innerHTML=i>=0?`<b>${lvName(S.home,i)}</b>${digits(S.pool,S.home)}`:`<b>Custom</b>${digits(S.pool,S.home)}`;
+  const pn=($('pace').selectedOptions[0]||{}).textContent||'';b.innerHTML=(i>=0?`<b>${lvName(S.home,i)}</b>${digits(S.pool,S.home)}`:`<b>Custom</b>${digits(S.pool,S.home)}`)+`<small class="lvpace">${pn}</small>`;
   b.setAttribute('aria-label',`Notes in play: ${i>=0?lvName(S.home,i):'custom'}. Change level`)}
 function renderLevels(){
   const tab=gemTab();$('lv-hint').textContent=`Each gig is 10 questions of ${TABNAME[tab]}. 7 right earns a ring, 9 earns two, all 10 at Steady pace or faster earns three: an encore. One ring books your next gig.`;
@@ -3021,7 +3039,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat'||S.tab==='key';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat'||S.tab==='key';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel','sing'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -4221,6 +4239,38 @@ function applyBrief(){document.querySelectorAll('.pglist').forEach(ol=>{const ta
 document.addEventListener('click',e=>{const ol=e.target.closest('.pglist');if(ol){if(ol.dataset.full)delete ol.dataset.full;else ol.dataset.full='1';applyBrief();return}
   const pb=e.target.closest('.stage .btn.primary');if(pb){const tab=pb.closest('.stage').id.replace('panel-','');S.gRounds=S.gRounds||{};S.gRounds[tab]=(S.gRounds[tab]||0)+1;persist();setTimeout(applyBrief,50)}},true);
 new MutationObserver(()=>applyBrief()).observe(document.body,{childList:true,subtree:true,attributes:false});
+
+
+/* ---------- a quieter top bar: key, your gig (with its difficulty), chord notes where chords play ---------- */
+(function(){const row=document.querySelector('.ctxrow'),keyL=$('key').closest('label');keyL.after($('lvl-btn'));
+  $('home-sel').closest('label').hidden=true;$('pace-pill').classList.add('gone');
+  const seg=$('lv-pace');seg.innerHTML=[...$('pace').options].map(o=>`<button data-v="${o.value}">${o.textContent}</button>`).join('');
+  const sync=()=>seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(S.pace)));sync();
+  seg.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('pace').value=b.dataset.v;$('pace').dispatchEvent(new Event('change'));sync();renderLvlBtn()});
+  $('pace').addEventListener('change',()=>{sync();renderLvlBtn()})})();
+
+/* ---------- leaving a game turns the drone off straight away ---------- */
+{const _gs2=goScreen;goScreen=function(sc,fromPop){if(sc!=='game'&&document.body.dataset.screen==='game'){if($('drone').getAttribute('aria-pressed')==='true')$('drone').click();try{if(typeof setDrone==='function'&&droneNodes)setDrone(false)}catch(e){}stopAll()}return _gs2(sc,fromPop)}}
+
+/* ---------- Settings in sections that open and close ---------- */
+(function(){const dr=$('drawer');if(!dr)return;
+  const SECS=[['inst','Instrument'],['nums','Key and numbers'],['key','Hearing the key'],['sound','Sound'],['drone','Drone'],['mic','Microphone'],['rem','Practice reminder'],['prog','Progress and levels'],['help','Help']];
+  const anchor={inst:'inst','fb-nums-f':'inst',remind:'rem','onb-again':'help','opt-colours':'nums',range:'nums',labels:'nums',ctxmode:'key',every:'key','opt-autopace':'prog','opt-unlock':'prog',
+    drone:'drone','drone-idle':'drone','drone-fifth':'drone',voice:'sound',room:'sound',audition:'sound',vol:'sound'};
+  const box={};SECS.forEach(([k,t])=>{const d=document.createElement('details');d.className='setsec';d.dataset.k=k;d.innerHTML=`<summary><span>${t}</span><small class="setval"></small></summary><div class="setbody"></div>`;box[k]=d});
+  // home (world) for free practice lives with the key settings
+  const hl=document.createElement('label');hl.className='field';hl.innerHTML='<span>Home (world) when you practise outside a tour</span>';hl.appendChild($('home-sel'));box.nums.querySelector('.setbody').appendChild(hl);
+  let cur='inst';
+  [...dr.children].forEach(ch=>{let k=null;if(ch.classList.contains('micopts'))k='mic';else if(ch.classList.contains('drawer-folds'))k='prog';
+    else{const ids=[ch.id,...[...ch.querySelectorAll('[id]')].map(x=>x.id)];for(const id of ids){if(anchor[id]){k=anchor[id];break}}}
+    if(k)cur=k;box[cur].querySelector('.setbody').appendChild(ch)});
+  SECS.forEach(([k])=>{if(box[k].querySelector('.setbody').children.length)dr.appendChild(box[k])});
+  const mh=box.mic.querySelector('.micopts-h');if(mh)mh.remove();
+  const val={inst:()=>({guitar:'Guitar',uke:'Ukulele',piano:'Piano'})[S.inst]||'',nums:()=>`${NAMES[S.key]} · ${S.range==='two'?'2 octaves':'1 octave'}`,key:()=>($('ctxmode').selectedOptions[0]||{}).textContent.split(' (')[0],
+    sound:()=>(VOICES[S.voice]||{}).name||'',drone:()=>$('drone').getAttribute('aria-pressed')==='true'?'On':'Off',mic:()=>S.micAuto?'On':'Off',rem:()=>S.rem?S.rem.time:'',prog:()=>'',help:()=>''};
+  window.setVals=()=>SECS.forEach(([k])=>{const e=box[k].querySelector('.setval');try{e.textContent=val[k]()}catch(x){}});
+  dr.addEventListener('click',()=>setTimeout(setVals,60));dr.addEventListener('change',()=>setTimeout(setVals,60));setVals();
+  $('set-toggle').addEventListener('click',()=>setTimeout(setVals,30))})();
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
