@@ -27,6 +27,11 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Every game shows the same numbered guide: "Press ▶ to start." … "Press → for the next one.", with the current line lit (see `GUIDE`, `#pg-steps`, `#psteps`).
 - Short, plain instructions, one per line. No jargon without an example.
 - Instrument (guitar, ukulele, piano) is chosen only in Settings.
+- Minimal first: Sonofield is the reference. Show as little as possible; extras go into the options sheet.
+- The tonal map (the row of numbers) is the default answer view; circle and neck are optional.
+- The numbered guide shrinks to the current line after 3 rounds of a game (`S.gRounds`); tapping it shows all steps.
+- After an answer, show "You" and "Answer" rows, each with a speaker button (`slotRow(who,items,act)`, `.rowplay`), so the player can hear the difference.
+- Sounds lean ethereal and spacey: Ethereal (default), Shimmer, Glass bells, Choir pad, Bowed strings (`PADS`, `SPACEY()`).
 
 ## Product decisions
 - Free: Tuner, Rhythm, Chord decoder, Key finder, the Guide, and the first game levels. Paid: everything else, after a 7-day trial. €9.99 a year or €25.99 lifetime ("for as long as Big Ears is offered"). `PAYWALL.on` stays `false` until there's a store version.

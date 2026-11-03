@@ -490,6 +490,13 @@ body[data-screen="game"] .bottomnav{display:none}
 @media (min-width:1000px){.appbar{margin-inline:0}}
 
 #pg-prompt{display:none}
+.rowplay{flex:none;width:34px;height:34px;margin-left:4px;border-radius:50%;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.rowplay svg{width:22px;height:22px}.rowplay:active{color:var(--brass)}
+.phrase.mini{margin:4px 0 8px}.phrase.mini .slot{min-width:46px}
+.pglist.brief li:not(.on){display:none}
+.pglist.brief li.on small{display:none}
+.pglist.brief{cursor:pointer}
+
 .singnum{font-size:clamp(84px,26vw,128px);min-height:1.1em;text-align:center;line-height:1}
 .pkbig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:42vh;border-radius:20px;background:var(--sunk);border:1px solid var(--line);text-align:center;padding:20px}
 .pkbig span{font:500 18px var(--font-body);color:var(--muted)}
@@ -1118,11 +1125,12 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <p class="prompt" id="deg-prompt"></p>
     <p class="feedback" id="deg-fb"></p>
     <div class="actions">
-      <button class="btn primary" id="deg-next">Start</button><button class="btn" id="deg-weak">Practise my weak notes</button>
+      <button class="btn primary" id="deg-next">Start</button>
       <button class="btn" id="deg-replay">Replay note</button>
       <button class="btn" id="deg-compare" hidden>Hear both again</button>
       <button class="btn" id="deg-cad">Cadence</button>
     </div>
+    <div class="actions"><button class="btn" id="deg-weak">Practise my weak notes</button></div>
     <div class="actions">
       <details class="more"><summary>Options</summary>
         <div class="actions" style="margin-top:8px">
@@ -1605,6 +1613,7 @@ const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
+if(!S.v10){S.v10=true;S.showMap=true;S.showCircle=false;S.showNeck=false}
 if(!S.v9){S.v9=true;S.cc7=false;S.csz='3';if(S.voxMode==='shell')S.voxMode='explore'}
 if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
@@ -1670,6 +1679,10 @@ function setRoom(){if(!wet)return;wet.gain.value={off:0,small:0.12,hall:0.3,spac
 /* ---------- voices: plucked strings by Karplus-Strong, piano by additive partials, rendered once per note and cached ---------- */
 const VOICES={
   ether:{name:'Ethereal'},
+  shimmer:{name:'Shimmer (spacey)'},
+  glass:{name:'Glass bells'},
+  choir:{name:'Choir pad'},
+  bowed:{name:'Bowed strings'},
   nylon:{name:'Nylon guitar',T:2.6,bright:0.18,pos:0.17,body:[[110,8,4],[220,6,3],[420,3,2]],lp:2600},
   steel:{name:'Steel acoustic',T:3.2,bright:0.55,pos:0.12,body:[[100,7,3],[200,5,3],[1600,1.5,2.5]],lp:6500},
   electric:{name:'Clean electric',T:4.2,bright:0.42,pos:0.22,body:[[650,1.2,2]],lp:3600},
@@ -1705,12 +1718,33 @@ function voiceChain(v,dest){let node=dest;
   (v.body||[]).forEach(([fq,gain,q])=>{const pk=ctx.createBiquadFilter();pk.type='peaking';pk.frequency.value=fq;pk.gain.value=gain;pk.Q.value=q;pk.connect(node);node=pk});
   return node}
 // warm the cache for the notes in use, a few at a time, so the first notes don't stall
-function warmCache(){if(!ctx||S.voice==='synth'||S.voice==='ether')return;const list=[];for(let m=T()-24;m<=T()+26;m++)list.push(m);
+function warmCache(){if(!ctx||S.voice==='synth'||SPACEY())return;const list=[];for(let m=T()-24;m<=T()+26;m++)list.push(m);
   let i=0;(function step(){const end=Math.min(list.length,i+6);for(;i<end;i++)noteBuffer(list[i]);if(i<list.length)setTimeout(step,15)})()}
 const hz=m=>440*Math.pow(2,(m-69)/12);
+function SPACEY(){return ['ether','shimmer','glass','choir','bowed'].includes(S.voice)}
+// spacey voices, built from oscillators like Ethereal
+function padOut(t,len,peak,att,rel){const g=ctx.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+att);g.gain.setTargetAtTime(0.0001,t+Math.max(att,len-rel),rel/4);g.connect(voiceIn);return g}
+function osc(type,f,t,end,dest,gain=1,det=0){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;o.detune.value=det;g.gain.value=gain;o.connect(g);g.connect(dest);o.start(t);o.stop(end);active.push(o);return o}
+const PADS={
+  shimmer(m,t,dur,vel){const f=hz(m),len=dur+3.2,end=t+len+0.3,fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(9000,f*10);
+    const g=padOut(t,len,vel*0.6,0.12,2.6);fl.connect(g);
+    osc('sine',f,t,end,fl,0.9);osc('triangle',f,t,end,fl,0.25,7);osc('triangle',f,t,end,fl,0.25,-7);
+    const hi=ctx.createGain();hi.gain.setValueAtTime(0.0001,t);hi.gain.exponentialRampToValueAtTime(0.22,t+0.9);hi.connect(fl);   // the octave and fifth above bloom in slowly
+    osc('sine',f*2,t,end,hi,1,4);osc('sine',f*3,t,end,hi,0.35,-5);osc('sine',f*4,t,end,hi,0.15,3)},
+  glass(m,t,dur,vel){const f=hz(m),len=dur+2.8,end=t+len+0.3,g=padOut(t,len,vel*0.7,0.005,2.6);
+    [[1,1,len],[2.76,0.35,len*0.55],[5.4,0.16,len*0.3],[8.93,0.06,len*0.18]].forEach(([mul,a,d])=>{const gg=ctx.createGain();gg.gain.setValueAtTime(a,t);gg.gain.exponentialRampToValueAtTime(0.0001,t+d);gg.connect(g);osc('sine',f*mul,t,end,gg)})},
+  choir(m,t,dur,vel){const f=hz(m),len=dur+1.8,end=t+len+0.3,g=padOut(t,len,vel*0.55,0.28,1.6),mix=ctx.createGain();mix.gain.value=0.5;
+    [[700,6],[1150,7],[2600,9]].forEach(([fq,q],i)=>{const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=fq;bp.Q.value=q;const bg=ctx.createGain();bg.gain.value=[1,0.55,0.25][i]*3;mix.connect(bp);bp.connect(bg);bg.connect(g)});
+    const vib=ctx.createOscillator(),vg=ctx.createGain();vib.frequency.value=5.2;vg.gain.value=5;vib.connect(vg);vib.start(t);vib.stop(end);active.push(vib);
+    [-8,0,8].forEach(d=>{const o=osc('sawtooth',f,t,end,mix,0.33,d);vg.connect(o.detune)})},
+  bowed(m,t,dur,vel){const f=hz(m),len=dur+1.4,end=t+len+0.3,fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(5000,f*5);fl.Q.value=0.7;
+    const g=padOut(t,len,vel*0.5,0.22,1.2);fl.connect(g);
+    const vib=ctx.createOscillator(),vg=ctx.createGain();vib.frequency.value=5;vg.gain.setValueAtTime(0,t);vg.gain.linearRampToValueAtTime(9,t+0.6);vib.connect(vg);vib.start(t);vib.stop(end);active.push(vib);
+    [-5,5].forEach(d=>{const o=osc('sawtooth',f,t,end,fl,0.5,d);vg.connect(o.detune)})}};
 function pluck(m,t,dur=1.2,vel=0.5){
-  busyUntil=Math.max(busyUntil,t+Math.min(dur+(S.voice==='ether'?0.5:0.15),2.2));micRecent(m,t,dur);
+  busyUntil=Math.max(busyUntil,t+Math.min(dur+(SPACEY()?0.5:0.15),2.2));micRecent(m,t,dur);
   if(S.voice==='ether')return etherNote(m,t,dur,vel);
+  if(PADS[S.voice])return PADS[S.voice](m,t,dur,vel);
   if(S.voice!=='synth'){const v=VOICES[S.voice],src=ctx.createBufferSource(),g=ctx.createGain();src.buffer=noteBuffer(m);
     const ring=S.voice==='piano'?0.35:0.6,end=Math.min(t+src.buffer.duration-0.02,t+dur+ring);
     g.gain.setValueAtTime(vel*1.25,t);g.gain.setValueAtTime(vel*1.25,Math.max(t,end-0.25));g.gain.linearRampToValueAtTime(0.0001,end);
@@ -1936,7 +1970,7 @@ function answer(o){
     $('deg-fb').innerHTML=`<span class="tag no">Not ${labK(o)}</span> You heard your guess, then the real note. One more try.`;return}
   Q.done=true;record('deg',Q.o,false);marks={};marks[o]='no';marks[keyFor(Q.m)]='ok';renderPad();
   compareDeg();$('deg-compare').hidden=false;
-  $('deg-fb').innerHTML=`<span class="tag no">You: ${labK(o)}</span> <span class="tag ok">Answer: ${labM(Q.m)}</span> You'll hear yours, then the answer, then its walk home: <span class="path">${pathText(resolution(Q.m))}</span>${anchorHint(Q.o)}`;
+  $('deg-fb').innerHTML=`<div class="phrase mini">${slotRow('You',[[labK(o),'no']],'deg-you')}${slotRow('Answer',[[labM(Q.m),'ok']],'deg-ans')}</div>Walk home: <span class="path">${pathText(resolution(Q.m))}</span>${anchorHint(Q.o)}`;
   setPrompt('Press Next when ready.')}
 function replayDeg(){if(!Q)return nextDeg();stopAll();ensure();playQuestion(false)}
 function cadOnly(){stopAll();ensure();cadence(ctx.currentTime+0.05);sinceCad=0;sinceCadC=0}
@@ -2019,15 +2053,15 @@ function genPhrase(){
   for(let m=lo;m<=hi;m++)if(offOf(m)===e&&m!==prev&&(best===null||Math.abs(m-prev)<Math.abs(best-prev)))best=m;
   if(best===null)best=prev;
   seq.push(best);{const R=playRange(true);if(R&&!two()){let k=0;while(Math.max(...seq)+k>R[1]&&Math.min(...seq)+k-12>=R[0])k-=12;while(Math.min(...seq)+k<R[0]&&Math.max(...seq)+k+12<=R[1])k+=12;if(k)for(let q=0;q<seq.length;q++)seq[q]+=k}}return seq}
-function slotRow(who,items){return `<div class="prow">${who?`<span class="who">${who}</span>`:''}${items.map(([txt,cls])=>`<div class="slot ${cls}">${txt}</div>`).join('')}</div>`}
+function slotRow(who,items,act){return `<div class="prow">${who?`<span class="who">${who}</span>`:''}${items.map(([txt,cls])=>`<div class="slot ${cls}">${txt}</div>`).join('')}${act?`<button class="rowplay" data-act="${act}" aria-label="Hear ${who||'it'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button>`:''}</div>`}
 function renderPhrase(lit=-1,litRow='answer'){
   const el=$('phrase');if(!P){el.innerHTML='';return}
   if(S.pmode==='imagine'){const sung=P.sung||[];
-    el.innerHTML=(sung.length?slotRow('You',P.seq.map((m,i)=>sung[i]===undefined?['·','empty']:[labK(sung[i]),P.revealed?(pc(sung[i])===offOf(m)?'ok':'no'):''])):'')
-      +slotRow(sung.length?'Phrase':'',P.seq.map((m,i)=>[labM(m),(P.revealed&&i<=P.shownTo?'ok':'')+(i===lit?' lit':'')]));return}
+    el.innerHTML=(sung.length?slotRow('You',P.seq.map((m,i)=>sung[i]===undefined?['·','empty']:[labK(sung[i]),P.revealed?(pc(sung[i])===offOf(m)?'ok':'no'):'']),P.revealed?'p-sung':''):'')
+      +slotRow(sung.length?'Phrase':'',P.seq.map((m,i)=>[labM(m),(P.revealed&&i<=P.shownTo?'ok':'')+(i===lit?' lit':'')]),P.revealed?'p-ans':'');return}
   if(!P.done){el.innerHTML=slotRow('You',P.seq.map((m,i)=>P.ans[i]!==undefined?[labK(P.ans[i]),'']:['·','empty']));return}
-  el.innerHTML=slotRow('You',P.seq.map((m,i)=>[labK(P.ans[i]),(isRight(P.ans[i],m)?'ok':'no')+(litRow==='mine'&&i===lit?' lit':'')]))
-    +slotRow('Answer',P.seq.map((m,i)=>[labM(m),'ok'+(litRow==='answer'&&i===lit?' lit':'')]))}
+  el.innerHTML=slotRow('You',P.seq.map((m,i)=>[labK(P.ans[i]),(isRight(P.ans[i],m)?'ok':'no')+(litRow==='mine'&&i===lit?' lit':'')]),'p-you')
+    +slotRow('Answer',P.seq.map((m,i)=>[labM(m),'ok'+(litRow==='answer'&&i===lit?' lit':'')]),'p-ans')}
 const PSTEPS={imagine:['Press ▶, then listen to the key (chords only).','Read the numbers and hear them in your head.','Sing them out loud.','Press Check to hear the real phrase.','Play it on your instrument, then press → for the next one.'],
   hear:['Press ▶, then listen to the key (chords only).','Listen to the phrase.','Sing it back.','Tap its numbers in order.','Play it on your instrument, then press → for the next one.']};
 // stage: which step is current (0-based); several steps can be current at once
@@ -2357,8 +2391,8 @@ function renderPgButtons(){$('pg-answers').innerHTML=pgSet().map(c=>`<button cla
 function pgSlots(lit=-1,row='answer'){
   if(!PG){$('pg-slots').innerHTML='';return}
   const you=PG.seq.map((c,i)=>PG.ans[i]!==undefined?[PG.ans[i],PG.done?(PG.ans[i]===c[1]?'ok':'no'):'']:['?','empty'+(PG.phase==='answer'&&i===PG.ans.length?' cur':'')]);
-  let h=slotRow(PG.done?'You':'',you.map(([t,c],i)=>[t,c+((row==='mine'||row==='listen')&&i===lit?' lit':'')]));
-  if(PG.done)h+=slotRow('Answer',PG.seq.map((c,i)=>[c[1],'ok'+(row==='answer'&&i===lit?' lit':'')]));
+  let h=slotRow(PG.done?'You':'',you.map(([t,c],i)=>[t,c+((row==='mine'||row==='listen')&&i===lit?' lit':'')]),PG.done?'pg-you':'');
+  if(PG.done)h+=slotRow('Answer',PG.seq.map((c,i)=>[c[1],'ok'+(row==='answer'&&i===lit?' lit':'')]),'pg-ans');
   $('pg-slots').innerHTML=h;pgPhase()}
 function genProg(){
   if(S.pgSet==='jazz')return pick(JZ_PATTERNS).map(pgFind);
@@ -2629,7 +2663,7 @@ function detectPitch(x,sr){
 let busyUntil=0;
 // what the app itself played recently, and until when its sound may still ring in the room
 const RECENT=[];
-function micRecent(m,t,dur){const tail=S.voice==='ether'?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
+function micRecent(m,t,dur){const tail=SPACEY()?2.8:S.voice==='piano'?1.6:1.2;RECENT.push({m,until:t+dur+tail});if(RECENT.length>40)RECENT.splice(0,RECENT.length-40)}
 const echoOf=(m,now)=>(droneNodes&&[0,7].includes((((m-(droneNodes.root??bass(S.home)))%12)+12)%12))||RECENT.some(x=>now<x.until&&[0,7].includes((((m-x.m)%12)+12)%12));   // the drone's note is the app's too
 const MIC={on:false,stream:null,src:null,an:null,buf:null,timer:null,cur:null,since:0,emitted:false,prevRms:0,gate:0,hitAt:0,hits:[],heardTxt:''};
 const micThr=()=>0.002*Math.pow(1.6,10-S.micSens);   // sensitivity 10 = quietest notes count
@@ -4160,6 +4194,24 @@ $('std-play').addEventListener('click',()=>{const sh=STD.shapes[STD.i];if(sh)pla
 {const _st=showTab;showTab=function(t){if(S.tab==='vox'&&t!=='vox'){S.voxMode='std';persist()}_st(t)}}
 if(S.tab!=='vox'){S.voxMode='std';persist()}
 {const _gs=goScreen;goScreen=function(sc,fromPop){if(sc!=='game'&&S.tab==='vox'&&document.body.dataset.screen==='game'){S.voxMode='std';persist();syncVox()}return _gs(sc,fromPop)}}
+
+
+/* the speaker on each row: hear what you answered, then the real one */
+document.addEventListener('click',e=>{const b=e.target.closest('.rowplay');if(!b)return;e.stopPropagation();ensure();const a=b.dataset.act,t=ctx.currentTime+0.05,st=0.55*PACE();
+  if(a==='p-you'&&P&&P.done)return playMine();
+  if(a==='p-ans'&&P){stopAll();ensure();return playSeq(P.seq,0,'answer')}
+  if(a==='p-sung'&&P&&P.sung){stopAll();ensure();P.sung.forEach((k,i)=>pluck(pitchOfKey(k,P.seq[i]),ctx.currentTime+0.05+i*st,0.8,0.5));return}
+  if(a==='pg-you'&&PG&&PG.done){stopAll();ensure();return playProg(PG.ans.map(pgFind),0,false,'mine')}
+  if(a==='pg-ans'&&PG){stopAll();ensure();return playProg(PG.seq,0,false,'answer')}
+  if(a==='deg-you'&&Q&&Q.guess!=null){stopAll();ensure();pluck(pitchOfKey(Q.guess,Q.m),ctx.currentTime+0.05,1.1,0.5);lightAt(0,Q.guess);unlightAt(900);return}
+  if(a==='deg-ans'&&Q){stopAll();ensure();pluck(Q.m,ctx.currentTime+0.05,1.1,0.55);lightAt(0,keyFor(Q.m));walkHome(resolution(Q.m),1.3);return}},true);
+
+/* the guide shrinks to the current line once you know a game (tap it to see every step) */
+function guideBrief(tab){return ((S.gRounds||{})[tab]||0)>=3}
+function applyBrief(){document.querySelectorAll('.pglist').forEach(ol=>{const tab=(ol.closest('.stage')||{}).id?ol.closest('.stage').id.replace('panel-',''):'';ol.classList.toggle('brief',guideBrief(tab)&&!ol.dataset.full)})}
+document.addEventListener('click',e=>{const ol=e.target.closest('.pglist');if(ol){if(ol.dataset.full)delete ol.dataset.full;else ol.dataset.full='1';applyBrief();return}
+  const pb=e.target.closest('.stage .btn.primary');if(pb){const tab=pb.closest('.stage').id.replace('panel-','');S.gRounds=S.gRounds||{};S.gRounds[tab]=(S.gRounds[tab]||0)+1;persist();setTimeout(applyBrief,50)}},true);
+new MutationObserver(()=>applyBrief()).observe(document.body,{childList:true,subtree:true,attributes:false});
 
 /* ---------- app shell: screens, menu, settings sheet ---------- */
 function goScreen(sc,fromPop){
