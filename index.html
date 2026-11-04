@@ -1764,6 +1764,12 @@ details.lvw>summary::-webkit-details-marker{display:none}
 </div>
 
 <script>
+/* safety nets: ?reset clears settings only (songs, melodies and stats stay); any error shows on screen */
+try{if(/[?&]reset\b/.test(location.search)){localStorage.removeItem('tmt-settings');history.replaceState(null,'',location.pathname)}}catch(e){}
+window.addEventListener('error',e=>{try{let b=document.getElementById('errbar');if(!b){b=document.createElement('div');b.id='errbar';b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#3C1D23;color:#fff;border:1px solid #E77D8A;border-radius:12px;padding:10px 12px;font:13px system-ui;line-height:1.4';document.body.appendChild(b)}
+  b.innerHTML=`Something broke: <b>${String(e.message).replace(/</g,'&lt;')}</b> (line ${e.lineno}). <a href="?reset" style="color:#E0A84F">Reset settings</a> (keeps songs and stats) or reload.`}catch(_){}});
+</script>
+<script>
 (()=>{
 const NAMES=['C','D♭','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 const DEG={0:{n:'1',s:'do'},1:{n:'♭2',s:'ra'},2:{n:'2',s:'re'},3:{n:'♭3',s:'me'},4:{n:'3',s:'mi'},5:{n:'4',s:'fa'},6:{n:'♯4',s:'fi'},7:{n:'5',s:'sol'},8:{n:'♯5',s:'si'},9:{n:'6',s:'la'},10:{n:'♭7',s:'te'},11:{n:'7',s:'ti'}};

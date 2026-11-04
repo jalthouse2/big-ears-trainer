@@ -16,6 +16,8 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 5. Commit with a plain message saying what changed for the player, then `git push`.
 6. Only bump `CACHE` in `sw.js` when you change `sw.js` itself. The app is fetched network-first, so updates arrive without a bump.
 
+- Safety nets at the top of the page: any uncaught error shows a red bar with the message, and `?reset` clears `tmt-settings` only (songs, melodies, stats stay). Keep both.
+
 ## Theory rules
 - Every note is a number relative to the key's home: major home is 1, minor home is 6. The seven "worlds" are the scale started from each number, and the distances never change.
 - Don't mention Jojo anywhere in the app.
