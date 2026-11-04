@@ -43,7 +43,8 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 
 ## Product decisions
 - Free: Tuner, Rhythm, Chord decoder, Key finder, the Guide, and the first game levels. Paid: everything else, after a 7-day trial. €9.99 a year or €25.99 lifetime ("for as long as Big Ears is offered"). `PAYWALL.on` stays `false` until there's a store version.
-- Daily plan (`PLAN`): weeks 1–12 focus on singing, hearing notes in your head and finding them on the guitar. Shapes (triads, shells) and jazz come in weeks 13–16. Song anchors and My songs are optional extras, outside the daily minutes.
+- Daily plan (`PLAN`), in this order: weeks 1–6 the neck and the voice (Name the box, singing in sync, feelings over a drone, minor on 6, finding the key from one note); weeks 7–12 the chord grammar as sounds (chord tones, Explore, Chord pairs, Melody paths, a bank of progressions); week 13 outside notes; weeks 14–16 shapes and jazz. The optional extra defaults to `HABIT`: number one song you already strum each week.
+- No circle of fifths: the map (plus the neck) is the only answer view.
 - The path chooses the game: gigs alternate Single notes (Name the number) and Notes over chords (`gigGame`). The path is a band's world tour: each world is named by its home number and feel (`tourName`: World 1 · Bright, World 6 · Moody, World 2 · Soulful, World 3 · Spanish, World 4 · Dreamy, World 5 · Bluesy, World 7 · Edgy). Say "world", not "tour", for each one; the mode name (Dorian etc.) is only a small footnote.
 - Daily challenge (`DAILY`, `chalStart`): 20 notes, same for everyone each day (seeded by date), rated out of 5 stars with halves (Mon 1, Tue 1.5, Wed 2.5, Thu 3, Fri 3.5, Sat 4.5, Sun 5), harder from Monday (1 3 5 6, relaxed) to Sunday (all twelve, a surprise world, fast). One try per note. The end screen reviews every note and each miss, with replay, and shares a green/red grid.
 - No made-up testimonials anywhere.
