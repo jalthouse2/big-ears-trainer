@@ -1217,11 +1217,11 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <div class="panelcard"><h3>How to use it</h3>
         <p><b>1. Start with Today.</b> It runs a short session (5–45 minutes, your choice) and switches games for you.</p>
         <p><b>2. In every game, sing before you answer.</b> The singing is the training; the tap just checks it.</p>
-        <p><b>3. Answer any way:</b> tap the circle, the map, the neck or keys, or play or sing it with the mic on.</p>
+        <p><b>3. Answer any way:</b> tap the map, the neck or keys, or play or sing it with the mic on.</p>
         <p><b>4. Earn rings, book gigs.</b> 7 of 10 right earns a ring and opens the next set of notes. Go slowly; speed comes on its own.</p>
         <p>Every game has a <b>?</b> button: how it works, its options, and a guided round.</p></div>
-      <div class="panelcard"><h3>The circle</h3>
-        <p>Numbers around the circle are a fifth apart, so neighbours sound related: 1 sits between 4 and 5, and the seven notes of the key make one unbroken arc. Chords show up as shapes: a major chord is always the same triangle.</p></div>
+      <div class="panelcard"><h3>The map</h3>
+        <p>The map is the key in a row, 1 to 7 and on to 1 again. The gaps are the distances: only 3–4 and 7–1 are half steps, every other step is a whole step. The small keys in between are the outside notes (♭3, ♯4…). Minor is the same map, with home on 6.</p></div>
       <div class="panelcard"><h3>What the colours mean</h3><ul class="legend">
           <li><span class="sw home"></span>Home (1 in major, 6 in minor)</li>
           <li><span class="sw off"></span>Faded: not in play</li>
@@ -1254,7 +1254,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   <div class="games">
   <section class="stage" id="panel-deg">
     <p class="eyebrow">Cadence, then one note</p>
-    <div class="howto"><p class="why"><b>Why:</b> this is the core skill. Hearing any note as a number against home is what lets you play what you hear, find a melody by ear, and always know where you are.</p><p>You hear the key: a cadence, or the drone.</p><p>Then one note.</p><p>Sing it, then tap its number on the circle, the map or the neck.</p><p>You'll hear it walk home.</p><p>Keys: 1–8 answer · Space next · R replay · C cadence</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> this is the core skill. Hearing any note as a number against home is what lets you play what you hear, find a melody by ear, and always know where you are.</p><p>You hear the key: a cadence, or the drone.</p><p>Then one note.</p><p>Sing it, then tap its number on the map or the neck.</p><p>You'll hear it walk home.</p><p>Keys: 1–8 answer · Space next · R replay · C cadence</p></div>
     <p class="starter" id="starter"><b>New here?</b> Keep Notes on "Home chord". Move on after 8 in a row.</p>
     <p class="prompt" id="deg-prompt"></p>
     <p class="feedback" id="deg-fb"></p>
@@ -1444,7 +1444,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-free" hidden>
     <p class="eyebrow">Free play</p>
-    <div class="howto"><p class="why"><b>Why:</b> each number has its own feeling against home. Getting to know them by ear is what makes them easy to name later.</p><p>The drone holds home. Tap any number on the circle, the map or the neck.</p><p>Listen: which ones feel settled? Which want to move, and where to?</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> each number has its own feeling against home. Getting to know them by ear is what makes them easy to name later.</p><p>The drone holds home. Tap any number on the map or the neck.</p><p>Listen: which ones feel settled? Which want to move, and where to?</p></div>
     <p class="prompt keep" id="free-feel">Tap a number.</p>
     <div class="actions"><button class="btn" id="free-cad">Cadence</button><button class="btn dronebtn">Drone</button></div>
   </section>
@@ -1661,7 +1661,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <button class="lvlbtn" id="lvl-btn" aria-haspopup="dialog"></button>
       <label class="field" id="fb-win-f"><span>Frets</span><select id="fb-win"></select></label>
       <span class="micpill" id="mic-pill" hidden><i></i><span id="mic-heard">Listening</span></span>
-      <div class="field"><span>Show</span><div class="seg" id="dock-show"><button data-v="circle">Circle</button><button data-v="map">Map</button><button data-v="neck">Neck</button></div></div>
+      <div class="field"><span>Show</span><div class="seg" id="dock-show"><button data-v="map">Map</button><button data-v="neck">Neck</button></div></div>
     </div>
     <section class="circwrap" id="circwrap">
       <svg id="circ" viewBox="-128 -128 256 256" role="group" aria-label="Circle of fifths"></svg>
@@ -1792,6 +1792,7 @@ const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
 if(!S.v10){S.v10=true;S.showMap=true;S.showCircle=false;S.showNeck=false}
+if(!S.v11){S.v11=true;S.showCircle=false;S.showMap=true}
 if(!S.v9){S.v9=true;S.cc7=false;S.csz='3';if(S.voxMode==='shell')S.voxMode='explore'}
 if(S.csz==='sh')S.csz='4';if(S.scr==='songs')S.scr='tools';
 if(!S.v4){S.v4=true;S.voice='ether'}
@@ -2283,7 +2284,7 @@ function newPhrase(){
     const d=cadence(ctx.currentTime+0.05);
     later(d*1000,()=>{setStage([1]);$('p-fb').innerHTML=`<b>Listen</b> to the phrase. It ends on ${e}.`});
     const end=playSeq(P.seq,d,'answer');P.playEnd=ctx.currentTime+end;
-    later(end*1000,()=>{setStage([2,3]);$('p-fb').innerHTML=`<b>Your turn.</b> Sing it back, then tap its ${P.seq.length} numbers in order on the circle or map. ↻ plays it again.`})}}
+    later(end*1000,()=>{setStage([2,3]);$('p-fb').innerHTML=`<b>Your turn.</b> Sing it back, then tap its ${P.seq.length} numbers in order on the map. ↻ plays it again.`})}}
 function enterPhrase(o){
   const playing=P.playEnd&&ctx.currentTime<P.playEnd;   // you can answer while it's still playing
   if(!playing){stopAll();ensure();pluck(pitchOfKey(o,P.seq[P.ans.length]),ctx.currentTime+0.02,0.6,0.4)}P.ans.push(o);lightAt(0,o);unlightAt(350);
@@ -3005,8 +3006,8 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=['anc','songs','tune','beat','today','pocket'].includes(t);
-  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||(t==='vox'?!S.voxMap:!S.showMap);$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&t!=='key'&&!neckGame;$('circwrap').hidden=!S.showCircle||neckGame;
-  document.querySelector('#dock-show button[data-v="circle"]').hidden=neckGame;document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
+  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||(t==='vox'?!S.voxMap:!S.showMap);$('fbwrap').hidden=!S.showNeck&&t!=='dec'&&t!=='key'&&!neckGame;$('circwrap').hidden=true;
+  document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
   $('fb-win-f').hidden=!S.showNeck;
   document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?(t==='vox'?!!S.voxMap:S.showMap):b.dataset.v==='circle'?S.showCircle:S.showNeck));
   }
@@ -3757,7 +3758,7 @@ $('tune-mic').addEventListener('click',()=>{if(typeof micEnable!=='function')ret
 $('inst').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.inst=b.dataset.v;persist();applyInst();applyDock();showTab(S.tab)});
 $('inst-sel').addEventListener('change',e=>{S.inst=e.target.value;persist();applyInst();applyDock();showTab(S.tab)});
 // the run dots sit with the level pill so the top row stays on one line
-$('circwrap').appendChild($('runinfo'));
+$('mapwrap').prepend($('runinfo'));
 var instReady=true;applyInst();
 
 
@@ -3941,18 +3942,18 @@ function syncSongSeg(){document.querySelectorAll('.songseg button').forEach(b=>b
 /* ---------- guided tour: one thing at a time, everything else dimmed and blurred ---------- */
 var TOURS={
   deg:[['.ctxrow','Your key, your home world and your pace. Home is where every note wants to return.'],
-       ['#circ-go','Press play. You\'ll hear the key, then one note.'],
-       ['#circ','Sing the note, then tap its number here on the circle…'],
-       ['#mapwrap','…or on the map. Either works, and so does the neck.'],
+       ['#panel-deg .btn.primary','Press play. You\'ll hear the key, then one note.'],
+       ['#mapwrap','Sing the note, then tap its number here on the map…'],
+       ['#mapwrap','…or play or sing it with the mic on.'],
        ['#panel-deg .primary-row .btn:not(.primary)','Hear it again, pause, hear the key again, or hold home underneath with the drone.'],
        ['#lvl-btn','Your gig: the notes in play. Get 7 of 10 right to earn a ring and book the next gig.'],
        ['#stage-mode','How it works and more options, any time.']],
-  chord:[['#circ-go','Press play. A chord plays, then one note rings on top.'],['#circ','Name the top note\'s number, counted from home. The chord shows as a shape on the circle.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
-  phr:[['#p-new','Press play for a new short phrase.'],['#p-play','In Imagine first, the eye reveals the phrase so you can check your singing.'],['#circ','In Hear and name, you tap its numbers in order here.'],['#stage-mode','Switch between the two ways under How to.']],
+  chord:[['#panel-chord .btn.primary','Press play. A chord plays, then one note rings on top.'],['#mapwrap','Name the top note\'s number, counted from home. The chord\'s own notes light up on the map.'],['#panel-chord .primary-row','Hear it again, or the top note alone.'],['#stage-mode','How it works and options.']],
+  phr:[['#p-new','Press play for a new short phrase.'],['#p-play','In Imagine first, the eye reveals the phrase so you can check your singing.'],['#mapwrap','In Hear and name, you tap its numbers in order here.'],['#stage-mode','Switch between the two ways under How to.']],
   find:[['#find-num','This is the number to find.'],['#fbwrap','Tap every place it lives on the neck, inside the bright frets.'],['#panel-find .primary-row','Skip, hear it, or show the rest.']],
   vox:[['#vox-mode','Standard: 1 3 5, the full shapes you strum (open and barre). Triads: 1 3 5 on three strings, every inversion. Shells: 1, 3, 7, the jazz way. Quiz: test yourself.'],['#vox-chords','Pick a chord.'],['#vx-strings','Choose three strings to walk along.'],['#vox-nextshape','The arrows move the same chord up the neck: same three notes, new order each time.'],['#fbwrap','The shape lights up here. Gold dots are the shape; small dots are the same notes elsewhere.']],
-  prog:[['#circ-go','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
-  duel:[['#circ-go','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#circ','Tap them in order, or play them with the mic on. One more each round.']],
+  prog:[['#panel-prog .btn.primary','Press play. The key, then a few chords.'],['#pg-answers','Tap the chords in order.'],['#stage-mode','More chords and lengths under options.']],
+  duel:[['#panel-duel .btn.primary','Press play. It always starts on home, 1.'],['#duel-slots','The notes so far. The first is shown; the rest you play back from memory.'],['#mapwrap','Tap them in order, or play them with the mic on. One more each round.']],
   key:[['#kf-in','Paste a tab (straight from a tab site) or type note names.'],['#kf-strip','Every note heard so far, with its number in the best-guess key. Red ones sit outside it.'],['#kf-out','The likeliest keys. Tap one to see it on the map, or press play to hear it.'],['#mapwrap','The map follows the best guess live. Turn the mic on and play along to keep feeding it.'],['#fbwrap','The neck shows every note you\'ve played. Tap frets here to add notes too.']],
   dec:[['#dec-in','Type a chord: a tab like x32010, notes like C E G, numbers like 2 4 6, or a name like Am7.'],['#dec-voice','Or say it.'],['#fbwrap','Or tap it on the neck (or the keys).']],
   tune:[['#tune-set','Pick your tuning.'],['#hs','Tap a string to hear it. With the mic on, Auto follows the string you play.'],['#tune-drone','Drone holds the note so you can tune by ear.'],['.tmeter','The dot moves toward the centre as you get closer. Teal means in tune.']],
@@ -3962,22 +3963,22 @@ var TOURS={
 const TR={steps:[],i:0,el:null,poll:null,lesson:false};
 /* Lessons: the same spotlight, but you actually play. A step can wait for you to press the lit button, or for something to happen. */
 const LESSONS={
-  phr:()=>S.pmode==='hear'?[['#p-new','Press play.',{act:1}],['#circ','Listen to the short phrase…',{wait:()=>P&&!P.done&&!/Cadence/.test($('p-fb').textContent)}],['#circ','Tap its numbers in order, first to last.',{wait:()=>P&&P.done}],['#phrase','Green: right. Red: hear the difference with the buttons.',{}]]
+  phr:()=>S.pmode==='hear'?[['#p-new','Press play.',{act:1}],['#mapwrap','Listen to the short phrase…',{wait:()=>P&&!P.done&&!/Cadence/.test($('p-fb').textContent)}],['#mapwrap','Tap its numbers in order, first to last.',{wait:()=>P&&P.done}],['#phrase','Green: right. Red: hear the difference with the buttons.',{}]]
      :[['#p-new','Press play for a new phrase.',{act:1}],['#phrase','Read the numbers. Sing them, first in your head, then out loud.',{}],['#p-play','Now press the eye to hear the real phrase.',{act:1}],['#phrase','Did your singing match? That\'s the whole game: imagine, sing, check.',{}]],
-  deg:[['#circ-go','Let\'s play one. Press play.',{act:1}],
-       ['#circ','Listen. First the key (the cadence), then one note.',{wait:()=>Q&&!Q.done&&/^Sing/.test($('deg-prompt').textContent)}],
-       ['#circ','Sing that note. Then tap its number on the circle.',{wait:()=>Q&&Q.done}],
+  deg:[['#panel-deg .btn.primary','Let\'s play one. Press play.',{act:1}],
+       ['#mapwrap','Listen. First the key (the cadence), then one note.',{wait:()=>Q&&!Q.done&&/^Sing/.test($('deg-prompt').textContent)}],
+       ['#mapwrap','Sing that note. Then tap its number on the map.',{wait:()=>Q&&Q.done}],
        ['#deg-fb','Green is the answer; red would be your guess. Then you hear it walk home.',{}],
-       ['#circ-go','Press → for the next note. Get 7 of 10 right to earn a ring.',{}]],
-  chord:[['#circ-go','Press play.',{act:1}],
-       ['#circ','A chord plays, then one note on top. Listen.',{wait:()=>CQ&&!CQ.done&&!/Cadence/.test($('ch-prompt').textContent)}],
-       ['#circ','Tap the top note\'s number, counted from home.',{wait:()=>CQ&&CQ.done}],
+       ['#panel-deg .btn.primary','Press → for the next note. Get 7 of 10 right to earn a ring.',{}]],
+  chord:[['#panel-chord .btn.primary','Press play.',{act:1}],
+       ['#mapwrap','A chord plays, then one note on top. Listen.',{wait:()=>CQ&&!CQ.done&&!/Cadence/.test($('ch-prompt').textContent)}],
+       ['#mapwrap','Tap the top note\'s number, counted from home.',{wait:()=>CQ&&CQ.done}],
        ['#ch-fb','You hear whether it rests on the chord or leans to a neighbour.',{}]],
-  duel:[['#circ-go','Press play. It always starts on home.',{act:1}],
+  duel:[['#panel-duel .btn.primary','Press play. It always starts on home.',{act:1}],
        ['#duel-slots','Listen: home, then one new note.',{wait:()=>DUEL.listen}],
-       ['#circ','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
+       ['#mapwrap','Now play them back: tap home first, then the new note.',{wait:()=>DUEL.over||DUEL.i===0&&DUEL.seq.length>2||DUEL.seq.length>2}],
        ['#duel-slots','Each round adds one more. How far can you go?',{}]],
-  prog:[['#circ-go','Press play.',{act:1}],
+  prog:[['#panel-prog .btn.primary','Press play.',{act:1}],
        ['#pg-steps','First the key, then the chords. Just listen…',{wait:()=>PG&&PG.phase==='answer'}],
        ['#pg-answers','Your turn: tap the chords in order. The gold box shows which one you\u2019re on.',{wait:()=>PG&&PG.done}],
        ['#pg-fb','Green ones you got; red ones you can hear again with ↻.',{}]],
