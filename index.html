@@ -1304,12 +1304,12 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
 
   <section class="stage" id="panel-find" hidden>
-    <div class="seg keep voxmode" id="find-mode"><button data-v="all">Every place</button><button data-v="home">From home</button></div>
+    <div class="seg keep voxmode" id="find-mode"><button data-v="home">From home</button><button data-v="box">Name the box</button><button data-v="all">By ear</button></div>
     <p class="eyebrow">The map on the neck</p>
-    <div class="howto"><p class="why"><b>Why:</b> it puts the map under your fingers. Each number gets places on the neck in every position, so hearing a number means knowing where your hand goes.</p><p>A number appears.</p><p>Tap every place it lives on the neck, inside the bright frets.</p><p>Ask by sound plays the note instead of showing it.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> it puts the map under your fingers. Each number gets places on the neck in every position, so hearing a number means knowing where your hand goes.</p><p>From home: play the gold home note, then find a number above it, string by string.</p><p>Name the box: walk up through one position, naming every note as you play it.</p><p>By ear: hear home, then a note. Find where it lives.</p></div>
     <details class="more"><summary>Options</summary>
     <div class="actions" style="margin-top:8px">
-      <div class="field"><span>Ask by</span><div class="seg" id="find-ask"><button data-v="number">Number</button><button data-v="sound">Sound</button></div></div>
+      <div class="field" hidden><span>Ask by</span><div class="seg" id="find-ask"><button data-v="number">Number</button><button data-v="sound">Sound</button></div></div>
       <div class="field"><span>Order</span><div class="seg" id="find-seq"><button data-v="seq">Same number up the neck</button><button data-v="rand">Random</button></div></div>
       <div class="field"><span>Show on the neck</span><div class="seg" id="find-show"><button data-v="home">Home only</button><button data-v="none">Nothing</button></div></div>
     </div>
@@ -1726,7 +1726,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,findMode:'all',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,findMode:'home',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1736,6 +1736,7 @@ if(S.csz==='sh')S.csz='4';if(S.scr==='songs')S.scr='tools';
 if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
 if(!S.v6){S.v6=true;if(S.vxStr==='all')S.vxStr='0';S.duelMode='notes'}
+if(!S.v7){S.v7=true;S.findMode='home'}
 const persist=()=>save('tmt-settings',S);
 
 /* ---------- levels ---------- */
@@ -1980,6 +1981,7 @@ function lightAt(ms,o,extra){later(ms,()=>{nowKey=o;if(extra)extra();renderPad()
 function unlightAt(ms){later(ms,()=>{nowKey=null;renderPad()})}
 function preview(o){if(!JAM.on)stopAll();ensure();const t=ctx.currentTime+0.02;pluck(H()+o,t,1.2,0.5);lightAt(0,o);unlightAt(600)}
 function padPress(o){
+  if(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ&&!BQ.done)return boxAnswer(pc(o));
   if(S.tab==='key')return kfTapDeg(pc(o));
   if(S.tab==='free'){preview(o);freeFeel(o);return}
   if(S.tab==='mel')return melInput(o);
@@ -2262,7 +2264,7 @@ let OPEN=[64,59,55,50,45,40],FRETS=15;        // high string on top, as in tab
 const INST={guitar:{open:[64,59,55,50,45,40],frets:15,str:['e','B','G','D','A','E']},uke:{open:[69,64,60,67],frets:12,str:['A','E','C','G']}};
 const WINDOWS=[{lo:0,hi:15,name:'Whole neck'},{lo:0,hi:4,name:'Frets 0–4'},{lo:2,hi:5,name:'Frets 2–5'},{lo:4,hi:8,name:'Frets 4–8'},{lo:7,hi:10,name:'Frets 7–10'},{lo:9,hi:13,name:'Frets 9–13'},{lo:12,hi:15,name:'Frets 12–15'}];
 let cellMarks={},cellNow=null,FRETLIST=[];
-const curWin=()=>{if(S.tab==='key')return WINDOWS[0];if(S.tab==='find'&&S.findMode==='home'&&typeof IQ!=='undefined'&&IQ){const lo=Math.max(0,IQ.hf-2),hi=Math.min(FRETS,Math.max(lo+6,IQ.hf+5));return {lo,hi,name:'around home'}}return WINDOWS[(S.tab==='find'&&FQ)?FQ.w:S.win]};
+const curWin=()=>{if(S.tab==='key')return WINDOWS[0];if(S.tab==='find'&&S.findMode==='home'&&typeof IQ!=='undefined'&&IQ){const lo=Math.max(0,IQ.hf-2),hi=Math.min(FRETS,Math.max(lo+6,IQ.hf+5));return {lo,hi,name:'around home'}}return WINDOWS[(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ)?BQ.w:(S.tab==='find'&&FQ)?FQ.w:S.win]};
 const inWin=(f,W)=>f>=W.lo&&f<=W.hi;
 function renderFB(){
   if(S.inst==='piano')return renderKB();
@@ -2283,6 +2285,7 @@ function renderFB(){
     if(!st&&iw&&S.tab!=='find'&&S.tab!=='vox'&&S.tab!=='dec'&&S.tab!=='key'){st=markPc[o]||(trailPc.has(o)?'trail':'')}
     let now=cellNow===id||(iw&&nowPc===o&&S.tab!=='find'&&S.tab!=='vox');
     let vis=!!st||now,label=lab(o),extra='';
+    if(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ){const ix=BQ.cells.indexOf(id);if(ix>=0){vis=true;if(ix<BQ.i||BQ.done)extra='ok';else if(ix===BQ.i){extra='vox';label='?'}else extra='pool pip'}}
     if(S.tab==='key'&&KF&&!st){const ap=m%12,inK=DIATONIC.includes(o);if(KF.cells.has(id)||KF.ms.has(m)){vis=true;extra=inK?'vox':'no'}else if(KF.w[ap]>0){vis=true;extra=(inK?'tone':'no')+' pip'}}
     if(S.tab==='chord'&&iw&&!st&&toneSet().has(o)){vis=true;extra='tone pip'}
     if(chordNow&&iw&&!st&&S.tab!=='vox'&&!(S.tab==='dec'&&DEC.src==='tab')&&chordNow.tones.includes(o)){vis=true;extra=(o===chordNow.root?'vox':'tone')+' pip'}
@@ -2300,6 +2303,7 @@ function renderFB(){
 $('fb').addEventListener('click',e=>{const b=e.target.closest('.fc');if(!b)return;const [s,f]=b.dataset.c.split('-').map(Number);fbPress(s,f)});
 function fbPress(s,f){
   if(S.tab==='find'&&S.findMode==='home'&&IQ&&!IQ.done)return answerIQ(s,f);
+  if(S.tab==='find'&&S.findMode==='box'){const c=BQ&&!BQ.done&&boxCur();if(c&&c.s===s&&c.f===f)boxSound();return}
   if(S.tab==='dec')return decFret(s,f);
   if(S.tab==='key'){cellNow=s+'-'+f;setTimeout(()=>{if(cellNow===s+'-'+f){cellNow=null;renderFB()}},600);return kfTapMidi(OPEN[s]+f,s+'-'+f)}
   if(S.tab==='find'&&FQ&&!FQ.done)return answerFind(s,f);
@@ -2320,6 +2324,8 @@ function findCount(){
   $('find-count').innerHTML=`<b>${got}</b> of ${n} found${FQ.done?'':` · ${left} left`}${FQ.miss?` · ${FQ.miss} miss${FQ.miss>1?'es':''}`:''}`}
 function nextFind(){
   if(S.findMode==='home')return nextIQ();
+  if(S.findMode==='box')return nextBox();
+  S.findAsk='sound';
   stopAll();ensure();marks={};trail=new Set();cellMarks={};
   let o,w,k=0;const L=posList();
   if(S.findSeq==='seq'&&FQ&&FQ.done&&FQ.k+1<L.length){o=FQ.o;k=FQ.k+1;w=L[k]}
@@ -2333,7 +2339,33 @@ function nextFind(){
     const t=ctx.currentTime+0.05;const d=cadence(t);pluck(FQ.ref,t+d,1.6,0.55)}
   $('find-fb').textContent=S.findSeq==='seq'&&L.length>1?`Position ${k+1} of ${L.length} for this number. Say the number out loud with each one you find.`:'Say the number out loud with each one you find.';
   $('find-reveal').hidden=false;$('find-next').textContent='Skip';findCount()}
-function hearFind(){if(S.findMode==='home')return hearIQ();if(!FQ)return;stopAll();ensure();const t=ctx.currentTime+0.05;const d=cadence(t);pluck(FQ.ref,t+d,1.6,0.55)}
+/* Name the box: walk up one position, naming every note as you play it */
+var BQ=null;
+function nextBox(){stopAll();ensure();marks={};trail=new Set();cellMarks={};
+  const L=posList(),k=BQ?(BQ.done?(BQ.k+1)%L.length:BQ.k):0,w=L[k],W=WINDOWS[w];
+  const cells=S.pool.flatMap(o=>cellsFor(o,W)).sort((a,b)=>(OPEN[a[0]]+a[1])-(OPEN[b[0]]+b[1])||b[0]-a[0]).map(([s2,f])=>s2+'-'+f);
+  BQ={k,w,cells,i:0,miss:0,tries:0,done:false};
+  $('find-num').textContent='?';
+  $('find-prompt').innerHTML=`Walk up through ${W.name.toLowerCase()}, low to high. Play the gold dot, say its number out loud, then tap the number.`;
+  $('find-fb').textContent=`${cells.length} notes in this box. Home (${lab(S.home)}) is your landmark.`;
+  $('find-reveal').hidden=true;$('find-next').textContent='Skip';boxCount();renderFB();renderPad();boxSound()}
+function boxCur(){const [s2,f]=BQ.cells[BQ.i].split('-').map(Number);return {s:s2,f,m:OPEN[s2]+f}}
+function boxSound(){if(!BQ||BQ.done)return;stopAll();ensure();const c=boxCur();pluck(c.m,ctx.currentTime+0.05,1.2,0.55);cellNow=c.s+'-'+c.f;setTimeout(()=>{if(cellNow===c.s+'-'+c.f){cellNow=null;renderFB()}},600);renderFB()}
+function boxCount(){$('find-count').innerHTML=BQ?`<b>${BQ.i}</b> of ${BQ.cells.length} named${BQ.miss?` · ${BQ.miss} miss${BQ.miss>1?'es':''}`:''}`:''}
+function boxAnswer(o){if(!BQ||BQ.done)return;const c=boxCur(),right=offOf(c.m);
+  if(o===right){record('find',right,BQ.tries===0);BQ.tries=0;addXP(1);BQ.i++;
+    if(BQ.i>=BQ.cells.length){BQ.done=true;FS.n++;if(!BQ.miss){FS.c++;FS.streak++}else FS.streak=0;
+      $('find-score').textContent=`This session ${FS.c}/${FS.n} clean · streak ${FS.streak}`;
+      stopAll();ensure();const t=ctx.currentTime+0.2,seq=[...BQ.cells,...BQ.cells.slice(0,-1).reverse()];
+      seq.forEach((id,i)=>{const [a,b]=id.split('-').map(Number);pluck(OPEN[a]+b,t+i*0.32,0.8,0.48);later((0.2+i*0.32)*1000,()=>{cellNow=id;renderFB()})});
+      later((0.2+seq.length*0.32+0.3)*1000,()=>{cellNow=null;renderFB()});
+      $('find-fb').innerHTML=`<span class="tag ok">${BQ.miss?'Named':'Clean'}</span> Now play it up and down on your guitar, singing each number. Then improvise inside the box, naming every note.`;
+      $('find-next').textContent='Next box'}
+    else{$('find-fb').innerHTML=`<span class="tag ok">${lab(right)}</span> ${cheerLine()}`;boxSound()}}
+  else{BQ.miss++;BQ.tries++;$('find-fb').innerHTML=`<span class="tag no">Not ${lab(o)}</span> Count from the last note you named, or from home (${lab(S.home)}).`}
+  boxCount();renderFB()}
+const cheerLine=()=>pick(['Say it as you play it.','Keep walking up.','Name it, then play it.','Next one is gold.']);
+function hearFind(){if(S.findMode==='home')return hearIQ();if(S.findMode==='box')return boxSound();if(!FQ)return;stopAll();ensure();const t=ctx.currentTime+0.05;const d=cadence(t);pluck(FQ.ref,t+d,1.6,0.55)}
 function finishFind(revealed){
   FQ.done=true;const perfect=!revealed&&FQ.miss===0;
   FS.n++;if(perfect){FS.c++;FS.streak++}else FS.streak=0;
@@ -2733,7 +2765,7 @@ const TD=load('tmt-today',{done:0,days:[]});
 const SESS2={on:false,i:0,end:0,timer:null};
 function setupBlock(i){const w=S.week,P=planFor(w);
   jamStop();S.home=P.home;S.pool=LEVELS[P.notes].pool();S.every=P.every;S.win=P.win;S.range=P.range||'one';
-  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;S.cc7=!!P.cc7;S.csz=P.cc7?'4':'3';if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.findMode=P.findMode||'all';
+  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;S.cc7=!!P.cc7;S.csz=P.cc7?'4':'3';if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.findMode=P.findMode||(P.findAsk==='sound'?'all':'box');
   persist();resetKeyContext();
   const drone=$('drone'),wantDrone=i===0;if((drone.getAttribute('aria-pressed')==='true')!==wantDrone)drone.click();
   if(i===0){showTab('today');ensure();cadence(ctx.currentTime+0.1)}
@@ -4058,9 +4090,9 @@ function answerIQ(s2,f){const m=OPEN[s2]+f,id=s2+'-'+f;stopAll();ensure();const 
   renderFB();setTimeout(()=>{if(cellMarks[id]==='no'&&IQ&&!IQ.done){delete cellMarks[id];renderFB()}},1200)}
 $('find-reveal').addEventListener('click',()=>{if(S.findMode!=='home'||!IQ||IQ.done)return;IQ.done=true;iqCells().forEach(([a,b])=>{cellMarks[a+'-'+b]='ok'});renderFB();hearIQ();$('find-fb').textContent='Here it is. Play it from home a few times.';$('find-next').textContent=IQ.lap<OPEN.length-1?'Next string':'Next'},true);
 $('iq-back').addEventListener('click',backIQ);
-function syncFindMode(){$('iq-back').hidden=S.findMode!=='home'||!IQH.length;document.querySelectorAll('#find-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findMode))}
-$('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;IQH=[];FQ=null;cellMarks={};syncFindMode();
-  $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears: play it first, then find a number above it, then the same jump from every string.':'Press start, then tap every place that number lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
+function syncFindMode(){try{const g=GUIDE.find;if(g.el)g.el.innerHTML=g.lines.map((l,i)=>i?`<li data-i="${i}"><b>${i}</b><span>${l}<small></small></span></li>`:'').join('')}catch(e){}$('iq-back').hidden=S.findMode!=='home'||!IQH.length;document.querySelectorAll('#find-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findMode))}
+$('find-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.findMode=b.dataset.v;persist();IQ=null;IQH=[];FQ=null;BQ=null;cellMarks={};syncFindMode();
+  $('find-num').textContent='';$('find-prompt').textContent=S.findMode==='home'?'Press start. A gold home note appears: play it first, then find a number above it, then the same jump from every string.':S.findMode==='box'?'Press start. Walk up one position, low to high, naming every note as you play it.':'Press start. Hear home, then a note: find where it lives on the neck.';$('find-fb').textContent='';$('find-next').textContent='Start';renderFB()});
 syncFindMode();
 
 
@@ -4241,8 +4273,8 @@ const GUIDE={
     cur:()=>!Q?[0]:Q.done?[3]:[1,2]},
   chord:{prompt:'ch-prompt',lines:['Press ▶ to start.','Listen: a chord, then one note on top.','Tap the number of that note.','Press → for the next one.'],
     cur:()=>!CQ?[0]:CQ.done?[3]:[1,2]},
-  find:{prompt:'find-prompt',lines:['Press ▶ to start.','Hear home, then the number to find.','Tap where it lives on the neck.','Press → for the next one (or wait, it moves on).'],
-    cur:()=>{const q=S.findMode==='home'?IQ:FQ;return !q?[0]:q.done?[3]:[1,2]}},
+  find:{prompt:'find-prompt',get lines(){return S.findMode==='box'?['Press ▶ to start.','Play the gold dot and say its number.','Tap that number. The next dot lights up.','At the top, play the whole box up and down, singing. → for the next box.']:S.findMode==='home'?['Press ▶ to start.','Play the gold home note.','Find the number above it, within reach.','Press → for the next string.']:['Press ▶ to start.','Hear home, then a note.','Tap where it lives on the neck.','Press → for the next one.']},
+    cur:()=>{const q=S.findMode==='home'?IQ:S.findMode==='box'?BQ:FQ;return !q?[0]:q.done?[3]:[1,2]}},
   vox:{prompt:'vq-prompt',only:()=>S.voxMode==='quiz',lines:['Press ▶ to start.','Listen: the key, then a shape lights up and plays.','Name it with the buttons below.','Press → for the next one.'],
     cur:()=>!VQ?[0]:VQ.done?[3]:[1,2]},
   duel:{prompt:'duel-prompt',lines:['Press ▶ to start.','Listen: home, then the notes so far plus one new one.','Play them all back, in order.','One slip ends the duel. Press ▶ to go again.'],
