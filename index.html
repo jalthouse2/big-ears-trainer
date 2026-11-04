@@ -770,7 +770,10 @@ body:not([data-screen="game"]) #set-toggle{display:none}
 .tour.still .tb,.tour.still .ring,.tour.still .tip{transition:none!important}
 .tourbtn{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;border-radius:999px;min-height:40px;padding:6px 16px}
 
-.dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg)}
+.dronebtn.on{background:var(--home);border-color:var(--home);color:var(--bg);animation:dronePulse 2.4s ease-in-out infinite}
+#drone[aria-pressed="true"]:not(.sleep),.kfcand .play.dr[aria-pressed="true"],.kfask .opt button.dr[aria-pressed="true"],#tune-drone[aria-pressed="true"]{animation:dronePulse 2.4s ease-in-out infinite}
+@keyframes dronePulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--home) 55%,transparent)}50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--home) 0%,transparent)}}
+@media (prefers-reduced-motion: reduce){.dronebtn.on,#drone[aria-pressed="true"],#tune-drone[aria-pressed="true"]{animation:none}}
 .dronebtn.on.sleep{background:var(--home-soft);color:var(--home)}
 #drone.sleep{background:var(--home-soft);color:var(--home)}
 .voxmode{align-self:flex-start}
@@ -1987,11 +1990,11 @@ function setDrone(on,slow,rootM){
   if(droneNodes){const n=droneNodes;droneNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,slow?1.2:0.15);setTimeout(()=>n.o.forEach(o=>{try{o.stop()}catch(e){}}),slow?6000:700)}
   if(!on)return;ensure();
   const g=ctx.createGain();g.gain.value=0.0001;g.connect(master);
-  const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=900;fl.Q.value=0.6;fl.connect(g);
-  const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=0.07;lg.gain.value=350;lfo.connect(lg);lg.connect(fl.frequency);lfo.start();
-  const root=rootM??droneRootPin??bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.5],[root+12,'sine',0.32],...(S.droneFifth?[[root+7,'sine',0.1]]:[]),[root+12.06,'sine',0.12]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
+  const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=1800;fl.Q.value=0.6;fl.connect(g);
+  const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=0.07;lg.gain.value=500;lfo.connect(lg);lg.connect(fl.frequency);lfo.start();
+  const root=rootM??droneRootPin??bass(S.home),o=[[root,'sawtooth',0.18],[root,'triangle',0.45],[root+12,'triangle',0.5],...(S.droneFifth?[[root+7,'sine',0.1],[root+19,'sine',0.12]]:[]),[root+12.06,'sine',0.14],[root+24,'sine',0.22]].map(([m,ty,a])=>{const x=ctx.createOscillator();x.type=ty;x.frequency.value=hz(Math.round(m))*(m%1?1.003:1);
     const gg=ctx.createGain();gg.gain.value=a;x.connect(gg);gg.connect(fl);x.start();return x});o.push(lfo);
-  g.gain.setTargetAtTime(0.09,ctx.currentTime,0.6);droneNodes={g,o,root}}
+  g.gain.setTargetAtTime(0.26,ctx.currentTime,0.6);droneNodes={g,o,root}}
 
 /* ---------- the pad (tonal map) ---------- */
 let marks={},trail=new Set(),nowKey=null;
@@ -3860,8 +3863,8 @@ let tdNodes=null;
 function tuneDrone(m){ensure();tuneDroneOff();if(m==null)return;
   const g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(4000,hz(m)*6);fl.Q.value=0.7;fl.connect(g);g.connect(voiceIn);
   fl.frequency.value=Math.min(6000,hz(m)*12);
-  const os=[['sawtooth',1,0.24],['triangle',1,0.45],['triangle',2,0.6],['sine',3,0.22],['sine',4,0.14]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
-  g.gain.value=0.0001;g.gain.setTargetAtTime(0.55,ctx.currentTime,0.15);tdNodes={g,os};
+  const os=[['sawtooth',1,0.24],['triangle',1,0.45],['triangle',2,0.7],['sine',3,0.32],['sine',4,0.24],['sine',5,0.1]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
+  g.gain.value=0.0001;g.gain.setTargetAtTime(0.85,ctx.currentTime,0.15);tdNodes={g,os};
   $('tune-msg').textContent='Play the string with the drone: the wobble slows as you get close, and the dot moves to the centre.';document.querySelector('.tmeter').classList.remove('in')}
 function tuneDroneOff(){if(!tdNodes)return;const n=tdNodes;tdNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.12);setTimeout(()=>n.os.forEach(o=>{try{o.stop()}catch(e){}}),600)}
 $('tune-drone').addEventListener('click',e=>{TUNE.droneOn=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.droneOn);
