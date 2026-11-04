@@ -911,11 +911,11 @@ body.paused .circgo{opacity:.5}
 .dectab .rl{font-size:12px;color:var(--muted)}
 /* ===== Chord grammar ===== */
 .cgchips{display:flex;flex-wrap:wrap;gap:6px}
-.cgrid{display:grid;grid-template-columns:28px repeat(calc(var(--n) + var(--l,0)),minmax(0,1fr));gap:3px;align-items:center;text-align:center}
+.cgrid{display:grid;grid-template-columns:28px repeat(calc(var(--n) + var(--l,0)),minmax(0,1fr));gap:6px 4px;max-width:340px;margin:4px auto;align-items:center;text-align:center}
 .cgrid .ch{font:700 15px var(--font-display);color:var(--muted);padding-bottom:2px}
 .cgrid .ch.cur{color:var(--brass);text-decoration:underline;text-underline-offset:4px}
 .cgrid .rl{font:600 12px var(--font-mono);color:var(--muted)}
-.cgrid .cell{height:30px;border-radius:8px;display:grid;place-items:center;font:700 15px var(--font-display);color:var(--muted)}
+.cgrid .cell{height:34px;border-radius:8px;display:grid;place-items:center;font:700 15px var(--font-display);color:var(--muted)}
 .cgrid .cell.cur:not(.tone):not(.path){background:none}
 .cgrid .cell.tone{border:2px solid var(--brass);color:var(--fg);border-radius:999px;margin:0 auto;width:30px}
 .cgrid .cell.held{background:var(--brass-soft)}
@@ -931,6 +931,10 @@ body.paused .circgo{opacity:.5}
 .exgrid .ec{height:26px;border-radius:6px;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:14px}
 .exgrid .ec.rest{background:var(--good-soft);border:1px solid var(--good)} .exgrid .ec.rub{background:var(--brass-soft);border:1px solid var(--brass)} .exgrid .ec.clash{background:var(--bad-soft);border:1px solid var(--bad)}
 .exgrid .ec.cur{box-shadow:0 0 0 2px var(--brass)}
+.prbig{text-align:center;font:800 40px/1.1 var(--font-display);letter-spacing:.02em;min-height:0;margin:6px 0}
+.prbig:empty{display:none}.prbig span{color:var(--brass);font-weight:600}
+#pr-ans{justify-content:center;gap:8px}#pr-ans .chip{min-width:52px;min-height:44px;font:700 18px var(--font-display)}
+#panel-pairs .prompt{text-align:center;line-height:1.5}
 /* ===== Key finder ===== */
 .kfin{display:flex;flex-direction:column;gap:8px}
 .kfin textarea{width:100%;min-height:64px;max-height:220px;resize:vertical;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);font:500 14px/1.35 var(--font-mono);color:var(--fg);white-space:pre;overflow-x:auto}
@@ -1450,23 +1454,14 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-pairs" hidden>
     <p class="eyebrow">Chord pairs</p>
-    <div class="howto"><p class="why"><b>Why:</b> every progression is a chain of pairs. In each pair some notes stay and one or two move. Hearing those is how you recognise chords by ear instead of working them out.</p></div>
-    <div class="seg keep voxmode" id="pr-mode"><button data-v="learn">Learn a pair</button><button data-v="quiz">Quiz</button></div>
-    <div class="chips cgchips" id="pr-chips"></div>
-    <div id="pr-learn">
-      <div id="pr-grid"></div>
-      <p class="hint" id="pr-story"></p>
-      <ol class="pglist keep" id="pr-steps"><li data-i="1"><b>1</b><span>Hear the pair.</span></li><li data-i="2"><b>2</b><span>Sing the note that stays, over both chords.</span></li><li data-i="3"><b>3</b><span>Chords only: hear that note inside them.</span></li><li data-i="4"><b>4</b><span>Sing the note that moves.</span></li><li data-i="5"><b>5</b><span>Quiz yourself on the pairs.</span></li></ol>
-      <p class="prompt keep" id="pr-now"></p>
-      <div class="actions"><button class="btn primary" id="pr-play">▶ Pair</button><button class="btn" id="pr-held">Note that stays</button><button class="btn" id="pr-bare">Chords only</button><button class="btn" id="pr-move">Note that moves</button></div>
-    </div>
-    <div id="pr-quiz" hidden>
-      <p class="prompt keep" id="pr-qprompt">Press ▶. After the key, two chords play twice. Tap them in order.</p>
-      <div class="chips" id="pr-qans"></div>
-      <p class="feedback" id="pr-qfb"></p>
-      <div id="pr-qgrid"></div>
-      <div class="actions"><button class="btn primary" id="pr-qgo">▶</button><button class="btn" id="pr-qrep">↻</button></div>
-    </div>
+    <div class="howto"><p class="why"><b>Why:</b> every progression is a chain of pairs. In each pair some notes stay and one moves. Hearing them is how you recognise chords.</p><p>Each round is one pair: listen, sing the note that stays, sing the note that moves, then name a pair by ear.</p></div>
+    <details class="more"><summary>Choose a pair</summary><div class="chips cgchips" id="pr-chips" style="margin-top:10px"></div></details>
+    <p class="prompt" id="pr-prompt">Press ▶ to start.</p>
+    <div class="prbig keep" id="pr-big"></div>
+    <div class="keep" id="pr-grid"></div>
+    <div class="chips cgchips keep" id="pr-ans" hidden></div>
+    <div class="keep" id="pr-rows"></div>
+    <div class="actions"><button class="btn primary" id="pr-next">Start</button><button class="btn" id="pr-replay">Replay</button><span class="score" id="pr-score"></span></div>
   </section>
 
   <section class="stage" id="panel-paths" hidden>
@@ -2814,7 +2809,7 @@ const PLAN={
  7:{t:'A chord is a set of numbers',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'vox',vqAsk:'notes',voice:'Sing each chord up from its root: 1-3-5, 2-4-6, 4-6-1, 5-7-2, 6-1-3.',map:'Chord chart: every chord in the key, as numbers.',earTxt:'Chords on the neck, quiz: hear a chord, name every note from the top.',jam:'1 4 5 1',play:'Over each chord, play only its three numbers, in one position.'},
  8:{t:'Every note over every chord',home:0,notes:3,every:3,win:0,range:'two',findMode:'home',ear:'chord',chMode:'explore',voice:'Hold one number and sing it while the chords change under it. Where does it rest, rub or clash?',map:'Find it, from home, across two octaves.',earTxt:'Note over chord, Explore: two numbers a day over all seven chords. Then the quiz.',jam:'1 4 5 1',play:'On each change, play one note that rests on the new chord, naming it.'},
  9:{t:'Chord pairs: what stays',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'pairs',voice:'Sing the note that stays: 1 over 1 → 4, then 1 and 3 over 1 → 6m.',map:'Chord chart: find the shared notes of 1 and 4, 1 and 6m.',earTxt:'Chord pairs: 1 → 4, 1 → 5, 1 → 6m. Then the quiz.',jam:'1 6m 4 5',play:'Hold a shared note while the loop changes under it.'},
- 10:{t:'Chord pairs: what moves',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'pairs',voice:'Sing the moving voice: 3 → 4 (6m → 4), 7 → 1 (5 → 1).',map:'Chord chart: only the 5 chord has 7, only the 4 has 6.',earTxt:'Chord pairs: 4 → 5, 6m → 4, 5 → 6m, 2m → 5. Then the quiz.',jam:'6m 4 1 5',play:'Move just one note per chord change, by step.'},
+ 10:{t:'Chord pairs: what moves',home:0,notes:3,every:3,win:0,mapTab:'cc',ear:'pairs',pairFrom:3,voice:'Sing the moving voice: 3 → 4 (6m → 4), 7 → 1 (5 → 1).',map:'Chord chart: only the 5 chord has 7, only the 4 has 6.',earTxt:'Chord pairs: 4 → 5, 6m → 4, 5 → 6m, 2m → 5. Then the quiz.',jam:'6m 4 1 5',play:'Move just one note per chord change, by step.'},
  11:{t:'Melody paths',home:0,notes:3,every:5,win:0,findMode:'home',ear:'paths',voice:'Sing the paths over 6m 4 1 5 and 1 5 6m 4, starting on each chord note.',map:'Find it, from home: each path note, in one position.',earTxt:'Melody paths, mic on: sing each path over the chords.',jam:'6m 4 1 5',play:'Land the path on beat 1 of each chord. Fill between with neighbour notes.'},
  12:{t:'Your bank of progressions',home:0,notes:3,every:5,win:0,findMode:'all',findAsk:'sound',ear:'prog',pgSet:'basic',voice:'Sing the bass of loops as a melody: 1-5-6-4, 6-4-1-5, 1-6-4-5.',map:'Find it, by ear.',earTxt:'Progressions with 1 4 5 6m.',jam:'1 5 6m 4',play:'Work out a song you love by ear: home, bass line, chords, melody.'},
  13:{t:'Outside notes',home:0,notes:4,every:10,win:0,findMode:'all',findAsk:'sound',ear:'deg',voice:'Outside notes with neighbours: 6-♯5-6, 1-♭7-6, 5-♯4-5, ♭3-3-1.',map:'Find it, by ear, outside notes included.',earTxt:'Name the number, outside notes included.',jam:'1 3 6m 4',play:'Over the 3 chord use ♯5; elsewhere use 5.'},
@@ -2837,7 +2832,7 @@ const TD=load('tmt-today',{done:0,days:[]});
 const SESS2={on:false,i:0,end:0,timer:null};
 function setupBlock(i){const w=S.week,P=planFor(w);
   jamStop();S.home=P.home;S.pool=LEVELS[P.notes].pool();S.every=P.every;S.win=P.win;S.range=P.range||'one';
-  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;S.cc7=!!P.cc7;S.csz=P.cc7?'4':'3';if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.chMode=P.chMode||'quiz';S.findMode=P.findMode||(P.findAsk==='sound'?'all':'box');
+  if(P.pmode)S.pmode=P.pmode;if(P.pgSet)S.pgSet=P.pgSet;if(P.vqAsk)S.vqAsk=P.vqAsk;S.cc7=!!P.cc7;S.csz=P.cc7?'4':'3';if(P.findAsk)S.findAsk=P.findAsk;else S.findAsk='number';S.chMode=P.chMode||'quiz';if(P.ear==='pairs'){PRG.i=P.pairFrom||0;PRG.stage=0}S.findMode=P.findMode||(P.findAsk==='sound'?'all':'box');
   persist();resetKeyContext();
   const drone=$('drone'),wantDrone=i===0;if((drone.getAttribute('aria-pressed')==='true')!==wantDrone)drone.click();
   if(i===0){showTab('today');ensure();cadence(ctx.currentTime+0.1)}
@@ -3275,7 +3270,7 @@ markStages();
 
 
 /* ---------- lean game screens: only the prompt, the result and the buttons; everything else lives under Options ---------- */
-const FIT_TABS=['deg','chord','phr','find','vox','prog','duel','sing'];
+const FIT_TABS=['deg','chord','phr','find','vox','prog','duel','sing','pairs'];
 function leanMark(){FIT_TABS.forEach(t=>{const st=$('panel-'+t);if(!st)return;st.classList.add('fit');
   st.querySelectorAll('.xtra').forEach(x=>x.classList.remove('xtra'));
   const isKeep=el=>el.matches('.prompt,.feedback,.phrase,.chordbtns,.bignum,.keep')||(el.matches('.actions')&&el.querySelector(':scope>.btn.primary'));
@@ -4342,6 +4337,8 @@ const PUSH={url:null};
 
 /* the same simple guide in every game: numbered lines, the current one lit, what's happening right now underneath */
 const GUIDE={
+  pairs:{prompt:'pr-prompt',lines:['Press ▶ to start.','Listen to the pair.','Sing the note that stays.','Sing the note that moves.','Name a pair by ear.'],
+    cur:()=>{const s2=PRG.stage;return s2===0?[0]:s2===5?[4]:[s2]}},
   deg:{prompt:'deg-prompt',lines:['Press ▶ to start.','Listen: the key, then one note.','Tap the number you heard.','Hear it walk home, then press → for the next one.'],
     cur:()=>!Q?[0]:Q.done?[3]:[1,2]},
   chord:{prompt:'ch-prompt',lines:['Press ▶ to start.','Listen: a chord, then one note on top.','Tap the number of that note.','Press → for the next one.'],
@@ -4461,33 +4458,43 @@ const PAIRS=[['1','4'],['1','5'],['1','6m'],['4','5'],['6m','4'],['5','6m'],['2m
 const PSTORY={'1-4':'Home steps out. 1 stays; 3 and 5 rise.','1-5':'Home to tension. 5 stays; 1 falls to 7, 3 rises to 4.','1-6m':'Same family: only 5 moves up to 6. Light turns to shade.',
   '4-5':'Two major chords a step apart: nothing stays, everything climbs. It pushes toward home.','6m-4':'1 and 6 stay; 3 rises to 4. The wilderness move.','5-6m':'5 promises home and lands on its shadow.',
   '2m-5':'2 stays; 4 and 6 fall. The jazz push toward 1.','6m-2m':'Minor to minor, drifting away from home.'};
-const PR={i:0,mode:'learn',held:0,mv:0,q:null,pick:[]};
-function pairCur(){const [a,b]=PAIRS[PR.i];return [vch(a),vch(b)]}
-function pairsRender(){const [A,B]=pairCur(),L=pairMoves(A,B);
-  $('pr-chips').innerHTML=PAIRS.map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===PR.i}">${p[0]} → ${p[1]}</button>`).join('');
-  document.querySelectorAll('#pr-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===PR.mode));
-  const learn=PR.mode==='learn';$('pr-learn').hidden=!learn;$('pr-quiz').hidden=learn;$('pr-chips').hidden=!learn;
-  if(learn){$('pr-grid').innerHTML=cgGrid([{c:A},{c:B}],{link:L,held:L.held});
-    $('pr-story').innerHTML=`<b>${A[1]} → ${B[1]}</b> ${PSTORY[A[1]+'-'+B[1]]||''} Stays: <b>${L.held.map(lab).join(' ')||'nothing'}</b>. Moves: <b>${L.moves.map(([a,b])=>lab(a)+'→'+lab(b)).join(', ')}</b>.`;
-    $('pr-held').disabled=!L.held.length;$('pr-move').disabled=!L.moves.length}
-  else{const q=PR.q;$('pr-qgrid').innerHTML=q&&q.done?cgGrid([{c:q.A},{c:q.B}],{link:pairMoves(q.A,q.B),held:pairMoves(q.A,q.B).held}):'';
-    $('pr-qans').innerHTML=['1','2m','3m','4','5','6m'].map(n=>`<button class="chip" data-n="${n}" aria-pressed="${PR.pick.includes(n)}">${n}</button>`).join('')}}
-function pairPlay(top,loops=2){stopAll();ensure();const [A,B]=pairCur(),t0=ctx.currentTime+0.05,d=1.7*PK(),tok=++chordTok;
+const PRG={i:0,stage:0,q:null,pick:[],n:0,c:0};
+function pairCur(){const [a,b]=PAIRS[PRG.i];return [vch(a),vch(b)]}
+const PR_TXT=['Press ▶ to start.','Listen: two chords, twice.','Sing the note that stays, over both chords.','Sing the note that moves.','Which two chords? Tap them in order.','Press → for the next pair.'];
+function pairsRender(){const st=PRG.stage,[A,B]=pairCur(),L=pairMoves(A,B);
+  $('pr-chips').innerHTML=PAIRS.map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===PRG.i}">${p[0]} → ${p[1]}</button>`).join('');
+  const q=PRG.q,quiz=st>=4;
+  $('pr-big').innerHTML=st===0?'':quiz?(q&&st===5?`${q.A[1]} → ${q.B[1]}`:'? → ?'):`${A[1]} <span>→</span> ${B[1]}`;
+  const show=st===0?null:quiz?(st===5&&q?[q.A,q.B]:null):[A,B];
+  $('pr-grid').innerHTML=show?cgGrid([{c:show[0]},{c:show[1]}],{link:st===3||st===5?pairMoves(show[0],show[1]):{held:st===2?L.held:[],moves:[]},held:st===2||st===5?pairMoves(show[0],show[1]).held:[]}):'';
+  $('pr-ans').hidden=st!==4;$('pr-ans').innerHTML=['1','2m','3m','4','5','6m'].map(n=>`<button class="chip" data-n="${n}" aria-pressed="${PRG.pick.includes(n)}">${n}</button>`).join('');
+  $('pr-next').textContent=st===0?'Start':'Next';
+  if(st===2)$('pr-prompt').textContent=L.held.length?`Sing ${L.held.map(lab).join(' and ')} over both chords.`:'Nothing stays in this pair. Every note moves.';
+  else if(st===3)$('pr-prompt').textContent=`Sing ${L.moves.map(([a,b])=>lab(a)+' → '+lab(b)).join(', then ')}.`;
+  else $('pr-prompt').textContent=PR_TXT[st];
+  if(st!==5)$('pr-rows').innerHTML=''}
+function pairPlay(pr,top,loops=2){stopAll();ensure();const [A,B]=pr,t0=ctx.currentTime+0.05,d=1.7*PK(),tok=++chordTok;
   for(let k=0;k<loops;k++)[[A,top&&top[0]],[B,top&&top[1]]].forEach(([c,m],j)=>{const t=t0+(k*2+j)*d;chord(c[0],c[2],t,d*0.95,0.2);
-    if(m!=null)pluck(cgMel(m),t+0.05,d*0.95,0.5);later((t-ctx.currentTime)*1000,()=>{cgShow(c,tok);$('pr-now').textContent=m!=null?`Sing ${lab(m)} over ${c[1]}`:c[1]})});
-  later((t0-ctx.currentTime+loops*2*d)*1000,()=>{cgShow(null);$('pr-now').textContent=''})}
-function pairStep(n){document.querySelectorAll('#pr-steps li').forEach(li=>li.classList.toggle('on',+li.dataset.i===n))}
-function pairQuiz(){stopAll();ensure();const p=pick(PAIRS),[A,B]=Math.random()<0.5?[vch(p[0]),vch(p[1])]:[vch(p[1]),vch(p[0])];
-  PR.q={A,B,done:false};PR.pick=[];const d=cadence(ctx.currentTime+0.05);const t=ctx.currentTime+0.05+d+0.3,dd=1.7*PK();
-  chord(A[0],A[2],t,dd*0.95,0.22);chord(B[0],B[2],t+dd,dd*0.95,0.22);chord(A[0],A[2],t+2*dd,dd*0.95,0.22);chord(B[0],B[2],t+3*dd,dd*0.95,0.22);
-  $('pr-qfb').textContent='';$('pr-qprompt').textContent='Which two chords? Tap them in order.';$('pr-qgo').textContent='→';pairsRender()}
-function pairAns(n){const q=PR.q;if(!q||q.done)return;PR.pick.push(n);
-  if(PR.pick.length===2){q.done=true;const ok=PR.pick[0]===q.A[1]&&PR.pick[1]===q.B[1],L=pairMoves(q.A,q.B);
-    $('pr-qfb').innerHTML=(ok?`<span class="tag ok">${q.A[1]} → ${q.B[1]}</span> `:`<span class="tag no">You: ${PR.pick.join(' → ')}</span> <span class="tag ok">Answer: ${q.A[1]} → ${q.B[1]}</span> `)
-      +`Stays: <b>${L.held.map(lab).join(' ')||'nothing'}</b>. Moves: <b>${L.moves.map(([a,b])=>lab(a)+'→'+lab(b)).join(', ')}</b>. Listen for those.`;
-    if(ok)addXP(3)}
-  pairsRender()}
-
+    if(m!=null)pluck(cgMel(m),t+0.05,d*0.95,0.5);later((t-ctx.currentTime)*1000,()=>cgShow(c,tok))});
+  later((t0-ctx.currentTime+loops*2*d)*1000,()=>cgShow(null))}
+function pairStage(){const st=PRG.stage,[A,B]=pairCur(),L=pairMoves(A,B);
+  if(st===1)pairPlay([A,B],null);
+  else if(st===2)pairPlay([A,B],L.held.length?[L.held[0],L.held[0]]:null);
+  else if(st===3)pairPlay([A,B],L.moves[0]);
+  else if(st===4){const q=PRG.q;stopAll();ensure();const d=cadence(ctx.currentTime+0.05);const t=ctx.currentTime+0.05+d+0.3,dd=1.7*PK();
+    [q.A,q.B,q.A,q.B].forEach((c,i)=>chord(c[0],c[2],t+i*dd,dd*0.95,0.22))}
+  else if(st===5){const q=PRG.q;pairPlay([q.A,q.B],null,1)}}
+function pairNext(){if(PRG.stage===5){PRG.i=(PRG.i+1)%PAIRS.length;PRG.stage=0}
+  PRG.stage++;
+  if(PRG.stage===4){const pool=PAIRS.slice(0,Math.max(PRG.i+1,2)),p=pick(pool),[a,b]=Math.random()<0.5?p:[p[1],p[0]];PRG.q={A:vch(a),B:vch(b)};PRG.pick=[]}
+  pairsRender();pairStage()}
+function pairAns(n){const q=PRG.q;if(PRG.stage!==4||!q)return;PRG.pick.push(n);
+  if(PRG.pick.length<2){pairsRender();return}
+  const ok=PRG.pick[0]===q.A[1]&&PRG.pick[1]===q.B[1];PRG.n++;if(ok){PRG.c++;addXP(3)}
+  $('pr-score').textContent=`${PRG.c}/${PRG.n}`;PRG.stage=5;pairsRender();
+  $('pr-rows').innerHTML=(ok?'':slotRow('You',PRG.pick.map(x=>[x,'no']),'pr-you'))+slotRow(ok?'Right':'Answer',[[q.A[1],'ok'],[q.B[1],'ok']],'pr-ans');
+  if(ok&&typeof cheer==='function')$('pr-prompt').textContent=cheer(PRG.c)+' Press → for the next pair.';
+  pairStage()}
 /* Melody paths */
 const PATHPROGS=['6m 4 1 5','1 5 6m 4','1 6m 4 5','4 5 3m 6m','2m 5 1 6m','1 4 5 1'];
 const PA={prog:0,start:null,loop:false,i:-1,hits:[],path:[]};
@@ -4521,15 +4528,12 @@ function exRender(){const c=EX.ci>=0?VCH[EX.ci]:null;
     h+=`<span class="ec ${v||''}${n===EX.n&&i===EX.ci?' cur':''}" title="${lab(n)} over ${c[1]}">${v&&r==='rub'?'•':''}</span>`})});
   $('ex-grid').innerHTML=h+'</div>'}
 
-$('pr-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PR.mode=b.dataset.v;stopAll();pairsRender()});
-$('pr-chips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PR.i=+b.dataset.i;PR.held=0;PR.mv=0;pairsRender();pairPlay(null,1);pairStep(1)});
-$('pr-play').addEventListener('click',()=>{pairPlay(null,2);pairStep(1)});
-$('pr-held').addEventListener('click',()=>{const [A,B]=pairCur(),L=pairMoves(A,B);if(!L.held.length)return;const n=L.held[PR.held++%L.held.length];pairPlay([n,n],2);pairStep(2)});
-$('pr-bare').addEventListener('click',()=>{pairPlay(null,2);pairStep(3);$('pr-now').textContent='Listen for the note that stays, inside the chords.'});
-$('pr-move').addEventListener('click',()=>{const [A,B]=pairCur(),L=pairMoves(A,B);if(!L.moves.length)return;const mv=L.moves[PR.mv++%L.moves.length];pairPlay(mv,2);pairStep(4)});
-$('pr-qgo').addEventListener('click',pairQuiz);
-$('pr-qrep').addEventListener('click',()=>{const q=PR.q;if(!q)return;stopAll();ensure();const t=ctx.currentTime+0.05,d=1.7*PK();[q.A,q.B,q.A,q.B].forEach((c,i)=>chord(c[0],c[2],t+i*d,d*0.95,0.22))});
-$('pr-qans').addEventListener('click',e=>{const b=e.target.closest('button');if(b)pairAns(b.dataset.n)});
+$('pr-chips').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PRG.i=+b.dataset.i;PRG.stage=0;closeOpts&&closeOpts();pairNext()});
+$('pr-next').addEventListener('click',pairNext);
+$('pr-replay').addEventListener('click',()=>{if(PRG.stage)pairStage()});
+$('pr-ans').addEventListener('click',e=>{const b=e.target.closest('button');if(b)pairAns(b.dataset.n)});
+$('pr-rows').addEventListener('click',e=>{const b=e.target.closest('.rowplay');if(!b||!PRG.q)return;
+  if(b.dataset.act==='pr-you'){const [a,c]=PRG.pick.map(vch);if(a&&c)pairPlay([a,c],null,1)}else pairPlay([PRG.q.A,PRG.q.B],null,1)});
 $('pa-progs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PA.prog=+b.dataset.i;PA.start=null;PA.hits=[];stopAll();pathsRender()});
 $('pa-starts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.o==null)return;PA.start=+b.dataset.o;PA.hits=[];pathsRender();pathPlay(true,1)});
 $('pa-hear').addEventListener('click',()=>pathPlay(true,2));
