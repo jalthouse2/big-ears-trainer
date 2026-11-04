@@ -3866,8 +3866,8 @@ let tdNodes=null;
 function tuneDrone(m){ensure();tuneDroneOff();if(m==null)return;
   const g=ctx.createGain(),fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=Math.min(4000,hz(m)*6);fl.Q.value=0.7;fl.connect(g);g.connect(voiceIn);
   fl.frequency.value=Math.min(6000,hz(m)*12);
-  const os=[['sawtooth',1,0.22],['triangle',1,0.45],['triangle',2,0.55],['sine',4,0.12]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
-  g.gain.value=0.0001;g.gain.setTargetAtTime(0.26,ctx.currentTime,0.15);tdNodes={g,os};
+  const os=[['sawtooth',1,0.24],['triangle',1,0.45],['triangle',2,0.6],['sine',3,0.22],['sine',4,0.14]].map(([ty,mul,a])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=ty;o.frequency.value=hz(m)*mul;gg.gain.value=a;o.connect(gg);gg.connect(fl);o.start();return o});
+  g.gain.value=0.0001;g.gain.setTargetAtTime(0.55,ctx.currentTime,0.15);tdNodes={g,os};
   $('tune-msg').textContent='Play the string with the drone: the wobble slows as you get close, and the dot moves to the centre.';document.querySelector('.tmeter').classList.remove('in')}
 function tuneDroneOff(){if(!tdNodes)return;const n=tdNodes;tdNodes=null;n.g.gain.setTargetAtTime(0.0001,ctx.currentTime,0.12);setTimeout(()=>n.os.forEach(o=>{try{o.stop()}catch(e){}}),600)}
 $('tune-drone').addEventListener('click',e=>{TUNE.droneOn=e.currentTarget.getAttribute('aria-pressed')!=='true';e.currentTarget.setAttribute('aria-pressed',TUNE.droneOn);
