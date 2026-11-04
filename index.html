@@ -1326,7 +1326,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 
   <section class="stage" id="panel-vox" hidden>
     <p class="eyebrow">One chord, many shapes</p>
-    <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a shape lights up and plays. Name the chord.</p></div>
+    <div class="howto"><p class="why"><b>Why:</b> one chord lives all over the neck. Knowing its shapes and inversions lets you play it anywhere, and hear which note sits on top.</p><p>Learn: one chord has many shapes on the neck.</p><p>Pick a chord. The arrows move it up the neck.</p><p>Every shape uses the same three notes, stacked in a new order: root position, then 1st inversion, then 2nd inversion.</p><p>Quiz: a chord plays. Name its notes by ear, top note first. The shape shows once you've named them.</p></div>
     <div class="seg keep voxmode" id="vox-mode"><button data-v="std">Standard</button><button data-v="explore">Triads</button><button data-v="shell">Shells</button><button data-v="quiz">Quiz</button></div>
     <div id="vox-std" class="sub" style="border-top:0;padding-top:0" hidden>
       <p class="prompt" id="std-prompt">1 3 5, the full shapes you strum. The arrows show its other shapes.</p>
@@ -1352,7 +1352,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     </div>
     <div id="vox-quiz" class="sub" style="border-top:0;padding-top:0" hidden>
       <div class="actions">
-        <div class="field"><span>Ask</span><div class="seg" id="vq-ask"><button data-v="chord">Which chord</button><button data-v="top">Top note</button><button data-v="bass">Bass note</button></div></div>
+        <div class="field"><span>Ask</span><div class="seg" id="vq-ask"><button data-v="notes">Every note</button><button data-v="top">Top note</button><button data-v="bass">Bass note</button><button data-v="chord">Which chord</button></div></div>
         <div class="field"><span>Chords</span><div class="seg" id="vox-set"><button data-v="basic">1 4 5 6m</button><button data-v="all">All seven</button></div></div></div>
       <p class="prompt" id="vq-prompt">Press Start. A shape lights up on the neck and plays.</p>
       <div class="chordbtns" id="vq-answers"></div>
@@ -1726,7 +1726,7 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,findMode:'home',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'chord',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,findMode:'home',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'notes',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
@@ -1737,6 +1737,7 @@ if(!S.v4){S.v4=true;S.voice='ether'}
 if(!S.v5){S.v5=true;S.fbNums='home'}
 if(!S.v6){S.v6=true;if(S.vxStr==='all')S.vxStr='0';S.duelMode='notes'}
 if(!S.v7){S.v7=true;S.findMode='home'}
+if(!S.v8){S.v8=true;if(S.vqAsk==='chord')S.vqAsk='notes'}
 const persist=()=>save('tmt-settings',S);
 
 /* ---------- levels ---------- */
@@ -2293,7 +2294,7 @@ function renderFB(){
       if(S.voxMode==='explore'&&ch[2].includes(o)&&(shapeIds.has(id)||S.voxAll)){vis=true;extra=shapeIds.has(id)?'vox':'tone pip'}
       if(S.voxMode==='shell'&&shapeIds.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='std'&&typeof STD!=='undefined'&&STD.ids.has(id)){vis=true;extra='vox'}
-      if(S.voxMode==='quiz'&&quizIds.has(id)){vis=true;extra=st?'':'vox';if(!VQ.done)label=''}}
+      if(S.voxMode==='quiz'&&quizIds.has(id)){const named=VQ.named&&VQ.named.has(id);vis=VQ.done||named;extra=st?'':'vox'}}
     if(!vis){if(show==='all'&&S.pool.includes(o)){vis=true;if(o!==S.home)extra='pool pip'}else if(show==='home'&&o===S.home)vis=true}
     const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra&&(vis||S.tab!=='vox')?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
     if(f===FRETLIST[0]&&f>0)h+=`<span class="fc sname">${STR[s]}</span>`;
@@ -2441,10 +2442,10 @@ function nextVQ(){
   stopAll();cellMarks={};const set=S.voxSet==='basic'?VCH.filter(c=>['1','4','5','6m'].includes(c[1])):VCH;
   let c,v,guard=0;do{c=pick(set);let sh=shapesFor(c[2],WINDOWS[S.win]);if(!sh.length)sh=shapesFor(c[2],WINDOWS[0]);v=sh.length?pick(sh):null}while(!v&&guard++<20);
   if(!v){$('vq-prompt').textContent='No shapes fit this fret window. Pick a wider one.';return}
-  VQ={c,v,done:false};renderFB();stopAll();ensure();const d=cadence(ctx.currentTime+0.05);playShape(v.ms,d+0.3);
-  $('vq-prompt').textContent=`Cadence in ${homeName()} sets home, then the shape. `+{chord:'Which chord is it?',top:'Which number is on top?',bass:'Which number is in the bass?'}[S.vqAsk];$('vq-fb').textContent='';$('vq-next').textContent='Next'}
+  VQ={c,v,done:false,named:new Set(),k:0,miss:0,order:v.ms.map((m,i)=>[m,v.ids[i]]).sort((a,b)=>b[0]-a[0])};renderFB();stopAll();ensure();const d=cadence(ctx.currentTime+0.05);playShape(v.ms,d+0.3);
+  $('vq-prompt').textContent=`Cadence in ${homeName()} sets home, then the shape. `+{notes:'Name every note, top first.',chord:'Which chord is it?',top:'Which number is on top?',bass:'Which number is in the bass?'}[S.vqAsk];$('vq-fb').textContent='';$('vq-next').textContent='Next'}
 function answerVQ(name){
-  if(!VQ||VQ.done)return;if(S.vqAsk!=='chord')return answerVQNote(Number(name));VQ.done=true;const right=name===VQ.c[1];
+  if(!VQ||VQ.done)return;if(S.vqAsk==='notes')return answerVQSeq(Number(name));if(S.vqAsk!=='chord')return answerVQNote(Number(name));VQ.done=true;const right=name===VQ.c[1];
   VS.n++;if(right){VS.c++;VS.streak++}else VS.streak=0;$('vq-score').textContent=`This session ${VS.c}/${VS.n} right · streak ${VS.streak}`;
   const top=lab(offOf(Math.max(...VQ.v.ms)));
   if(right){VQ.v.ids.forEach(id=>cellMarks[id]='ok');renderFB();playShape(VQ.v.ms);
@@ -2453,6 +2454,14 @@ function answerVQ(name){
     const g=VCH.find(c=>c[1]===name);stopAll();ensure();const t=ctx.currentTime+0.05;chord(g[0],g[2],t,1.3,0.22);
     later(1500,()=>playShape(VQ.v.ms));
     $('vq-fb').innerHTML=`<span class="tag no">You: ${name}</span> <span class="tag ok">Answer: ${VQ.c[1]}</span> You'll hear the ${name} chord, then this shape. Its notes, low to high: <span class="path">${voiceText(VQ.v.ms)}</span>.`}}
+function answerVQSeq(o){const [m,id]=VQ.order[VQ.k],want=offOf(m);stopAll();ensure();const t=ctx.currentTime+0.03;
+  if(o===want){VQ.named.add(id);cellMarks[id]='ok';VQ.k++;pluck(m,t,1.2,0.55);
+    if(VQ.k>=VQ.order.length){VQ.done=true;VS.n++;if(!VQ.miss){VS.c++;VS.streak++}else VS.streak=0;$('vq-score').textContent=`This session ${VS.c}/${VS.n} clean · streak ${VS.streak}`;
+      later(900,()=>playShape(VQ.v.ms));
+      $('vq-fb').innerHTML=`<span class="tag ok">${VQ.order.map(([x])=>lab(offOf(x))).join(' ')}</span> The <b>${VQ.c[1]}</b> chord, ${invOf(VQ.v,VQ.c[2])}. Now sing it top to bottom, then play the shape.`}
+    else $('vq-fb').innerHTML=`<span class="tag ok">${lab(want)}</span> Next note down.`}
+  else{VQ.miss++;pluck(pitchOfKey(o,m),t,0.7,0.45);pluck(m,t+0.8,1.2,0.55);$('vq-fb').innerHTML=`<span class="tag no">Not ${lab(o)}</span> That was yours, then the real note. Try again.`}
+  renderFB()}
 function answerVQNote(o){
   VQ.done=true;const ms=VQ.v.ms,target=S.vqAsk==='top'?Math.max(...ms):Math.min(...ms),want=offOf(target),right=o===want;
   VS.n++;if(right){VS.c++;VS.streak++}else VS.streak=0;$('vq-score').textContent=`This session ${VS.c}/${VS.n} right · streak ${VS.streak}`;
@@ -2746,7 +2755,7 @@ const PLAN={
  10:{t:'The seven worlds',home:0,notes:3,every:5,win:4,ear:'phr',pmode:'imagine',voice:'Sing the scale from today\'s world (2, 5, 4, 3 or 7) up to its octave. The map stays the same.',map:'Find it, ask by sound.',findAsk:'sound',earTxt:'Phrases: imagine first, ending on today\'s world.',jam:'2m 5 2m 5',play:'Start and end phrases on 2 over this loop.'},
  11:{t:'Outside notes',home:0,notes:4,every:10,win:0,ear:'deg',voice:'Outside notes with neighbours: 6-♯5-6, 1-♭7-6, 5-♯4-5, ♭3-3-1.',map:'Find it, including outside notes.',earTxt:'Name the number, outside notes included.',jam:'1 3 6m 4',play:'Over the 3 chord use ♯5; elsewhere use 5.'},
  12:{t:'Play what you hear',home:0,notes:4,every:10,win:0,findAsk:'sound',ear:'phr',pmode:'imagine',playTab:'duel',voice:'Sing along with a song you know, in numbers.',map:'Find it, ask by sound: hear it, then find it.',earTxt:'Phrases: imagine first, outside notes included.',jam:'1 ♭7 4 1',play:'Duel, then free play: sing a line, play it straight away.',extra:'Work out a song you love by ear, then add it to My songs.'},
- 13:{t:'Triads and inversions',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'explore',ear:'vox',voxMode:'quiz',vqAsk:'chord',voice:'Sing each chord: 1-3-5, 4-6-1, 5-7-2, 6-1-3.',map:'Chords on the neck, triads: walk each chord up the G B e strings.',earTxt:'Chords on the neck, quiz: which chord is this shape?',jam:'1 6m 4 5',play:'Fills of 3–5 notes between chords, from triad shapes.'},
+ 13:{t:'Triads and inversions',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'explore',ear:'vox',voxMode:'quiz',vqAsk:'notes',voice:'Sing each chord: 1-3-5, 4-6-1, 5-7-2, 6-1-3.',map:'Chords on the neck, triads: walk each chord up the G B e strings.',earTxt:'Chords on the neck, quiz: hear a chord, name every note from the top. Sing it before you play it.',jam:'1 6m 4 5',play:'Fills of 3–5 notes between chords, from triad shapes.'},
  14:{t:'Seventh chords and shells',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'shell',cc7:true,ear:'prog',pgSet:'jazz',voice:'Sing 7th arpeggios: 1-3-5-7, 2-4-6-1, 5-7-2-4.',map:'Chords on the neck, shells: 1, 3, 7 with the root on string 6, then 5.',earTxt:'Progressions: Jazz 7ths.',jam:'2m7 5(7) 1maj7 1maj7',play:'Land on 3rds and 7ths of each chord.'},
  15:{t:'2–5–1 and guide tones',home:0,notes:3,every:5,win:0,mapTab:'vox',voxMap:'shell',ear:'chord',voice:'Guide-tone line: 1 (on 2m7) → 7 (on 5) → 7 (on 1maj7); then 4 → 4 → 3.',map:'Shells: play 2m7–5(7)–1maj7 with the smallest moves.',earTxt:'Note over chord.',jam:'2m7 5(7) 1maj7 6m7',play:'Play only 3rds and 7ths, moving by step.'},
  16:{t:'Outside chords',home:0,notes:4,every:5,win:0,mapTab:'cc',ear:'prog',pgSet:'outside',voice:'Sing ♯5 → 6 and ♯4 → 5.',map:'Chord chart: outside chords.',earTxt:'Progressions with outside chords.',jam:'1 3 6m 4',play:'Use ♯5 over the 3 chord, ♯4 over the 2 chord.'}};
