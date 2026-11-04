@@ -29,6 +29,8 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Instrument (guitar, ukulele, piano) is chosen only in Settings.
 - Minimal first: Sonofield is the reference. Show as little as possible; extras go into the options sheet.
 - The tonal map (the row of numbers) is the default answer view; the neck is optional.
+- Every switch (`.seg`: Map/Neck, game modes, settings) is a row of separate rounded pills, the chosen one in brass. No joined block buttons.
+- The Chord decoder and Key finder have their own neck switch (`S.toolNeck`, on by default), separate from the games' `S.showNeck`.
 - The numbered guide shrinks to the current line after 3 rounds of a game (`S.gRounds`); tapping it shows all steps.
 - After an answer, show "You" and "Answer" rows, each with a speaker button (`slotRow(who,items,act)`, `.rowplay`), so the player can hear the difference.
 - Chord words, the same everywhere: chords sound either as "1 3 5" (basic) or "1 3 5 7" (7ths), one top pill where chords play (`csize`, Chord chart, Note over chord, Progressions). Shells (1 3 7) and Triads (1 3 5 on three strings) are ways to play a chord, so they only appear in Chords on the neck, whose pill is Standard · Triads · Shells · Quiz.
