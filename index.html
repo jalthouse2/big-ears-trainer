@@ -596,7 +596,13 @@ body:not([data-screen="game"]) #set-toggle{display:none}
 #pk-go.on{background:var(--surface);color:var(--fg);border-color:var(--line)}
 #free-feel{font-size:17px;min-height:3em}
 #free-feel .fnum{font-size:30px;margin-right:8px;color:var(--brass)}
-:root{--n0:#5fc9b0;--n2:#f2c14e;--n4:#f2906b;--n5:#a48ff2;--n7:#6fb3f2;--n9:#e57fab;--n11:#b9d66f}
+:root{--n0:#FF5C5C;--n2:#FF9F2E;--n4:#FFE14A;--n5:#45D46A;--n7:#3FA9FF;--n9:#A877FF;--n11:#FF62CF}
+:root[data-theme="light"]{--n0:#D62828;--n2:#D96A00;--n4:#A88000;--n5:#1E9440;--n7:#1F6FD1;--n9:#7A3FD1;--n11:#C2188B}
+/* a stripe of the number's colour on top of each map key, so colours read at a glance */
+.cnum .key.diat{background-image:linear-gradient(var(--nc),var(--nc));background-size:100% 5px;background-repeat:no-repeat;background-position:top}
+.cnum .key.diat[data-pc="0"]{--nc:var(--n0)}.cnum .key.diat[data-pc="2"]{--nc:var(--n2)}.cnum .key.diat[data-pc="4"]{--nc:var(--n4)}.cnum .key.diat[data-pc="5"]{--nc:var(--n5)}
+.cnum .key.home .big{color:var(--nc)}
+.cnum .key.diat[data-pc="7"]{--nc:var(--n7)}.cnum .key.diat[data-pc="9"]{--nc:var(--n9)}.cnum .key.diat[data-pc="11"]{--nc:var(--n11)}
 .cnum .key.diat[data-pc="0"],.cnum #circ .cn[data-p="0"] text,.cnum [data-pc="0"].singnum,.cnum .fnum[data-pc="0"]{color:var(--n0);fill:var(--n0)}
 .cnum .key.diat[data-pc="2"],.cnum #circ .cn[data-p="2"] text,.cnum [data-pc="2"].singnum,.cnum .fnum[data-pc="2"]{color:var(--n2);fill:var(--n2)}
 .cnum .key.diat[data-pc="4"],.cnum #circ .cn[data-p="4"] text,.cnum [data-pc="4"].singnum,.cnum .fnum[data-pc="4"]{color:var(--n4);fill:var(--n4)}
@@ -1182,7 +1188,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </section>
   <section class="screen" id="scr-about" hidden><div class="about">
     <div class="ab-head"><span class="ab-mark" id="ab-mark"></span><div><h2>Big Ears</h2><p>Ear training on the tonal map</p></div></div>
-    <div class="ab-card"><h3>What it is</h3><p>Big Ears teaches you to hear every note as a number from home, the 1, and to find it straight away on your instrument.</p><p>Hear it, sing it, play it: a few minutes a day, on a path of gigs across seven worlds.</p></div>
+    <div class="ab-card"><h3>What it is</h3><p>Big Ears teaches you to hear every note as a number from home, the 1, and to find it straight away on your instrument.</p><p>Hear it, sing it, play it: a few minutes a day, on a world tour of gigs across seven worlds.</p></div>
     <div class="ab-card"><h3>What's free</h3><p>Everything, while Big Ears is in early access.</p><p>Later, the tuner, rhythm, chord decoder, key finder, the guide and the first gigs stay free. The rest comes with a 7-day free trial, then €9.99 a year or €25.99 once.</p></div>
     <div class="ab-card"><h3>Your data</h3><p>Your progress, songs and settings stay on this phone. There's no account.</p><p>The microphone only listens while a game or the tuner is open, and the sound never leaves your phone.</p><p>If you turn on daily nudges, the nudge server keeps only an anonymous address for your phone, your reminder time and the days you practised.</p></div>
     <div class="ab-card"><h3>Tips</h3><p>Headphones help the mic hear only you.</p><p>Add Big Ears to your home screen: it works offline and can send nudges.</p></div>
@@ -1678,7 +1684,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
   </div>
   </div>
 
-  <nav class="bottomnav" id="bottomnav" aria-label="Sections"><button data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button><button data-s="path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span>Path</span></button><button data-s="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="17.8" cy="13.8" r=".9" fill="currentColor"/></svg><span>Games</span></button><button data-s="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9.7h18M3 14.3h18M9 5v14M15 5v14"/></svg><span>Tools</span></button><button data-s="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></nav>
+  <nav class="bottomnav" id="bottomnav" aria-label="Sections"><button data-s="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button><button data-s="path"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9M12 3c-2.6 2.6-3.9 5.6-3.9 9s1.3 6.4 3.9 9"/></svg><span>Tour</span></button><button data-s="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="17.8" cy="13.8" r=".9" fill="currentColor"/></svg><span>Games</span></button><button data-s="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9.7h18M3 14.3h18M9 5v14M15 5v14"/></svg><span>Tools</span></button><button data-s="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>More</span></button></nav>
 
   <div class="sheet" id="lvsheet" hidden role="dialog" aria-modal="true" aria-labelledby="lv-title">
     <div class="sheet-in">
@@ -4680,7 +4686,7 @@ function renderPath(){const nx=pathNext(),L=pathLevels(nx.h);
     return `<details class="ptour"${j===0?' open':''}><summary><span>${tourName(h)}<small class="pmode">${tourMode(h)}</small></span><small>${earned}/${L.length*3} rings</small></summary><div class="ptrack">${nodes}</div></details>`}).join('')}
 function renderPathCard(){const c=$('path-card');if(!c)return;const nx=pathNext(),L=pathLevels(nx.h);
   const tot=WORLDS.reduce((a,h)=>a+pathLevels(h).reduce((x,_,i)=>x+gigGems(h,i),0),0);
-  c.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span class="pc-txt"><span class="pc-k">Your path · ${tourName(nx.h)}</span><span class="pc-n">Next: <b>${lvName(nx.h,nx.i)}</b> ${digits(L[nx.i],nx.h)}</span><span class="pc-r">${gigTag(nx.i)} · ${tot} rings so far</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`}
+  c.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9M12 3c-2.6 2.6-3.9 5.6-3.9 9s1.3 6.4 3.9 9"/></svg><span class="pc-txt"><span class="pc-k">World tour · ${tourName(nx.h)}</span><span class="pc-n">Next: <b>${lvName(nx.h,nx.i)}</b> ${digits(L[nx.i],nx.h)}</span><span class="pc-r">${gigTag(nx.i)} · ${tot} rings so far</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`}
 $('path-card').addEventListener('click',()=>goScreen('path'));
 $('scr-path').addEventListener('click',e=>{const g=e.target.closest('.ph-go');if(g)return playGig(+g.dataset.h,+g.dataset.i);
   const n=e.target.closest('.pnode');if(!n)return;const h=+n.dataset.h,i=+n.dataset.i;if(!unlocked(h,i)){toast(`Earn a ring at ${lvName(h,i-1)} to book this gig`);return}playGig(h,i)});
@@ -4725,7 +4731,7 @@ function goScreen(sc,fromPop){
   document.body.dataset.screen=sc;
   ['home','games','tools','songs','path','more','profile','about','stats','guide','game'].forEach(k=>$('scr-'+k).hidden=k!==sc);
   const navOf=['profile','stats','guide','about'].includes(sc)?'more':sc;document.querySelectorAll('#bottomnav button').forEach(b=>{if(b.dataset.s===navOf)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'Your path',games:'Games',more:'More',profile:'Profile',about:'About',stats:'Stats',guide:'Guide'}[sc]||'';
+  $('screen-title').textContent={home:'',tools:'Tools',songs:'Songs',path:'World tour',games:'Games',more:'More',profile:'Profile',about:'About',stats:'Stats',guide:'Guide'}[sc]||'';
   if(sc==='path'&&typeof renderPath==='function')renderPath();if(sc==='profile'&&typeof renderProfile==='function')renderProfile();if(sc==='home'&&typeof renderPathCard==='function')renderPathCard();
   if(sc==='stats'){renderStats();renderRank()}if(sc==='home')renderHomeStats();if(sc!=='game'&&CHAL.on)chalStop();
   if(sc!=='game'){S.scr=sc;persist()}
