@@ -956,6 +956,10 @@ body.paused .circgo{opacity:.5}
 .kfask .skip{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13px;align-self:flex-start;padding:4px 0}
 .kfdone{font-size:14px;color:var(--muted);margin:0}
 .kfdone b{color:var(--home)}
+.kfhow{border-top:1px solid var(--line);padding-top:10px}
+.kfhow summary{cursor:pointer;font:600 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+.kfhow ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45}
+.kfhow .skip{display:inline;padding:0;margin-left:4px}
 .kffollow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .key.kfh{opacity:1}
 .key.kfh::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--kw,0) * 100%);background:var(--brass);opacity:.22;pointer-events:none}
@@ -3338,7 +3342,7 @@ $('dec-clear').addEventListener('click',()=>{$('dec-in').value='';DEC.frets=Arra
 var KF=null;
 const KK_MAJ=[6.35,2.23,3.48,2.33,4.38,4.09,2.52,5.19,2.39,3.66,2.29,2.88],KK_MIN=[6.33,2.68,3.52,5.38,2.60,3.53,2.54,4.75,3.98,2.69,3.34,3.17];
 const SC_MAJ=[0,2,4,5,7,9,11],SC_MIN=[0,2,3,5,7,8,10];
-function kfInit(){KF={drone:null,ms:new Set(),cells:new Set(),ev:[],g:0,w:Array(12).fill(0),max:0,yes:new Set(),no:new Set(),home:null,notHome:new Set(),q:null,skipped:new Set(),follow:true,prev:null,keep:false,shown:null,flash:null,tm:null,holdP:null,holdT:0,R:[]}}
+function kfInit(){KF={guess:null,reveal:false,drone:null,ms:new Set(),cells:new Set(),ev:[],g:0,w:Array(12).fill(0),max:0,yes:new Set(),no:new Set(),home:null,notHome:new Set(),q:null,skipped:new Set(),follow:true,prev:null,keep:false,shown:null,flash:null,tm:null,holdP:null,holdT:0,R:[]}}
 kfInit();
 const kfName=k=>`${NAMES[k.t]} ${k.mn?'minor':'major'}`;
 const kfKey1=k=>k.mn?(k.t+3)%12:k.t;
@@ -3369,11 +3373,12 @@ function kfQuestion(R){if(kfDistinct()<3||R.length<2)return null;const A=R[0],B=
   if(!onlyA.length&&KF.home===null&&B.pct>=10&&!KF.skipped.has('home:'+A.id+B.id))return {type:'home',key:'home:'+A.id+B.id,opts:[A.t,B.t],A,B};
   if(KF.home===null&&!KF.notHome.has(A.t)&&kfDistinct()>=4&&!KF.skipped.has('conf:'+A.t))return {type:'conf',key:'conf:'+A.t,opts:[A.t],A};
   return null}
+const kfGuessing=()=>S.kfGuess!==false&&!KF.reveal&&kfDistinct()>=3;
 function kfUpdate(){if(!KF)return;kfRecalc();const R=kfRank();KF.R=R;const best=R[0];
-  if(best&&kfDistinct()>=3){
+  if(best&&kfDistinct()>=3&&!kfGuessing()){
     if(KF.follow&&KF.shown!==best.id){const cur=R.find(r=>r.id===KF.shown);if(!cur||best.sc-cur.sc>0.02){KF.shown=best.id;kfApplyKey(best)}}
     else if(!KF.follow){const cur=R.find(r=>r.id===KF.shown);if(cur)kfApplyKey(cur)}}
-  if(!KF.q||!KF.q.keep)KF.q=kfQuestion(R);
+  if(kfGuessing())KF.q=null;else if(!KF.q||!KF.q.keep)KF.q=kfQuestion(R);
   kfRender();renderPad();renderFB()}
 function kfSoon(){if(KF.tm)return;KF.tm=setTimeout(()=>{KF.tm=null;kfUpdate()},220)}
 const kfPlayIcon='<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>';
@@ -3387,7 +3392,7 @@ function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
   // strip: twelve notes from the 1 of the key on the map
   $('kf-strip').innerHTML=Array.from({length:12},(_,d)=>{const ap=(S.key+d)%12,w=KF.w[ap],h=KF.max?Math.round(100*w/KF.max):0,inK=DIATONIC.includes(d);
     const cls=['c',w>0?(inK?'in':'out'):'',d===S.home?'home':'',KF.flash===ap?'flash':''].filter(Boolean).join(' ');
-    return `<div class="${cls}" title="${NAMES[ap]}: ${w?Math.round(w*10)/10:'not heard'}"><span class="bar"><i style="height:${h}%"></i></span><span class="nt">${NAMES[ap]}</span><span class="dg">${lab(d)}</span></div>`}).join('');
+    return `<div class="${cls}" title="${NAMES[ap]}: ${w?Math.round(w*10)/10:'not heard'}"><span class="bar"><i style="height:${h}%"></i></span><span class="nt">${NAMES[ap]}</span><span class="dg">${kfGuessing()?'·':lab(d)}</span></div>`}).join('');
   // question
   const q=KF.q;let a='';
   if(q){const opt=(p,i)=>`<span class="opt"><button data-kfa="${p}">${NAMES[p]}</button><button class="h" data-kfh="${i}" aria-label="Hear ${NAMES[p]}">${kfPlayIcon}</button>${q.type==='home'?`<button class="h dr" data-kfd="${p}" aria-pressed="${KF.drone===p}" aria-label="Drone on ${NAMES[p]}">${kfDroneIcon}</button>`:''}</span>`;
@@ -3398,15 +3403,54 @@ function kfRender(){if(!KF||!$('kf-out'))return;const R=KF.R,n=kfDistinct();
   // result
   let o='';
   if(n<3)o=`<p class="kfdone">${n?`${n} different note${n>1?'s':''} so far. `:''}Three or more different notes give a first guess; a whole riff or phrase gives a good one.</p>`;
+  else if(kfGuessing())o=kfGuessCard();
   else{const top=R.slice(0,4),best=R[0],settled=best.pct>=85&&KF.home===best.t;
     const outs=scl?KF.w.map((w,p)=>w>0&&!scl.includes(p)?p:null).filter(p=>p!==null):[];
     o=`<div class="kfbest"><div class="hd"><span class="nm">${kfName(best)}</span><span class="q">home ${best.mn?'6':'1'} · ${NAMES[kfKey1(best)]} = 1</span><span class="pc">${best.pct}%</span></div>`
       +(settled?`<p class="kfdone"><b>Settled.</b> The notes fit and you confirmed ${NAMES[best.t]} as home.</p>`:'')
       +(outs.length&&cur?`<p class="kfdone">Outside ${kfName(cur)}: ${outs.map(p=>`<b style="color:var(--bad)">${NAMES[p]}</b> (${lab((p-S.key+12)%12)})`).join(', ')}. ${outs.length===1?'One borrowed note is normal; a whole section of them can mean the key changes there.':'Several outside notes can mean a key change, or a section in another key.'}</p>`:'')
       +`<div class="kfcands">${top.map(k=>`<div class="kfcand"><button class="k" data-kfk="${k.id}" aria-pressed="${KF.shown===k.id}">${kfName(k)}<small>home ${k.mn?'6':'1'} · ${NAMES[kfKey1(k)]} = 1</small></button><span class="b"><i style="width:${k.pct}%"></i></span><span class="p">${k.pct}%</span><button class="play" data-kfp="${k.id}" aria-label="Hear a cadence in ${kfName(k)}">${kfPlayIcon}</button><button class="play dr" data-kfd="${k.t}" aria-pressed="${KF.drone===k.t}" aria-label="Drone on ${NAMES[k.t]}" title="Drone on ${NAMES[k.t]}">${kfDroneIcon}</button></div>`).join('')}</div>`
+      +(cur?kfHowTo(cur):'')
       +`<label class="kffollow"><input type="checkbox" id="kf-follow" ${KF.follow?'checked':''}> The map follows the best guess</label>`
+      +`<label class="kffollow"><input type="checkbox" id="kf-guessopt" ${S.kfGuess!==false?'checked':''}> Guess home myself before seeing the answer</label>`
       +`<div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn${KF.keep?'':' primary'}" id="kf-keep">${KF.keep?'Kept for every game':'Practise in '+(cur?kfName(cur):kfName(best))}</button></div></div>`}
   $('kf-out').innerHTML=o}
+// guess first: which note feels like home?
+function kfGuessCard(){const heard=KF.w.map((w,p)=>[p,w]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  const all=KF.allOpts?[...Array(12).keys()].map(i=>(heard[0]+i)%12):heard;
+  return `<div class="kfask"><span class="eb">Your turn first</span><p>Which note feels like <b>home</b>, the one the music rests on? Hum it, or try a drone under the song, then tap it.</p>
+    <div class="opts">${all.map(p=>`<span class="opt"><button data-kfg="${p}">${NAMES[p]}</button><button class="h dr" data-kfd="${p}" aria-pressed="${KF.drone===p}" aria-label="Drone on ${NAMES[p]}">${kfDroneIcon}</button></span>`).join('')}</div>
+    <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">${KF.allOpts?'':'<button class="skip" data-kfall="1">Home is a note I haven\'t played</button>'}<button class="skip" data-kfg="-1">Just show me</button></div></div>`}
+// how to arrive at the answer, step by step, for the key shown
+function kfHowTo(k){const scl=kfScale(k),k1=kfKey1(k),deg=p=>(p-k1+12)%12,L=p=>lab(deg(p));
+  const heard=KF.w.map((w,p)=>[p,w]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  const fit=heard.filter(([p])=>scl.includes(p)),outs=heard.filter(([p])=>!scl.includes(p));
+  const up=[0,2,4,5,7,9,11].map(i=>(k1+i)%12);           // the seven, from 1
+  const n=p=>`<b>${NAMES[p]}</b>`;
+  const h34=[up[2],up[3]],h71=[up[6],up[0]];
+  const home=k.t,rel=k.mn?k1:(k1+9)%12,hw=KF.w[home]||0,rw=KF.w[rel]||0,last=KF.ev.length?KF.ev[KF.ev.length-1].p:null;
+  const why=[];if(KF.home===home)why.push('you confirmed it');
+  if(hw>rw)why.push(`${NAMES[home]} came up more than ${NAMES[rel]} (${Math.round(hw)} to ${Math.round(rw)})`);
+  if(last===home)why.push(`the last note was ${NAMES[home]}`);
+  if(!why.length)why.push(`the note pattern leans that way, but it's close: try both drones`);
+  // staircase from the most-heard note that isn't home
+  const gs=KF.guess,st=gs!=null&&gs>=0&&gs!==home&&scl.includes(gs)?gs:(fit.find(([p])=>p!==home)||[])[0];let stair='';
+  if(st!=null){const hd=k.mn?9:0,ids=DIATONIC.map(d=>((d-hd)%12+12)%12).sort((a,b)=>a-b),sid=((deg(st)-hd)%12+12)%12,i=ids.indexOf(sid);
+    const down=ids.slice(0,i+1).reverse(),upw=[...ids.slice(i),12];const path=down.length<=upw.length?down:upw;KF.stair=path;
+    stair=`<li><b>Check it by ear: the invisible staircase.</b> Play ${n(st)} and walk ${path===down?'down':'up'} the map, one step at a time, until it feels like rest: ${path.map(id=>`<b>${labK(id)}</b>`).join(' → ')}. If you land on home, the answer holds. <button class="skip" data-kfstair="1">▶ Hear the walk</button></li>`}
+  const g=KF.guess;let verdict='';
+  if(g!=null&&g>=0){verdict=g===home?`<p class="kfdone"><b>Spot on.</b> You heard ${NAMES[g]} as home, and the notes agree. Here's how you could prove it:</p>`
+    :g===rel?`<p class="kfdone"><b>Close.</b> You picked ${NAMES[g]}: the other home of the same seven notes (${k.mn?'1, the major home':'6, the minor home'}). Step 3 shows what tips it to ${NAMES[home]}; trust your drone test over the numbers.</p>`
+    :scl.includes(g)?`<p class="kfdone">You picked ${NAMES[g]}, which is <b>${L(g)}</b> in ${kfName(k)}: in the key, but not where it rests. ${L(g)==='5'?'5 is the most stable note after home, an easy one to mistake for it.':L(g)==='3'?'3 is part of the home chord, so it feels settled too.':'Walk the staircase from it in step 4 and hear where it lands.'}</p>`
+    :`<p class="kfdone">You picked ${NAMES[g]}, which isn't one of the seven notes that fit. Hold its drone under the song and listen for the clash.</p>`}
+  return `<details class="kfhow" open><summary>How to get there</summary>${verdict}<ol>
+    <li><b>Collect the notes.</b> You played ${heard.length} different notes: ${heard.map(([p])=>NAMES[p]).join(' ')}${heard.length>4?' (most played first)':''}.</li>
+    <li><b>Find the seven that fit.</b> ${fit.length} of them belong to one set of seven: ${up.map(p=>KF.w[p]>0?n(p):NAMES[p]).join(' ')}${fit.length<7?' (the plain ones you haven\'t played yet)':''}. On the map the only half steps are 3–4 and 7–1; here they fall at ${n(h71[0])}–${n(h71[1])} and ${n(h34[0])}–${n(h34[1])}. Above ${NAMES[h34[1]]} come three whole steps before the next half step, so it's 4; above ${NAMES[h71[1]]} only two, so it's <b>1</b>.</li>
+    <li><b>Pick the home.</b> The same seven notes have two homes: ${n(k1)} (1, major) and ${n((k1+9)%12)} (6, minor). It's ${n(home)}${k.mn?' (6)':' (1)'}: ${why.join('; ')}.</li>
+    ${stair}
+    ${outs.length?`<li><b>Outside notes.</b> ${outs.map(([p])=>`${n(p)} is ${L(p)}`).join(', ')}: borrowed for colour. One or two don't change the key.</li>`:''}</ol></details>`}
+function kfPlayStair(){const path=KF.stair;if(!path)return;stopAll();ensure();const t=ctx.currentTime+0.05;
+  path.forEach((id,i)=>{pluck(H()+id,t+i*0.5,i===path.length-1?1.6:0.9,0.5);lightAt(i*500,id)});unlightAt(path.length*500+400)}
 // adding notes
 function kfAdd(ps,w=1,src='tap',ms,cs){if(!ps.length)return;KF.g++;ps.forEach((p,i)=>KF.ev.push({p:((p%12)+12)%12,w,src,g:KF.g,m:ms?ms[i]:null,c:cs?cs[i]:null}));
   const last=ps[ps.length-1];KF.flash=((last%12)+12)%12;setTimeout(()=>{if(KF.flash===((last%12)+12)%12){KF.flash=null;kfRender()}},450);kfUpdate()}
@@ -3473,6 +3517,10 @@ $('panel-key').addEventListener('click',e=>{const t=e.target.closest('button,inp
   if(d.kfk){const k=KF.R.find(r=>r.id===d.kfk);if(!k)return;KF.follow=false;KF.shown=k.id;kfApplyKey(k);return kfUpdate()}
   if(d.kfp){const k=KF.R.find(r=>r.id===d.kfp);if(k)kfHearKey(k);return}
   if(d.kfd!==undefined)return kfDroneToggle(Number(d.kfd));
+  if(d.kfg!==undefined){const g=Number(d.kfg);KF.guess=g;KF.reveal=true;KF.allOpts=false;kfDroneOff();return kfUpdate()}
+  if(d.kfall){KF.allOpts=true;return kfRender()}
+  if(d.kfstair)return kfPlayStair();
+  if(t.id==='kf-guessopt'){S.kfGuess=t.checked;persist();return kfRender()}
   if(t.id==='kf-follow'){KF.follow=t.checked;if(KF.follow)KF.shown=null;return kfUpdate()}
   if(t.id==='kf-keep'){const k=KF.R.find(r=>r.id===KF.shown)||KF.R[0];if(!k)return;kfApplyKey(k);KF.keep=true;persist();toast(`Every game now uses ${kfName(k)}`);kfRender()}});
 
