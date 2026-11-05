@@ -1009,6 +1009,7 @@ body.paused .circgo{opacity:.5}
 .deckey{font-size:13px;color:var(--muted);padding:2px 0 8px;border-bottom:1px solid var(--line)}
 .deckey b{color:var(--home);font-weight:600}
 .deckeyb{margin:2px 0;font-family:var(--font-body)}
+.deckeysel{min-height:30px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:2px 10px;font-size:13px;margin:2px 0}
 .decstep summary{cursor:pointer;font:600 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brass);display:flex;align-items:center;gap:8px}
 .decstep summary b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--brass);color:var(--on-brass);font-size:12px}
 .decstep ol{margin:10px 0 6px;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5}
@@ -3031,7 +3032,7 @@ function applyDock(){const t=S.tab;
   }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(S.tab==='dec'||S.tab==='key')S.toolNeck=S.toolNeck===false;else S.showNeck=!S.showNeck;persist();applyDock();renderFB();renderCirc()});
-function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
+function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(S.tab==='dec'&&t!=='dec'&&typeof DEC!=='undefined'&&DEC.prev){S.key=DEC.prev.key;S.home=DEC.prev.home;DEC.prev=null;if(gameReady){syncSettings();renderPad()}}if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
   ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
@@ -3282,7 +3283,7 @@ const STAGE_NEXT={full:'mini',mini:'none',none:'full'},STAGE_LAB={full:'Panel',m
 function markStages(){document.querySelectorAll('.games .stage').forEach(st=>{const pb=st.querySelector('.btn.primary'),row=pb&&pb.closest('.actions');
   st.querySelectorAll('.primary-row').forEach(x=>x.classList.remove('primary-row'));
   if(row&&!['panel-today','panel-cc','panel-songs','panel-anc'].includes(st.id)){row.classList.add('primary-row');st.classList.remove('nomini')}else st.classList.add('nomini')})}
-function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat'||S.tab==='key';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel','sing'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
+function applyStage(){if(!gameReady)return;document.querySelector('.ctxrow').hidden=S.tab==='tune'||S.tab==='beat'||S.tab==='key'||S.tab==='dec';$('pace-pill').hidden=!['deg','chord','phr','prog','find','vox','duel'].includes(S.tab);$('lvl-btn').hidden=!['deg','chord','phr','prog','find','duel','sing'].includes(S.tab);document.body.dataset.stage='full';document.body.dataset.fit=FIT_TABS.includes(S.tab)?'1':'0';$('stage-mode').hidden=!FIT_TABS.includes(S.tab)&&!(TOURS&&TOURS[S.tab]);syncCsize()}
 $('stage-mode').addEventListener('click',openOpts);
 
 $('pace').value=String(S.pace);$('pace').addEventListener('change',e=>{S.pace=Number(e.target.value);AUTOF=1;persist()});
@@ -3532,15 +3533,21 @@ function csSteps(c,set){const R=c.root,nm=(i,deg)=>csSpell(R,i,deg),b=x=>`<b>${x
   return L}
 // step 2: the same chord as numbers in the key, and its relatives
 const csHomeNote=()=>NAMES[(S.key+S.home)%12];
-function csKeyLine(){return `<div class="deckey">Key: <b>${homeName()}</b>, so <b>${csHomeNote()} = ${lab(S.home)}</b>. Every number is counted from ${csHomeNote()}.</div>`}
+function csKeyLine(c,set){const fits=c?csFits(c,set):[],gk=DEC.prev||{key:S.key,home:S.home},gname=`${NAMES[(gk.key+gk.home)%12]} ${WORLD[gk.home][1]}`;
+  const chips=[...fits.slice(0,4).map(x=>`<button class="chip deckeyb" data-k="${x.k}" data-h="${x.home}" aria-pressed="${!!S.decKey&&S.decKey.k===x.k&&S.decKey.h===x.home}">${x.label}</button>`),
+    `<button class="chip deckeyb" data-k="${gk.key}" data-h="${gk.home}" aria-pressed="${!!S.decKey&&S.decKey.k===gk.key&&S.decKey.h===gk.home}">${gname} (games)</button>`];
+  const all=`<select class="deckeysel" aria-label="Pick the song's key"><option value="">Other key…</option>${[0,9].map(h=>NAMES.map((n,k)=>`<option value="${(k-h+12)%12},${h}">${n} ${h?'minor':'major'}</option>`).join('')).join('')}</select>`;
+  return S.decKey?`<div class="deckey">Key: <b>${homeName()}</b>, so <b>${csHomeNote()} = ${lab(S.home)}</b>. Every number is counted from ${csHomeNote()}. <button class="chip deckeyb" data-k="root">Don't know the key</button></div>`
+    :`<div class="deckey">No key set, so the chord's root is <b>${c?NAMES[c.root]:''} = 1</b>. Know the song's key? ${chips.join(' ')} ${all}</div>`}
 // every key whose seven notes hold the whole chord, named from the chord's point of view
 function csFits(c,set){const out=[];for(let k=0;k<12;k++){const sc=DIATONIC.map(d=>(k+d)%12);if(![...set].every(p=>sc.includes(p)))continue;
   const d=((c.root-k)%12+12)%12,minor=d===9,home=minor?9:0;out.push({k,home,label:`${NAMES[(k+home)%12]} ${minor?'minor':'major'}`,num:DEG[d].n+(/^\d/.test(c.sym)?`(${c.sym})`:c.sym)})}
   return out.sort((a,b)=>(b.home===9&&b.k===(c.root+3)%12)-(a.home===9&&a.k===(c.root+3)%12)||(a.k===c.root?-1:0))}
-function csKey(c,set){const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...set].map(degOfPc);
+function csKey(c,set){if(!S.decKey){const f=csFits(c,set);return [`With no key, every number counts from ${NAMES[c.root]} (= 1), so the chord's own shape shows: ${[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12)).map(p=>`<b>${csNumOf(c,p)}</b>`).join(' ')}.`,f.length?`It fits these keys with no outside notes: ${f.slice(0,4).map(x=>`<b>${x.label}</b> (the ${x.num})`).join(', ')}. If you know which one the song is in, pick it above.`:`No key holds all of its notes, so it borrows from outside whatever key it's in.`,`Not sure of the key? The Key finder works it out from a few notes of the song.`]}
+  const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...set].map(degOfPc);
   const outs=degs.filter(x=>!DIATONIC.includes(x)),order=[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12));
   const N=x=>csNumOf(c,(x+S.key)%12);
-  L.push(`Counting from ${b(csHomeNote()+' = '+lab(S.home))} (your key, ${homeName()}): ${NAMES[c.root]} is ${b(csNumOf(c,c.root))}, so this is the ${b(csMap(c))} chord. Its notes are ${order.map(p=>b(csNumOf(c,p))).join(' ')}.`);
+  L.push(`Counting from ${b(csHomeNote()+' = '+lab(S.home))} (the key you picked, ${homeName()}): ${NAMES[c.root]} is ${b(csNumOf(c,c.root))}, so this is the ${b(csMap(c))} chord. Its notes are ${order.map(p=>b(csNumOf(c,p))).join(' ')}.`);
   const vch=VCH.find(v=>v[0]===d);
   if(!outs.length){const extra=degs.filter(x=>vch&&!vch[2].includes(x));
     L.push(`Every note is in the key. ${vch?`Underneath, it's the ${b(vch[1])} chord${extra.length?`, with ${extra.map(N).join(' and ')} added`:''}.`:''}`)}
@@ -3551,7 +3558,7 @@ function csKey(c,set){const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...s
     if(c.third==='M'&&c.fifth!=='d'&&(c.sev==='b7'||!c.sev)&&tv&&tg!==d&&(![0,5,7].includes(d)||c.sev==='b7'))L.push(`It's the 5 of ${b(tv[1])}: a major chord a 5th above ${tv[1]}, so it pulls there. Play it, then ${tv[1]}.`);
     else if(c.third==='M'&&[3,8,10].includes(d))L.push(`Borrowed from the minor key: ♭3, ♭6 and ♭7 chords are darker shades of the same home.`);
     else if(c.third==='m'&&d===5)L.push(`The 4 chord made minor (4m), borrowed from minor: a sad turn on the way back to 1.`)}
-  if(outs.length){const f=csFits(c,set);if(f.length)L.push(`It fits these keys with no outside notes: ${f.slice(0,4).map(x=>`<button class="chip deckeyb" data-k="${x.k}" data-h="${x.home}">${x.label}: ${x.num}</button>`).join(' ')}. Tap one to count from there instead.`)}
+  if(outs.length){const f=csFits(c,set);if(f.length)L.push(`It fits these keys with no outside notes: ${f.slice(0,4).map(x=>`<b>${x.label}</b> (the ${x.num})`).join(', ')}. Pick one above to count from there.`)}
   const rel=VCH.filter(v=>v[0]!==d||outs.length).map(v=>[v,v[2].filter(t=>degs.includes(t))]).filter(([v,sh])=>sh.length>=2).sort((a,b2)=>b2[1].length-a[1].length);
   if(rel.length)L.push(`Close relatives in the key: ${rel.slice(0,3).map(([v,sh])=>`${b(v[1])} (shares ${sh.map(t=>DEG[t].n).join(', ')})`).join(', ')}.`);
   return L}
@@ -3561,20 +3568,21 @@ function decode(){const mode='auto',inp=parseInput($('dec-in').value,mode);
   if(inp.src!=='tab'){DEC.frets=Array(OPEN.length).fill(null)}else DEC.frets=inp.frets;
   DEC.src=inp.src;const cands=identify(inp.pcs,inp.bass),best=cands[0];DEC.res={inp,best,cands};
   const csAll=csName(inp.pcs,inp.bass);let cs=csAll[0];if(inp.root!=null){const pr=(inp.over&&csAll.find(c=>c.root===inp.root&&c.over))||csAll.find(c=>c.root===inp.root&&!c.over)||csAll.find(c=>c.root===inp.root);if(pr)cs=pr}const csSet=new Set(inp.pcs);
+  if(!DEC.prev)DEC.prev={key:S.key,home:S.home};{const k=S.decKey?S.decKey.k:cs.root,h=S.decKey?S.decKey.h:0;if(S.key!==k||S.home!==h){S.key=k;S.home=h;syncSettings();warmCache()}}
   const uniq=[];inp.pcs.forEach(p=>{if(!uniq.includes(p))uniq.push(p)});
   const order=cs&&uniq.length>1?uniq.slice().sort((a,b)=>((a-cs.root+12)%12)-((b-cs.root+12)%12)):uniq;
   const degs=order.map(degOfPc),outs=degs.filter(d=>!DIATONIC.includes(d));
   let head='',notes='',cells='';
   if(uniq.length===1){head=`<div class="dechead"><span class="nm">${nameOfPc(uniq[0])}</span><span class="q">a single note</span><div class="mp"><b>${DEG[degs[0]].n}</b><span>in ${homeName()}</span></div></div>`}
-  else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>in ${homeName()}</span></div></div>`}
+  else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>${S.decKey?'in '+homeName():NAMES[cs.root]+' = 1'}</span></div></div>`}
   else head=`<div class="dechead"><span class="nm">?</span><span class="q">no common chord name for these notes</span></div>`;
   cells=`<div class="dectab" style="--n:${order.length}"><span class="h">Note</span>${order.map(p=>`<span class="nt">${nameOfPc(p)}</span>`).join('')}
-    <span class="h">From ${csHomeNote()}</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${cs&&uniq.length>1?csNumOf(cs,p):DEG[d].n}</span>`}).join('')}
-    ${cs&&uniq.length>1?`<span class="h">From ${NAMES[cs.root]}</span>${order.map(p=>{const i=(p-cs.root+12)%12;return `<span class="rl${i===0?' root':''}">${cs.role[i]||''}</span>`}).join('')}`:''}</div>`;
+    <span class="h">${csHomeNote()} = ${lab(S.home)}</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${!S.decKey||DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${cs&&uniq.length>1?csNumOf(cs,p):DEG[d].n}</span>`}).join('')}
+    ${cs&&uniq.length>1?`<span class="h">In the name</span>${order.map(p=>{const i=(p-cs.root+12)%12;return `<span class="rl${i===0?' root':''}">${cs.role[i]||''}</span>`}).join('')}`:''}</div>`;
   if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
     notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
     notes+=`<details class="decstep" open><summary><b>2</b> In the key</summary><ol>${csKey(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol></details>`}
-  $('dec-out').innerHTML=`<div class="decres">${csKeyLine()}${head}${cells}${notes}</div>`;$('dec-acts').hidden=false;
+  $('dec-out').innerHTML=`<div class="decres">${csKeyLine(cs,csSet)}${head}${cells}${notes}</div>`;$('dec-acts').hidden=false;
   const tones=order.map(degOfPc);DEC.cur=cs&&uniq.length>1?{root:degOfPc(cs.root),tones,name:csMap(cs),tok:-1}:uniq.length?{root:degs[0],tones:degs,name:DEG[degs[0]].n,tok:-1}:null;
   if(!chordNow||chordNow.tok===-1)chordNow=DEC.cur;
   cellMarks={};if(inp.src==='tab')DEC.frets.forEach((f,s)=>{if(f!==null)cellMarks[s+'-'+f]='ok'});
@@ -3592,7 +3600,8 @@ function decFret(s,f){DEC.frets[s]=DEC.frets[s]===f?null:f;
 $('dec-go').addEventListener('click',decode);
 $('dec-in').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();decode();const ms=decMidis();if(ms.length){stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}}});
 $('dec-in').addEventListener('input',()=>{clearTimeout(DEC.tm);DEC.tm=setTimeout(decode,450)});
-$('dec-out').addEventListener('click',e=>{const kb=e.target.closest('.deckeyb');if(kb){S.key=+kb.dataset.k;S.home=+kb.dataset.h;resetKeyContext();setTimeout(decode,0);return}const b=e.target.closest('.decname');if(!b)return;$('dec-in').value=b.dataset.x;decode()});
+$('dec-out').addEventListener('change',e=>{const sel=e.target.closest('.deckeysel');if(!sel||!sel.value)return;const [k,h]=sel.value.split(',').map(Number);S.decKey={k,h};persist();decode()});
+$('dec-out').addEventListener('click',e=>{const kb=e.target.closest('.deckeyb');if(kb){S.decKey=kb.dataset.k==='root'?null:{k:+kb.dataset.k,h:+kb.dataset.h};persist();decode();return}const b=e.target.closest('.decname');if(!b)return;$('dec-in').value=b.dataset.x;decode()});
 document.querySelector('.decex').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('dec-in').value=b.dataset.x;decode();const ms=decMidis();if(ms.length){stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}});
 $('dec-play').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.035,2.4,0.42))});
 $('dec-arp').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>{pluck(m,t+i*0.45,1.2,0.48);lightAt(i*450,keyFor(m))});unlightAt(ms.length*450+300)});
