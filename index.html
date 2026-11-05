@@ -3499,7 +3499,12 @@ function csParse(str){const m=str.trim().match(/^([A-Ga-g])([#♯b♭]?)(.*?)(?:
 // spell a chord note by letters, the way it's written: the 3rd of E is G♯, not A♭
 function csSpell(root,i,deg){const Lt='CDEFGAB',nat=[0,2,4,5,7,9,11],li=Lt.indexOf(NAMES[root][0]),tl=(li+deg-1)%7,pc=(root+i)%12,d=((pc-nat[tl]+18)%12)-6;
   return Lt[tl]+({0:'',1:'♯',[-1]:'♭',2:'𝄪',[-2]:'𝄫'}[d]??'')}
-const csMap=c=>{const n=DEG[degOfPc(c.root)].n;return /^\d/.test(c.sym)?`${n}(${c.sym})`:n+c.sym};
+const CS_DEG={root:1,'♭3':3,'3':3,'4':4,'2':2,'5':5,'♭5':5,'♯5':5,'6':6,'♭6':6,'♭7':7,'7':7,'°7':7,'9':9,'♭9':9,'♯9':9,'11':11,'♯11':11,'13':13,'♭13':13};
+function csLetters(c){const m={};Object.entries(c.role).forEach(([i,r])=>{m[(c.root+ +i)%12]=csSpell(c.root,+i,CS_DEG[r]||1)});return m}
+function csNum(name,pc){const L='CDEFGAB',dn=(L.indexOf(name[0])-L.indexOf(NAMES[S.key][0])+7)%7,a=csSemi((S.key+DIATONIC[dn])%12,pc);
+  return (a<0?'♭'.repeat(-a):'♯'.repeat(a))+(dn+1)}
+const csNumOf=(c,pc)=>csNum(csLetters(c)[pc]||NAMES[pc],pc);
+const csMap=c=>{const n=csNumOf(c,c.root);return /^\d/.test(c.sym)?`${n}(${c.sym})`:n+c.sym};
 // step 1: how the chord is built, on its own
 function csSteps(c,set){const R=c.root,nm=(i,deg)=>csSpell(R,i,deg),b=x=>`<b>${x}</b>`,L=[];
   const has=i=>set.has((R+i)%12);
@@ -3525,12 +3530,13 @@ function csSteps(c,set){const R=c.root,nm=(i,deg)=>csSpell(R,i,deg),b=x=>`<b>${x
 // step 2: the same chord as numbers in the key, and its relatives
 function csKey(c,set){const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...set].map(degOfPc);
   const outs=degs.filter(x=>!DIATONIC.includes(x)),order=[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12));
-  L.push(`In ${homeName()} its notes are ${order.map(p=>b(DEG[degOfPc(p)].n)).join(' ')}: the ${b(csMap(c))} chord.`);
+  const N=x=>csNumOf(c,(x+S.key)%12);
+  L.push(`In ${homeName()} its notes are ${order.map(p=>b(csNumOf(c,p))).join(' ')}: the ${b(csMap(c))} chord.`);
   const vch=VCH.find(v=>v[0]===d);
   if(!outs.length){const extra=degs.filter(x=>vch&&!vch[2].includes(x));
-    L.push(`Every note is in the key. ${vch?`Underneath, it's the ${b(vch[1])} chord${extra.length?`, with ${extra.map(x=>DEG[x].n).join(' and ')} added`:''}.`:''}`)}
-  else{L.push(`Outside the key: ${outs.map(x=>b(DEG[x].n)).join(', ')}.`);
-    if(vch){const ch=vch[2].filter(t=>!degs.includes(t)).map(t=>{const n=degs.find(x=>!vch[2].includes(x)&&Math.abs(csSemi(t,x))===1);return n!=null?`${DEG[t].n} → ${DEG[n].n}`:null}).filter(Boolean);
+    L.push(`Every note is in the key. ${vch?`Underneath, it's the ${b(vch[1])} chord${extra.length?`, with ${extra.map(N).join(' and ')} added`:''}.`:''}`)}
+  else{L.push(`Outside the key: ${outs.map(x=>b(N(x))).join(', ')}.`);
+    if(vch){const ch=vch[2].filter(t=>!degs.includes(t)).map(t=>{const n=degs.find(x=>!vch[2].includes(x)&&Math.abs(csSemi(t,x))===1);return n!=null?`${DEG[t].n} → ${N(n)}`:null}).filter(Boolean);
       if(ch.length)L.push(`It's the key's ${vch[1]} chord with ${ch.join(', ')}.`)}
     const tg=(d+5)%12,tv=VCH.find(v=>v[0]===tg);
     if(c.third==='M'&&c.fifth!=='d'&&(c.sev==='b7'||!c.sev)&&tv&&tg!==d&&(![0,5,7].includes(d)||c.sev==='b7'))L.push(`It's the 5 of ${b(tv[1])}: a major chord a 5th above ${tv[1]}, so it pulls there. Play it, then ${tv[1]}.`);
@@ -3553,7 +3559,7 @@ function decode(){const mode='auto',inp=parseInput($('dec-in').value,mode);
   else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>in ${homeName()}</span></div></div>`}
   else head=`<div class="dechead"><span class="nm">?</span><span class="q">no common chord name for these notes</span></div>`;
   cells=`<div class="dectab" style="--n:${order.length}"><span class="h">Note</span>${order.map(p=>`<span class="nt">${nameOfPc(p)}</span>`).join('')}
-    <span class="h">Number</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${DEG[d].n}</span>`}).join('')}
+    <span class="h">Number</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${cs&&uniq.length>1?csNumOf(cs,p):DEG[d].n}</span>`}).join('')}
     ${cs&&uniq.length>1?`<span class="h">In the chord</span>${order.map(p=>{const i=(p-cs.root+12)%12;return `<span class="rl${i===0?' root':''}">${cs.role[i]||''}</span>`}).join('')}`:''}</div>`;
   if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
     notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
