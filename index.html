@@ -1004,7 +1004,12 @@ body.paused .circgo{opacity:.5}
 .decnote{margin:0;font-size:14px}
 .decnote b{color:var(--fg)}
 .decnote.warn{color:var(--bad)}
-.decalt{font-size:13px;color:var(--muted);margin:0}
+.decalt{font-size:13px;color:var(--muted);margin:0;line-height:1.9}
+.decstep{border-top:1px solid var(--line);padding-top:12px}
+.decstep summary{cursor:pointer;font:600 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--brass);display:flex;align-items:center;gap:8px}
+.decstep summary b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--brass);color:var(--on-brass);font-size:12px}
+.decstep ol{margin:10px 0 6px;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5}
+.decname{margin:2px 0}
 
 /* ===== Lean game screens ===== */
 .stage.fit .xtra{display:none!important}
@@ -3385,7 +3390,7 @@ function parseInput(str,mode){str=str.trim();if(!str)return null;
   const tryTab=()=>{const f=parseTab(str);if(!f)return null;const ms=[];f.forEach((x,s)=>{if(x!==null)ms.push(OPEN[s]+x)});ms.sort((a,b)=>a-b);return {src:'tab',frets:f,pcs:ms.map(m=>m%12),bass:ms[0]%12,ms}};
   const tryNotes=()=>{const pcs=toks.map(parseNote);if(pcs.some(x=>x===null))return null;return {src:'notes',pcs,bass:pcs[0]}};
   const tryNums=()=>{const pcs=toks.map(t=>{const m=t.match(/^([#♯b♭]?)([1-7])$/);return m?(S.key+DIATONIC[Number(m[2])-1]+accOf(m[1])+12)%12:null});if(pcs.some(x=>x===null))return null;return {src:'nums',pcs,bass:pcs[0]}};
-  const tryName=()=>{if(toks.length!==1)return null;const m=str.match(/^([A-G])([#♯b♭]?)([^/]*)(?:\/([A-G][#♯b♭]?))?$/);if(!m)return null;
+  const tryName=()=>{const cp=(toks.length===1||/[(]/.test(str))&&csParse(str);if(cp)return {src:'name',pcs:cp.pcs,bass:cp.bass,root:cp.root,over:cp.over,typed:str};if(toks.length!==1)return null;const m=str.match(/^([A-G])([#♯b♭]?)([^/]*)(?:\/([A-G][#♯b♭]?))?$/);if(!m)return null;
     let suf=m[3].trim();let key=SUFFIX[suf]!==undefined?suf:SUFFIX[suf.toLowerCase()]!==undefined?suf.toLowerCase():null;if(key===null)return null;
     const t=TPL.find(x=>x[0]===SUFFIX[key]);const root=(LET[m[1]]+accOf(m[2])+12)%12;const pcs=t[1].map(i=>(root+i)%12);
     const bass=m[4]?parseNote(m[4]):root;if(bass!==null&&!pcs.includes(bass))pcs.unshift(bass);return {src:'name',pcs,bass,typed:str}};
@@ -3407,28 +3412,154 @@ function identify(pcsIn,bass){const set=[...new Set(pcsIn)];if(!set.length)retur
 const chordLetters=(r,b)=>nameOfPc(r.root)+r.suf+(b!==r.root?'/'+nameOfPc(b):'');
 function mapName(r){const d=degOfPc(r.root),n=DEG[d].n;const suf={'':'',m:'m','°':'°','+':'+','7':'(7)','maj7':'maj7','m7':'m7','m7♭5':'ø','°7':'°7'}[r.suf];return n+(suf!==undefined?suf:r.suf)}
 function inversionText(r,b){const i=(b-r.root+12)%12;if(i===0)return 'root position';if(i===3||i===4)return '1st inversion: the 3rd is in the bass';if(i===7||i===6||i===8)return '2nd inversion: the 5th is in the bass';if(i===10||i===11||i===9)return '3rd inversion: the 7th is in the bass';return `${nameOfPc(b)} in the bass`}
+const csSemi=(a,b)=>{const d=((b-a)%12+12)%12;return d>6?d-12:d};
+/* ---------- chord symbols: read any symbol, name any set of notes, explain how it's built ---------- */
+// name the notes from one root, the way chord symbols are built: triad, then the 7th, then 9 11 13 stacked or added,
+// alterations in brackets, omitted notes, and a slash for the bass
+function csAnalyse(root,set,bass){
+  const iv=new Set([...set].map(p=>(p-root+12)%12));iv.delete(0);
+  const has=x=>iv.has(x),used=new Set(),role={0:'root'},alts=[],ext=[];const take=(x,r)=>{used.add(x);role[x]=r};
+  let third=null,sus=null,fifth=null,sev=null;
+  if(has(4)){third='M';take(4,'3')}else if(has(3)){third='m';take(3,'♭3')}
+  if(!third){if(has(5)){sus='4';take(5,'4')}else if(has(2)){sus='2';take(2,'2')}}
+  if(has(7)){fifth='P';take(7,'5')}
+  else if(third==='m'&&has(6)){fifth='d';take(6,'♭5')}
+  else if(third==='M'&&has(8)){fifth='a';take(8,'♯5')}
+  if(has(10)){sev='b7';take(10,'♭7')}else if(has(11)){sev='M7';take(11,'7')}
+  else if(fifth==='d'&&has(9)){sev='d7';take(9,'°7')}
+  if(has(2)&&!used.has(2)){take(2,'9');ext.push(9)}
+  if(has(1)){take(1,'♭9');alts.push(sev?'♭9':'add♭9')}
+  if(has(3)&&!used.has(3)){take(3,'♯9');alts.push('♯9')}
+  if(has(5)&&!used.has(5)){take(5,'11');ext.push(11)}
+  if(has(6)&&!used.has(6)){take(6,'♯11');alts.push(sev?'♯11':'add♯11')}
+  if(has(8)&&!used.has(8)){take(8,sev?'♭13':'♭6');alts.push(sev?'♭13':'add♭6')}
+  if(has(9)&&!used.has(9)){take(9,sev?'13':'6');ext.push(sev?13:6)}
+  if(has(11)&&!used.has(11)){take(11,'7');}
+  let sym='',pen=0;const minor=third==='m',adds=[],omits=[];
+  const power=!third&&!sus&&fifth==='P'&&!sev&&!ext.length&&!alts.length;
+  if(power)sym='5';
+  else if(fifth==='d'&&minor){sym=sev==='d7'?'°7':sev==='b7'?'m7♭5':sev==='M7'?'°(maj7)':'°';pen+=0.2}
+  else if(fifth==='a'&&!sev){sym='+';pen+=0.2}
+  else{
+    if(sev){const top=ext.includes(13)?13:ext.includes(11)&&ext.includes(9)?11:ext.includes(9)?9:7;
+      sym=sev==='M7'?(minor?`m(maj${top})`:`maj${top}`):(minor?'m':'')+top;
+      if(ext.includes(11)&&top<11)adds.push('add11');if(fifth==='a')alts.unshift('♯5')}
+    else{sym=minor?'m':'';
+      if(ext.includes(6)&&ext.includes(9))sym+='6/9';else if(ext.includes(6))sym+='6';else if(ext.includes(9))adds.push('add9');
+      if(ext.includes(11))adds.push('add11')}
+    if(sus)sym+='sus'+sus}
+  if(!fifth&&!power&&(sev||ext.length||alts.length||third))omits.push('no5');
+  if(!third&&!sus&&!power)omits.push('no3');
+  const brk=[...alts,...adds,...omits];
+  pen+=alts.length*(sev==='b7'&&third==='M'?0.4:0.8)+adds.length*0.6+(omits.includes('no3')?1.6:0)+(omits.includes('no5')?0.4:0)+(sus?0.4:0)+ext.length*0.1;
+  const inChord=set.has(bass);if(bass!==root)pen+=0.6;
+  const name=NAMES[root]+sym+(brk.length?`(${brk.join(' ')})`:'')+(bass!==root?'/'+NAMES[bass]:'');
+  return {root,bass,name,sym,third,sus,fifth,sev,ext,alts,adds,omits,role,pen,power}}
+function csName(pcs,bass){const set=new Set(pcs),out=[];
+  set.forEach(r=>out.push(csAnalyse(r,set,bass)));
+  // the bass may sit under a chord it isn't part of: G/A, E♭add9/C
+  if(set.size>=4){const up=new Set([...set].filter(p=>p!==bass));up.forEach(r=>{const a=csAnalyse(r,up,r);
+    const b={...a,bass,name:a.name+'/'+NAMES[bass],pen:a.pen+1.1,over:true};out.push(b)})}
+  const seen=new Set();return out.sort((a,b)=>a.pen-b.pen).filter(c=>!seen.has(c.name)&&seen.add(c.name))}
+// sensible other names: close in simplicity, no missing 3rd, no sus without its 5th
+function csAlts(list,best){return list.filter(c=>c!==best&&c.pen<=best.pen+1.3&&c.pen<2.2&&!c.omits.includes('no3')&&!(c.sus&&c.omits.includes('no5'))).slice(0,3)}
+// read a chord symbol the way the video lists them
+function csParse(str){const m=str.trim().match(/^([A-Ga-g])([#♯b♭]?)(.*?)(?:\/([A-Ga-g][#♯b♭]?))?$/);if(!m)return null;
+  const root=(LET[m[1].toUpperCase()]+accOf(m[2])+12)%12;let s=m[3].replace(/\s+/g,'').replace(/[()]/g,' ').replace(/♭/g,'b').replace(/♯/g,'#');
+  const iv=new Set([0]);let third=4,fifth=7,sev=null,quality='';const add=x=>iv.add(((x%12)+12)%12),rm=x=>{iv.delete(x)};
+  const eat=re=>{s=s.replace(/^\s+/,'');const r=s.match(re);if(r){s=(s.slice(0,r.index)+' '+s.slice(r.index+r[0].length)).replace(/^\s+/,'');return r}return null};
+  if(eat(/^(maj|ma|M|Δ)(?![a-z])/)){quality='maj'}
+  if(!quality&&eat(/^(maj|ma|M|Δ)(?=\d)/))quality='maj';
+  if(eat(/^(mM|m\s*maj|min\s*maj|-maj|mΔ|-Δ)/)){third=3;quality='mmaj'}
+  else if(eat(/^(min|m|-)(?!aj)/))third=3;
+  else if(eat(/^(dim|°|o)(?![a-z])/)){third=3;fifth=6;quality='dim'}
+  else if(eat(/^(ø|Ø)/)){third=3;fifth=6;sev=10}
+  else if(eat(/^(aug|\+)/)){fifth=8}
+  if(!quality&&eat(/^(maj|Maj|MA|Δ)/))quality='maj';
+  if(eat(/^alt/i)){sev=10;s+=' #9 b13'}
+  const six9=eat(/^6\/?9/);if(six9){add(9);add(2)}
+  const n=!six9&&eat(/^(5|6|7|9|11|13|2)(?![0-9])/);
+  if(n){const k=+n[1];
+    if(k===5){third=null}
+    else if(k===6)add(9);
+    else if(k===2)add(2);
+    else{sev=quality==='maj'||quality==='mmaj'?11:quality==='dim'?9:10;
+      if(k>=9)add(2);if(k>=11&&third===3)add(5);if(k===11&&third===4){add(5)}if(k>=13)add(9)}}
+  else if(quality==='maj'||quality==='mmaj'){sev=11}
+  if(eat(/sus2/))third=2;else if(eat(/sus4?/))third=5;
+  let r;while((r=eat(/(add|\+)?\s*([#b]?)(2|4|6|9|11|13)/))){const deg={2:2,4:5,6:9,9:2,11:5,13:9}[r[3]];add(deg+accOf(r[2]))}
+  while((r=eat(/(omit|no)\s*(3|5)/i))){if(r[2]==='3')third=null;else fifth=null}
+  while((r=eat(/([#b])\s*(5)/))){fifth=7+accOf(r[1])}
+  if(s.replace(/[\s,]/g,''))return null;
+  if(third!=null)add(third);if(fifth!=null)add(fifth);if(sev!=null)add(sev);
+  const order=[...iv].sort((a,b)=>a-b).map(i=>(root+i)%12);
+  const bass=m[4]?(LET[m[4][0].toUpperCase()]+accOf(m[4].slice(1))+12)%12:root;
+  const over=!order.includes(bass);if(over)order.unshift(bass);else if(bass!==root){order.splice(order.indexOf(bass),1);order.unshift(bass)}
+  return {root,pcs:order,bass,over}}
+// spell a chord note by letters, the way it's written: the 3rd of E is G♯, not A♭
+function csSpell(root,i,deg){const Lt='CDEFGAB',nat=[0,2,4,5,7,9,11],li=Lt.indexOf(NAMES[root][0]),tl=(li+deg-1)%7,pc=(root+i)%12,d=((pc-nat[tl]+18)%12)-6;
+  return Lt[tl]+({0:'',1:'♯',[-1]:'♭',2:'𝄪',[-2]:'𝄫'}[d]??'')}
+const csMap=c=>{const n=DEG[degOfPc(c.root)].n;return /^\d/.test(c.sym)?`${n}(${c.sym})`:n+c.sym};
+// step 1: how the chord is built, on its own
+function csSteps(c,set){const R=c.root,nm=(i,deg)=>csSpell(R,i,deg),b=x=>`<b>${x}</b>`,L=[];
+  const has=i=>set.has((R+i)%12);
+  L.push(`Root: ${b(NAMES[R])}. Every other note is counted up from it.`);
+  if(c.power)L.push(`Only the root and the 5th (${nm(7,5)}): a power chord, ${b(NAMES[R]+'5')}.`);
+  else{const t=c.third==='M'?`${nm(4,3)} is a major 3rd up: major`:c.third==='m'?`${nm(3,3)} is a minor 3rd up: minor`:c.sus==='4'?`no 3rd; the 4th (${nm(5,4)}) takes its place: sus4`:c.sus==='2'?`no 3rd; the 2nd (${nm(2,2)}) takes its place: sus2`:'no 3rd';
+    const f=c.fifth==='P'?`${nm(7,5)} is the 5th`:c.fifth==='d'?`${nm(6,5)} is a flattened 5th, so it's diminished (°)`:c.fifth==='a'?`${nm(8,5)} is a raised 5th, so it's augmented (+)`:'there is no 5th';
+    L.push(`The triad: ${t}; ${f}.`)}
+  if(c.sev==='b7')L.push(`${nm(10,7)} is the ♭7. A plain "7" in a symbol always means this one${c.third==='m'?'':': a dominant 7th'}.`);
+  if(c.sev==='M7')L.push(`${nm(11,7)} is the major 7th, written maj7 (or Δ).`);
+  if(c.sev==='d7')L.push(`${nm(9,7)} is the diminished 7th: the chord is a stack of minor 3rds, written °7.`);
+  if(c.fifth==='d'&&c.sev==='b7')L.push(`♭5 plus ♭7 is half-diminished: written ø or m7♭5.`);
+  const top=c.ext.filter(x=>x>=9);
+  if(c.sev&&top.length){const hi=c.sym.match(/(9|11|13)/);if(hi)L.push(`${hi[1]==='9'?nm(2,9)+' is the 9':hi[1]==='11'?`${nm(5,11)} is the 11`:`${nm(9,13)} is the 13`}. With a 7th underneath, it stacks: the symbol shows only the top number, ${b(c.sym)}, and the 7th${hi[1]!=='9'?' and 9':''} are implied.`)}
+  if(c.adds.includes('add11'))L.push(`${nm(5,11)} is the 11, but nothing stacks up to it${c.sev?' (no 9)':' (no 7th)'}, so it's added: (add11).`);
+  if(c.adds.includes('add9'))L.push(`${nm(2,9)} is the 9, but there's no 7th, so it's (add9), not 9.`);
+  if(c.ext.includes(6)&&!c.sev)L.push(`${nm(9,6)} is the 6th, written straight after the name: ${b(c.sym)}.`);
+  if(c.alts.length)L.push(`Altered notes go in brackets: ${c.alts.map(a=>b(a)).join(', ')}.`);
+  if(c.omits.includes('no5'))L.push(`No 5th here: (no5). Players often leave it out anyway.`);
+  if(c.omits.includes('no3'))L.push(`No 3rd: (no3), so it is neither major nor minor.`);
+  if(c.bass!==R)L.push(c.over?`${NAMES[c.bass]} is the lowest note but sits outside the chord: a slash chord, /${NAMES[c.bass]}.`:`${NAMES[c.bass]} is the lowest note: an inversion, written /${NAMES[c.bass]}.`);
+  return L}
+// step 2: the same chord as numbers in the key, and its relatives
+function csKey(c,set){const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...set].map(degOfPc);
+  const outs=degs.filter(x=>!DIATONIC.includes(x)),order=[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12));
+  L.push(`In ${homeName()} its notes are ${order.map(p=>b(DEG[degOfPc(p)].n)).join(' ')}: the ${b(csMap(c))} chord.`);
+  const vch=VCH.find(v=>v[0]===d);
+  if(!outs.length){const extra=degs.filter(x=>vch&&!vch[2].includes(x));
+    L.push(`Every note is in the key. ${vch?`Underneath, it's the ${b(vch[1])} chord${extra.length?`, with ${extra.map(x=>DEG[x].n).join(' and ')} added`:''}.`:''}`)}
+  else{L.push(`Outside the key: ${outs.map(x=>b(DEG[x].n)).join(', ')}.`);
+    if(vch){const ch=vch[2].filter(t=>!degs.includes(t)).map(t=>{const n=degs.find(x=>!vch[2].includes(x)&&Math.abs(csSemi(t,x))===1);return n!=null?`${DEG[t].n} → ${DEG[n].n}`:null}).filter(Boolean);
+      if(ch.length)L.push(`It's the key's ${vch[1]} chord with ${ch.join(', ')}.`)}
+    const tg=(d+5)%12,tv=VCH.find(v=>v[0]===tg);
+    if(c.third==='M'&&c.fifth!=='d'&&(c.sev==='b7'||!c.sev)&&tv&&tg!==d&&(![0,5,7].includes(d)||c.sev==='b7'))L.push(`It's the 5 of ${b(tv[1])}: a major chord a 5th above ${tv[1]}, so it pulls there. Play it, then ${tv[1]}.`);
+    else if(c.third==='M'&&[3,8,10].includes(d))L.push(`Borrowed from the minor key: ♭3, ♭6 and ♭7 chords are darker shades of the same home.`);
+    else if(c.third==='m'&&d===5)L.push(`The 4 chord made minor (4m), borrowed from minor: a sad turn on the way back to 1.`)}
+  const rel=VCH.filter(v=>v[0]!==d||outs.length).map(v=>[v,v[2].filter(t=>degs.includes(t))]).filter(([v,sh])=>sh.length>=2).sort((a,b2)=>b2[1].length-a[1].length);
+  if(rel.length)L.push(`Close relatives in the key: ${rel.slice(0,3).map(([v,sh])=>`${b(v[1])} (shares ${sh.map(t=>DEG[t].n).join(', ')})`).join(', ')}.`);
+  return L}
+
 function decode(){const mode='auto',inp=parseInput($('dec-in').value,mode);
   if(!inp){DEC.cur=null;DEC.res=null;$('dec-out').innerHTML=$('dec-in').value.trim()?'<p class="decnote warn">I couldn\'t read that. Try a tab like x32010 (low E first), notes like C E G, numbers like 2 4 6, or a name like Am7.</p>':'';$('dec-acts').hidden=true;renderPad();return}
   if(inp.src!=='tab'){DEC.frets=Array(OPEN.length).fill(null)}else DEC.frets=inp.frets;
   DEC.src=inp.src;const cands=identify(inp.pcs,inp.bass),best=cands[0];DEC.res={inp,best,cands};
+  const csAll=csName(inp.pcs,inp.bass);let cs=csAll[0];if(inp.root!=null){const pr=(inp.over&&csAll.find(c=>c.root===inp.root&&c.over))||csAll.find(c=>c.root===inp.root&&!c.over)||csAll.find(c=>c.root===inp.root);if(pr)cs=pr}const csSet=new Set(inp.pcs);
   const uniq=[];inp.pcs.forEach(p=>{if(!uniq.includes(p))uniq.push(p)});
-  const order=best?uniq.slice().sort((a,b)=>((a-best.root+12)%12)-((b-best.root+12)%12)):uniq;
+  const order=cs&&uniq.length>1?uniq.slice().sort((a,b)=>((a-cs.root+12)%12)-((b-cs.root+12)%12)):uniq;
   const degs=order.map(degOfPc),outs=degs.filter(d=>!DIATONIC.includes(d));
   let head='',notes='',cells='';
   if(uniq.length===1){head=`<div class="dechead"><span class="nm">${nameOfPc(uniq[0])}</span><span class="q">a single note</span><div class="mp"><b>${DEG[degs[0]].n}</b><span>in ${homeName()}</span></div></div>`}
-  else if(best){head=`<div class="dechead"><span class="nm">${chordLetters(best,inp.bass)}</span><span class="q">${best.q}${best.pen>=1.2&&best.pen<1.8?', no 5th':''}</span><div class="mp"><b>${mapName(best)}</b><span>in ${homeName()}</span></div></div>`}
+  else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>in ${homeName()}</span></div></div>`}
   else head=`<div class="dechead"><span class="nm">?</span><span class="q">no common chord name for these notes</span></div>`;
   cells=`<div class="dectab" style="--n:${order.length}"><span class="h">Note</span>${order.map(p=>`<span class="nt">${nameOfPc(p)}</span>`).join('')}
     <span class="h">Number</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${DEG[d].n}</span>`}).join('')}
-    ${best&&uniq.length>1?`<span class="h">In the chord</span>${order.map(p=>{const i=(p-best.root+12)%12;return `<span class="rl${i===0?' root':''}">${roleOf(i,best.suf)}</span>`}).join('')}`:''}</div>`;
-  if(best&&uniq.length>1){const d=degOfPc(best.root),inKey=!outs.length,vch=VCH.find(c=>c[0]===d),hm=d===S.home;
-    notes+=`<p class="decnote">${inversionText(best,inp.bass)[0].toUpperCase()+inversionText(best,inp.bass).slice(1)}.</p>`;
-    if(inKey)notes+=`<p class="decnote">All its notes are in the key. ${hm?`It's the <b>home chord</b> of ${homeName()}.`:vch?`It's built on <b>${DEG[d].n}</b>, the ${vch[1]} chord of the key${best.tp.length>3?' with extra colour':''}.`:''}</p>`;
-    else notes+=`<p class="decnote">Outside the key: <b>${outs.map(x=>DEG[x].n).join(', ')}</b>. ${outs.length===1&&best.suf===''&&[4,2,10].includes(d)?({4:'The major 3 chord usually leads to 6m.',2:'The major 2 chord usually leads to 5.',10:'♭7 is the borrowed rock chord; it often goes 4, then 1.'}[d]):'Change the key above if this chord belongs to a different key.'}</p>`}
-  const alts=cands.slice(1).filter((c,i,a)=>c.pen<1.8&&a.findIndex(x=>chordLetters(x,inp.bass)===chordLetters(c,inp.bass))===i).slice(0,3);
-  if(alts.length&&best)notes+=`<p class="decalt">Could also be called: ${alts.map(c=>`${chordLetters(c,inp.bass)} (${mapName(c)})`).join(', ')}</p>`;
+    ${cs&&uniq.length>1?`<span class="h">In the chord</span>${order.map(p=>{const i=(p-cs.root+12)%12;return `<span class="rl${i===0?' root':''}">${cs.role[i]||''}</span>`}).join('')}`:''}</div>`;
+  if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
+    notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
+    notes+=`<details class="decstep" open><summary><b>2</b> In the key</summary><ol>${csKey(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol></details>`}
   $('dec-out').innerHTML=`<div class="decres">${head}${cells}${notes}</div>`;$('dec-acts').hidden=false;
-  const tones=order.map(degOfPc);DEC.cur=best&&uniq.length>1?{root:degOfPc(best.root),tones,name:mapName(best),tok:-1}:uniq.length?{root:degs[0],tones:degs,name:DEG[degs[0]].n,tok:-1}:null;
+  const tones=order.map(degOfPc);DEC.cur=cs&&uniq.length>1?{root:degOfPc(cs.root),tones,name:csMap(cs),tok:-1}:uniq.length?{root:degs[0],tones:degs,name:DEG[degs[0]].n,tok:-1}:null;
   if(!chordNow||chordNow.tok===-1)chordNow=DEC.cur;
   cellMarks={};if(inp.src==='tab')DEC.frets.forEach((f,s)=>{if(f!==null)cellMarks[s+'-'+f]='ok'});
   renderPad()}
@@ -3445,6 +3576,7 @@ function decFret(s,f){DEC.frets[s]=DEC.frets[s]===f?null:f;
 $('dec-go').addEventListener('click',decode);
 $('dec-in').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();decode();const ms=decMidis();if(ms.length){stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}}});
 $('dec-in').addEventListener('input',()=>{clearTimeout(DEC.tm);DEC.tm=setTimeout(decode,450)});
+$('dec-out').addEventListener('click',e=>{const b=e.target.closest('.decname');if(!b)return;$('dec-in').value=b.dataset.x;decode()});
 document.querySelector('.decex').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('dec-in').value=b.dataset.x;decode();const ms=decMidis();if(ms.length){stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.03,2.2,0.42))}});
 $('dec-play').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>pluck(m,t+i*0.035,2.4,0.42))});
 $('dec-arp').addEventListener('click',()=>{const ms=decMidis();if(!ms.length)return;stopAll();ensure();const t=ctx.currentTime+0.05;ms.forEach((m,i)=>{pluck(m,t+i*0.45,1.2,0.48);lightAt(i*450,keyFor(m))});unlightAt(ms.length*450+300)});
@@ -3649,7 +3781,7 @@ function applyInst(){const g=S.inst==='uke'?INST.uke:INST.guitar;OPEN=g.open;FRE
   const vs=$('vx-strings');if(vs){const n=OPEN.length;vs.innerHTML='<option value="all">All string groups</option>'+Array.from({length:n-2},(_,i)=>`<option value="${i}">${STR[i+2]} ${STR[i+1]} ${STR[i]}${i===0?' (top three)':i===n-3?' (bottom three)':''}</option>`).join('');
     if(Number(S.vxStr)>n-3)S.vxStr='all';vs.value=S.vxStr}
   document.querySelectorAll('#inst button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.inst));$('inst-sel').value=S.inst;
-  const ex=document.querySelector('.decex');if(ex){const X=S.inst==='uke'?['0003','2000','0232','2010','C E G','2 4 6 1','Am7']:S.inst==='piano'?['C E G','A C E G','2 4 6 1','F#m7b5','D/F#','B♭maj7']:['x32010','022000','xx0232','B♭ D F A','2 4 6 1','F#m7b5','D/F#'];
+  const ex=document.querySelector('.decex');if(ex){const X=S.inst==='uke'?['0003','2000','0232','2010','C E G','2 4 6 1','Am7']:S.inst==='piano'?['C E G','A C E G','2 4 6 1','F#m7b5','D/F#','B♭maj7']:['x32010','xx0232','C E♭ G B♭ F','G13(no5)','E11(♭13)','Cm7(add11)','D/F#','2 4 6 1'];
     ex.innerHTML='<span>Try</span>'+X.map(x=>`<button data-x="${x}">${x}</button>`).join('')}
   const dh=document.querySelector('#panel-dec .hint');if(dh)dh.textContent=S.inst==='piano'?'Type a chord any way you know it, or tap the keys below.':`Type a chord any way you know it (tab is ${S.inst==='uke'?'G C E A':'low E first'}), or tap one fret per string on the neck below. Tap it again to mute that string.`;
   $('dec-in').placeholder=S.inst==='uke'?'0003  ·  C E G  ·  2 4 6  ·  Am7':S.inst==='piano'?'C E G  ·  2 4 6  ·  Am7':'x32010  ·  C E G  ·  2 4 6  ·  Am7';
