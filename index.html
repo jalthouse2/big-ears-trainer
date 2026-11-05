@@ -1669,7 +1669,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <button class="lvlbtn" id="lvl-btn" aria-haspopup="dialog"></button>
       <label class="field" id="fb-win-f"><span>Frets</span><select id="fb-win"></select></label>
       <span class="micpill" id="mic-pill" hidden><i></i><span id="mic-heard">Listening</span></span>
-      <div class="field"><span>Show</span><div class="seg" id="dock-show"><button data-v="map">Map</button><button data-v="neck">Neck</button></div></div>
+      <div class="field"><span>Show</span><div class="seg" id="dock-show"><button data-v="neck">Guitar</button></div></div>
     </div>
     <section class="circwrap" id="circwrap">
       <svg id="circ" viewBox="-128 -128 256 256" role="group" aria-label="Circle of fifths"></svg>
@@ -3021,13 +3021,13 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=['anc','songs','tune','beat','today','pocket'].includes(t);
-  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=t==='find'||(t==='vox'?!S.voxMap:!S.showMap);const toolNeck=t==='dec'||t==='key',neckOn=toolNeck?S.toolNeck!==false:S.showNeck;$('fbwrap').hidden=!neckOn&&!neckGame;$('circwrap').hidden=true;
-  document.querySelector('#dock-show button[data-v="map"]').hidden=t==='find';document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
+  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=false;const toolNeck=t==='dec'||t==='key',neckOn=toolNeck?S.toolNeck!==false:S.showNeck;$('fbwrap').hidden=!neckOn&&!neckGame;$('circwrap').hidden=true;
+  document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
   $('fb-win-f').hidden=!neckOn||toolNeck;
-  document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='map'?(t==='vox'?!!S.voxMap:S.showMap):b.dataset.v==='circle'?S.showCircle:neckOn));
+  document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',neckOn));
   }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  if(b.dataset.v==='map'){if(S.tab==='vox')S.voxMap=!S.voxMap;else S.showMap=!S.showMap}else if(b.dataset.v==='circle')S.showCircle=!S.showCircle;else if(S.tab==='dec'||S.tab==='key')S.toolNeck=S.toolNeck===false;else S.showNeck=!S.showNeck;persist();applyDock();renderFB();renderCirc()});
+  if(S.tab==='dec'||S.tab==='key')S.toolNeck=S.toolNeck===false;else S.showNeck=!S.showNeck;persist();applyDock();renderFB();renderCirc()});
 function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
@@ -3780,7 +3780,7 @@ $('panel-key').addEventListener('click',e=>{const t=e.target.closest('button,inp
 /* ---------- instruments: guitar, ukulele or piano shape how notes are shown ---------- */
 function applyInst(){const g=S.inst==='uke'?INST.uke:INST.guitar;OPEN=g.open;FRETS=g.frets;STR=g.str;
   const piano=S.inst==='piano';$('kb').hidden=!piano;document.querySelector('#fbwrap .fbscroll').hidden=piano;
-  const nb=document.querySelector('#dock-show button[data-v="neck"]');if(nb)nb.textContent=piano?'Keys':'Neck';
+  const nb=document.querySelector('#dock-show button[data-v="neck"]');if(nb)nb.textContent=piano?'Piano':S.inst==='uke'?'Ukulele':'Guitar';
   // games that only make sense on a fretboard
   ['find','vox'].forEach(t=>{document.querySelectorAll(`[data-open="${t}"],#tabs [data-t="${t}"]`).forEach(b=>b.hidden=piano)});
   if(piano&&['find','vox'].includes(S.tab))S.tab='deg';

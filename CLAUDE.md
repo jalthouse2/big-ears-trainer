@@ -30,9 +30,9 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Short, plain instructions, one per line. No jargon without an example.
 - Instrument (guitar, ukulele, piano) is chosen only in Settings.
 - Minimal first: Sonofield is the reference. Show as little as possible; extras go into the options sheet.
-- The tonal map (the row of numbers) is the default answer view; the neck is optional.
+- The tonal map (the row of numbers) is always shown on every game and tool page; it never hides. The only dock switch is the instrument (one pill named Guitar, Ukulele or Piano), which shows or hides the neck or keys.
 - Number colours (Settings → "Give each number its own colour", `.cnum`): rainbow order 1 red, 2 orange, 3 yellow, 4 green, 5 blue, 6 purple, 7 pink (`--n0`…`--n11`, darker twins for the day theme), as the number and a stripe on each map key. Home keeps its own colour; the teal border marks home.
-- Every switch (`.seg`: Map/Neck, game modes, settings) is a row of separate rounded pills, the chosen one in brass. No joined block buttons.
+- Every switch (`.seg`: the instrument pill, game modes, settings) is a row of separate rounded pills, the chosen one in brass. No joined block buttons.
 - The Chord decoder and Key finder have their own neck switch (`S.toolNeck`, on by default), separate from the games' `S.showNeck`.
 - The numbered guide shrinks to the current line after 3 rounds of a game (`S.gRounds`); tapping it shows all steps.
 - After an answer, show "You" and "Answer" rows, each with a speaker button (`slotRow(who,items,act)`, `.rowplay`), so the player can hear the difference.
