@@ -3533,17 +3533,18 @@ function csSteps(c,set){const R=c.root,nm=(i,deg)=>csSpell(R,i,deg),b=x=>`<b>${x
   return L}
 // step 2: the same chord as numbers in the key, and its relatives
 const csHomeNote=()=>NAMES[(S.key+S.home)%12];
+const csRootNum=c=>c&&c.third==='m'?(c.fifth==='d'?'7':'6'):'1';
 function csKeyLine(c,set){const fits=c?csFits(c,set):[],gk=DEC.prev||{key:S.key,home:S.home},gname=`${NAMES[(gk.key+gk.home)%12]} ${WORLD[gk.home][1]}`;
   const chips=[...fits.slice(0,4).map(x=>`<button class="chip deckeyb" data-k="${x.k}" data-h="${x.home}" aria-pressed="${!!S.decKey&&S.decKey.k===x.k&&S.decKey.h===x.home}">${x.label}</button>`),
     `<button class="chip deckeyb" data-k="${gk.key}" data-h="${gk.home}" aria-pressed="${!!S.decKey&&S.decKey.k===gk.key&&S.decKey.h===gk.home}">${gname} (games)</button>`];
   const all=`<select class="deckeysel" aria-label="Pick the song's key"><option value="">Other key…</option>${[0,9].map(h=>NAMES.map((n,k)=>`<option value="${(k-h+12)%12},${h}">${n} ${h?'minor':'major'}</option>`).join('')).join('')}</select>`;
   return S.decKey?`<div class="deckey">Key: <b>${homeName()}</b>, so <b>${csHomeNote()} = ${lab(S.home)}</b>. Every number is counted from ${csHomeNote()}. <button class="chip deckeyb" data-k="root">Don't know the key</button></div>`
-    :`<div class="deckey">No key set, so the chord's root is <b>${c?NAMES[c.root]:''} = 1</b>. Know the song's key? ${chips.join(' ')} ${all}</div>`}
+    :`<div class="deckey">No key set, so ${csRootNum(c)==='6'?'this minor chord sits on 6, the minor home':csRootNum(c)==='7'?'this diminished chord sits on 7, where it lives in a key':'the chord\'s root is 1'}: <b>${c?NAMES[c.root]:''} = ${csRootNum(c)}</b>. Know the song's key? ${chips.join(' ')} ${all}</div>`}
 // every key whose seven notes hold the whole chord, named from the chord's point of view
 function csFits(c,set){const out=[];for(let k=0;k<12;k++){const sc=DIATONIC.map(d=>(k+d)%12);if(![...set].every(p=>sc.includes(p)))continue;
   const d=((c.root-k)%12+12)%12,minor=d===9,home=minor?9:0;out.push({k,home,label:`${NAMES[(k+home)%12]} ${minor?'minor':'major'}`,num:DEG[d].n+(/^\d/.test(c.sym)?`(${c.sym})`:c.sym)})}
   return out.sort((a,b)=>(b.home===9&&b.k===(c.root+3)%12)-(a.home===9&&a.k===(c.root+3)%12)||(a.k===c.root?-1:0))}
-function csKey(c,set){if(!S.decKey){const f=csFits(c,set);return [`With no key, every number counts from ${NAMES[c.root]} (= 1), so the chord's own shape shows: ${[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12)).map(p=>`<b>${csNumOf(c,p)}</b>`).join(' ')}.`,f.length?`It fits these keys with no outside notes: ${f.slice(0,4).map(x=>`<b>${x.label}</b> (the ${x.num})`).join(', ')}. If you know which one the song is in, pick it above.`:`No key holds all of its notes, so it borrows from outside whatever key it's in.`,`Not sure of the key? The Key finder works it out from a few notes of the song.`]}
+function csKey(c,set){if(!S.decKey){const f=csFits(c,set);return [`With no key, every number counts from ${NAMES[c.root]} as ${csRootNum(c)}${csRootNum(c)==='6'?' (minor chords sit on 6, the minor home)':csRootNum(c)==='7'?' (diminished chords sit on 7)':''}, so the chord's own shape shows: ${[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12)).map(p=>`<b>${csNumOf(c,p)}</b>`).join(' ')}.`,f.length?`It fits these keys with no outside notes: ${f.slice(0,4).map(x=>`<b>${x.label}</b> (the ${x.num})`).join(', ')}. If you know which one the song is in, pick it above.`:`No key holds all of its notes, so it borrows from outside whatever key it's in.`,`Not sure of the key? The Key finder works it out from a few notes of the song.`]}
   const d=degOfPc(c.root),b=x=>`<b>${x}</b>`,L=[],degs=[...set].map(degOfPc);
   const outs=degs.filter(x=>!DIATONIC.includes(x)),order=[...set].sort((p,q)=>((p-c.root+12)%12)-((q-c.root+12)%12));
   const N=x=>csNumOf(c,(x+S.key)%12);
@@ -3563,21 +3564,21 @@ function csKey(c,set){if(!S.decKey){const f=csFits(c,set);return [`With no key, 
   if(rel.length)L.push(`Close relatives in the key: ${rel.slice(0,3).map(([v,sh])=>`${b(v[1])} (shares ${sh.map(t=>DEG[t].n).join(', ')})`).join(', ')}.`);
   return L}
 
-function decode(){const mode='auto',inp=parseInput($('dec-in').value,mode);
+function decode(){if(S.tab!=='dec')return;const mode='auto',inp=parseInput($('dec-in').value,mode);
   if(!inp){DEC.cur=null;DEC.res=null;$('dec-out').innerHTML=$('dec-in').value.trim()?'<p class="decnote warn">I couldn\'t read that. Try a tab like x32010 (low E first), notes like C E G, numbers like 2 4 6, or a name like Am7.</p>':'';$('dec-acts').hidden=true;renderPad();return}
   if(inp.src!=='tab'){DEC.frets=Array(OPEN.length).fill(null)}else DEC.frets=inp.frets;
   DEC.src=inp.src;const cands=identify(inp.pcs,inp.bass),best=cands[0];DEC.res={inp,best,cands};
   const csAll=csName(inp.pcs,inp.bass);let cs=csAll[0];if(inp.root!=null){const pr=(inp.over&&csAll.find(c=>c.root===inp.root&&c.over))||csAll.find(c=>c.root===inp.root&&!c.over)||csAll.find(c=>c.root===inp.root);if(pr)cs=pr}const csSet=new Set(inp.pcs);
-  if(!DEC.prev)DEC.prev={key:S.key,home:S.home};{const k=S.decKey?S.decKey.k:cs.root,h=S.decKey?S.decKey.h:0;if(S.key!==k||S.home!==h){S.key=k;S.home=h;syncSettings();warmCache()}}
+  if(!DEC.prev)DEC.prev={key:S.key,home:S.home};{const rn=csRootNum(cs),k=S.decKey?S.decKey.k:(rn==='6'?(cs.root+3)%12:rn==='7'?(cs.root+1)%12:cs.root),h=S.decKey?S.decKey.h:(rn==='6'?9:0);if(S.key!==k||S.home!==h){S.key=k;S.home=h;syncSettings();warmCache()}}
   const uniq=[];inp.pcs.forEach(p=>{if(!uniq.includes(p))uniq.push(p)});
   const order=cs&&uniq.length>1?uniq.slice().sort((a,b)=>((a-cs.root+12)%12)-((b-cs.root+12)%12)):uniq;
   const degs=order.map(degOfPc),outs=degs.filter(d=>!DIATONIC.includes(d));
   let head='',notes='',cells='';
   if(uniq.length===1){head=`<div class="dechead"><span class="nm">${nameOfPc(uniq[0])}</span><span class="q">a single note</span><div class="mp"><b>${DEG[degs[0]].n}</b><span>in ${homeName()}</span></div></div>`}
-  else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>${S.decKey?'in '+homeName():NAMES[cs.root]+' = 1'}</span></div></div>`}
+  else if(cs){head=`<div class="dechead"><span class="nm">${cs.name}</span><span class="q">${best&&best.root===cs.root&&chordLetters(best,inp.bass)===cs.name?best.q:''}</span><div class="mp"><b>${csMap(cs)}</b><span>${S.decKey?'in '+homeName():NAMES[cs.root]+' = '+csRootNum(cs)}</span></div></div>`}
   else head=`<div class="dechead"><span class="nm">?</span><span class="q">no common chord name for these notes</span></div>`;
   cells=`<div class="dectab" style="--n:${order.length}"><span class="h">Note</span>${order.map(p=>`<span class="nt">${nameOfPc(p)}</span>`).join('')}
-    <span class="h">${csHomeNote()} = ${lab(S.home)}</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${!S.decKey||DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${cs&&uniq.length>1?csNumOf(cs,p):DEG[d].n}</span>`}).join('')}
+    <span class="h">${!S.decKey&&cs&&uniq.length>1?NAMES[cs.root]+' = '+csRootNum(cs):csHomeNote()+' = '+lab(S.home)}</span>${order.map(p=>{const d=degOfPc(p);return `<span class="dn${!S.decKey||DIATONIC.includes(d)?'':' out'}${d===S.home?' hm':''}">${cs&&uniq.length>1?csNumOf(cs,p):DEG[d].n}</span>`}).join('')}
     ${cs&&uniq.length>1?`<span class="h">In the name</span>${order.map(p=>{const i=(p-cs.root+12)%12;return `<span class="rl${i===0?' root':''}">${cs.role[i]||''}</span>`}).join('')}`:''}</div>`;
   if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
     notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
