@@ -1628,7 +1628,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="decin"><input id="dec-in" placeholder="x32010  ·  C E G  ·  2 4 6  ·  Am7" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chord as tab, notes, numbers or name"><button class="btn primary" id="dec-go">Decode</button></div>
     <div class="decex"><span>Try</span><button data-x="x32010">x32010</button><button data-x="022000">022000</button><button data-x="xx0232">xx0232</button><button data-x="B♭ D F A">B♭ D F A</button><button data-x="2 4 6 1">2 4 6 1</button><button data-x="F#m7b5">F#m7b5</button><button data-x="D/F#">D/F#</button></div>
     <div id="dec-out" class="decout" aria-live="polite"></div>
-    <div class="actions" id="dec-acts" hidden><button class="btn" id="dec-play">Play</button><button class="btn" id="dec-arp">One by one</button><button class="btn" id="dec-clear">Clear</button></div>
+    <div class="actions" id="dec-acts" hidden><button class="btn" id="dec-play">Play</button><button class="btn" id="dec-arp">One by one</button><button class="btn" id="dec-clear">Clear</button><button class="btn primary" id="dec-next">+ Next chord</button></div>
     <div class="decsong">
       <p class="eyebrow">The whole song</p>
       <p class="hint">Put the chords in order, and a melody if you have one. It finds the key and shows how each chord leads to the next.</p>
@@ -3436,7 +3436,7 @@ function parseTab(str){   // frets low string first: "10 10 9 x x x", "10,10,9,x
     acc.push(Number(w[ci]));go(pi,ci+1,acc);acc.pop();
     if(ci+1<w.length&&w[ci]!=='0'&&/\d/.test(w[ci+1])&&Number(w.slice(ci,ci+2))<=24){acc.push(Number(w.slice(ci,ci+2)));go(pi,ci+2,acc);acc.pop()}};
   go(0,0,[]);
-  const trim=f=>{f=f.slice();while(f.length>N&&f[f.length-1]===null)f.pop();return f};   // extra x's at the end don't matter
+  const trim=f=>{f=f.slice();while(f.length>N&&f[f.length-1]===null)f.pop();while(f.length<N)f.push(null);return f};   // extra x's at the end don't matter; missing strings at the end are muted
   const ok=outs.map(trim).filter(f=>f.length===N&&f.some(x=>x!==null));
   if(!ok.length)return null;
   const big=f=>f.filter(x=>x!==null&&x>9).length,span=f=>{const v=f.filter(x=>x!==null&&x>0);return v.length?Math.max(...v)-Math.min(...v):0};
@@ -3745,8 +3745,9 @@ $('song-in').value=S.songTxt||'';$('song-mel').value=S.songMel||'';
 let songT=0;['song-in','song-mel'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(songT);songT=setTimeout(songUpdate,350)}));
 $('song-add').addEventListener('click',()=>{const R=DEC.res;if(!R)return toast('Decode a chord first');const all=csName(R.inp.pcs,R.inp.bass),cs=(R.inp.root!=null&&all.find(c=>c.root===R.inp.root))||all[0];
   const tok=R.inp.src==='tab'?stdTab(R.inp.frets.slice().reverse().map(x=>x===null?-1:x)).replace(/ /g,''):(cs?cs.name:'');if(!tok)return;
-  const tk=/\s/.test(tok)||(R.inp.src==='tab'&&R.inp.frets.some(x=>x>9))?(cs?cs.name:tok):tok;
+  const tk=R.inp.src==='tab'?R.inp.frets.slice().reverse().map(x=>x===null?'x':String(x)).join(''):tok;
   $('song-in').value=($('song-in').value.trim()+'  '+tk).trim();songUpdate()});
+$('dec-next').addEventListener('click',()=>{if(!DEC.res)return;$('song-add').click();const n=SONG.chords.length;$('dec-clear').click();toast(n===1?'Chord 1 saved. Now the next one.':`Chord ${n} saved. Keep going, or see the song below.`)});
 $('song-out').addEventListener('click',e=>{const k=e.target.closest('.songkeyb');if(k){S.decKey=k.dataset.k==='auto'?null:{k:+k.dataset.k,h:+k.dataset.h};persist();songRender();return}
   if(e.target.closest('#song-play')){stopAll();ensure();let t=ctx.currentTime+0.05;SONG.chords.forEach((c,i)=>{const v=c.fr?null:voicings(c.pcs,c.bass,c.cs.root,1)[0],ms=c.fr?c.fr.map((f,j)=>f<0?null:OPEN[OPEN.length-1-j]+f).filter(x=>x!=null):v?v.ms:c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.03,1.6,0.38));t+=1.3*PACE()});return}
   const ch=e.target.closest('.songch');if(ch){const c=SONG.chords[+ch.dataset.i];$('dec-in').value=c.tok;decode();$('dec-in').scrollIntoView({behavior:'smooth',block:'center'})}});
