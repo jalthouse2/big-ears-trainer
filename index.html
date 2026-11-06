@@ -905,6 +905,18 @@ body.paused .circgo{opacity:.5}
 .decex{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
 .decex button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font:500 12px var(--font-mono);color:var(--fg)}
 .decout:empty{display:none}
+.decsong{display:flex;flex-direction:column;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.songmel{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 14px var(--font-mono)}
+#song-out:empty{display:none}
+#song-out{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
+.songkey{font-size:14px;line-height:1.5}.songkey b{color:var(--brass)}
+.songrow{display:flex;flex-wrap:wrap;gap:8px}
+.songch{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:8px 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
+.songch .nm{font-size:13px;color:var(--muted)}.songch .n{font:600 22px var(--font-display,inherit);color:var(--fg)}.songch .tb{font:500 11px var(--font-mono);color:var(--muted);letter-spacing:.02em}
+.songch.out .n{color:var(--bad,#e07a6a)}.songch.home{border-color:var(--home)}
+.songlinks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:var(--muted)}.songlinks b{color:var(--fg)}
+.songmeln{font:500 14px var(--font-mono);letter-spacing:.04em}.songmeln .o{color:var(--bad,#e07a6a)}
+.dectabs{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}.dectabs .chip{font-family:var(--font-mono)}
 .decres{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
 .dechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
 .dechead .nm{font:800 44px/1 var(--font-display);letter-spacing:.03em}
@@ -1617,6 +1629,13 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="decex"><span>Try</span><button data-x="x32010">x32010</button><button data-x="022000">022000</button><button data-x="xx0232">xx0232</button><button data-x="B♭ D F A">B♭ D F A</button><button data-x="2 4 6 1">2 4 6 1</button><button data-x="F#m7b5">F#m7b5</button><button data-x="D/F#">D/F#</button></div>
     <div id="dec-out" class="decout" aria-live="polite"></div>
     <div class="actions" id="dec-acts" hidden><button class="btn" id="dec-play">Play</button><button class="btn" id="dec-arp">One by one</button><button class="btn" id="dec-clear">Clear</button></div>
+    <div class="decsong">
+      <p class="eyebrow">The whole song</p>
+      <p class="hint">Put the chords in order, and a melody if you have one. It finds the key and shows how each chord leads to the next.</p>
+      <div class="decin"><input id="song-in" placeholder="G  D/F#  Em  C" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chords in order"><button class="btn" id="song-add" title="Add the chord above">+ Add</button></div>
+      <input id="song-mel" class="songmel" placeholder="Melody notes (optional): B A G A B B B" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Melody notes">
+      <div id="song-out" aria-live="polite"></div>
+    </div>
   </section>
 
   <section class="stage" id="panel-key" hidden>
@@ -3059,7 +3078,7 @@ $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');i
 function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(S.tab==='dec'&&t!=='dec'&&typeof DEC!=='undefined'&&DEC.prev){S.key=DEC.prev.key;S.home=DEC.prev.home;DEC.prev=null;if(gameReady){syncSettings();renderPad()}}if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='dec'&&(S.songTxt||S.songMel))setTimeout(()=>{if(S.tab==='dec')songUpdate()},0);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
   applyDock();
@@ -3631,7 +3650,8 @@ function decode(){if(S.tab!=='dec')return;const mode='auto',inp=parseInput($('de
   if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
     notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
     notes+=`<details class="decstep" open><summary><b>2</b> On the tonal map</summary><ol>${csKey(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol></details>`}
-  $('dec-out').innerHTML=`<div class="decres">${csKeyLine(cs,csSet)}${head}${cells}${notes}</div>`;$('dec-acts').hidden=false;
+  const tabs=uniq.length>1?tabLine(uniq,inp.bass,cs?cs.root:null,inp.src==='tab'?DEC.frets.slice().reverse().map(x=>x===null?-1:x):null):'';
+  $('dec-out').innerHTML=`<div class="decres">${csKeyLine(cs,csSet)}${head}${tabs}${cells}${notes}</div>`;$('dec-acts').hidden=false;
   const tones=order.map(degOfPc);DEC.cur=cs&&uniq.length>1?{root:degOfPc(cs.root),tones,name:csMap(cs),tok:-1}:uniq.length?{root:degs[0],tones:degs,name:DEG[degs[0]].n,tok:-1}:null;
   if(!chordNow||chordNow.tok===-1)chordNow=DEC.cur;
   cellMarks={};if(inp.src==='tab')DEC.frets.forEach((f,s)=>{if(f!==null)cellMarks[s+'-'+f]='ok'});
@@ -3640,6 +3660,96 @@ function decMidis(){const R=DEC.res;if(!R)return[];if(R.inp.ms)return R.inp.ms;
   const pcs=[...new Set(R.inp.pcs)],b=R.inp.bass;let m=40+((b-4+12)%12),out=[m];
   const rest=pcs.filter(p=>p!==b).sort((x,y)=>((x-b+12)%12)-((y-b+12)%12));let cur=m+7;
   rest.forEach(p=>{let x=cur;while(x%12!==p)x++;out.push(x);cur=x+1});return out}
+/* ---------- tabs: playable shapes for any set of notes (standard or any tuning) ---------- */
+// the shapes guitarists actually use: open chords first, then barre shapes (root on the 6th, 5th or 4th string); the search below is the fallback
+const VQ_OF={'0,4,7':'','0,3,7':'m','0,4,7,10':'7','0,3,7,10':'m7','0,4,7,11':'maj7','0,3,6,10':'m7b5','0,3,6,9':'dim7','0,5,7':'sus4','0,2,7':'sus2','0,2,4,7,10':'9','0,4,7,9':'6','0,2,4,7,11':'maj9','0,2,3,7,10':'m9','0,3,4,7,10':'7#9','0,3,6':'dim','0,4,8':'aug','0,2,4,7':'add9','0,5,7,10':'7sus4'};
+const V_OPEN={'0':'x32010','9':'x02220','7':'320003','4':'022100','2':'xx0232','9m':'x02210','4m':'022000','2m':'xx0231','07':'x32310','97':'x02020','77':'320001','47':'020100','27':'xx0212','117':'x21202','9m7':'x02010','4m7':'022030','2m7':'xx0211','0maj7':'x32000','5maj7':'xx3210','9maj7':'x02120','2maj7':'xx0222','9sus4':'x02230','2sus4':'xx0233','4sus4':'022200','9sus2':'x02200','2sus2':'xx0230','0add9':'x32030','5':'133211','5m':'133111','11m':'x24432','0/7':'332010','7/11':'x20003','0/4':'032010','2/6':'200232','9m/7':'3x2210','2/9':'x00232','5/0':'x33211','4m/11':'x22000','9/4':'002220'};
+const V_E={'':[0,2,2,1,0,0],m:[0,2,2,0,0,0],'7':[0,2,0,1,0,0],m7:[0,2,0,0,0,0],maj7:[0,-9,1,1,0,-9],m7b5:[0,-9,0,0,-1,-9],dim7:[0,-9,-1,0,-1,-9],sus4:[0,2,2,2,0,0],'9':[0,-9,0,1,0,2],'7sus4':[0,2,0,2,0,0]};
+const V_A={'':[-9,0,2,2,2,0],m:[-9,0,2,2,1,0],'7':[-9,0,2,0,2,0],m7:[-9,0,2,0,1,0],maj7:[-9,0,2,1,2,0],m7b5:[-9,0,1,0,1,-9],dim7:[-9,0,1,-1,1,-9],sus4:[-9,0,2,2,3,0],sus2:[-9,0,2,2,0,0],'9':[-9,0,-1,0,0,0],'6':[-9,0,2,2,2,2],maj9:[-9,0,-1,1,0,-9],m9:[-9,0,-2,0,0,-9],'7#9':[-9,0,-1,0,1,-9],dim:[-9,0,1,2,1,-9],aug:[-9,0,-1,-2,-2,-9],'7sus4':[-9,0,2,0,3,0],add9:[-9,0,-1,-3,0,-9]};
+const V_D={'':[-9,-9,0,2,3,2],m:[-9,-9,0,2,3,1],'7':[-9,-9,0,2,1,2],m7:[-9,-9,0,2,1,1],maj7:[-9,-9,0,2,2,2],dim7:[-9,-9,0,1,0,1]};
+const fromTab=t=>(t.length===6?t.split(''):t.split(' ')).map(x=>x==='x'?-1:Number(x));
+function voicings(pcs,bass,root,max=2){if(S.inst==='piano'||!OPEN.length)return[];
+  if(root==null||!(S.inst==='guitar'&&OPEN.join()==='64,59,55,50,45,40'))return voicingSearch(pcs,bass,root,max);
+  const iv=[...new Set(pcs.map(p=>(p-root+12)%12))].sort((a,b)=>a-b).join(','),q=VQ_OF[iv];
+  const out=[],add=fr=>{if(fr.some(f=>f>FRETS))return;if(!out.some(o=>o.fr.join()===fr.join()))out.push({fr,lo:Math.min(...fr.filter(f=>f>0).concat([99])),ms:fr.map((f,j)=>f<0?null:OPEN[5-j]+f).filter(x=>x!=null)})};
+  if(q!==undefined){const ok=bass===root;
+    const op=V_OPEN[root+q+(ok?'':'/'+bass)];if(op)add(fromTab(op));
+    if(ok)[[V_E,4],[V_A,9],[V_D,2]].forEach(([T,str])=>{const t=T[q];if(!t)return;let r=(root-str+12)%12;const mnOff=Math.min(...t.filter(x=>x>-9));if(r+mnOff<1)r+=12;add(t.map(x=>x<=-9?-1:x+r))});}
+  if(!out.length)voicingSearch(pcs,bass,root,max).forEach(v=>add(v.fr));
+  const head=out[0]&&V_OPEN[root+q+(bass===root?'':'/'+bass)]?[out.shift()]:[];out.sort((a,b)=>a.lo-b.lo);
+  const res=head.concat(out);res.forEach(v=>v.lo=v.lo===99?0:v.lo);return res.slice(0,max)}
+function voicingSearch(pcs,bass,root,max=2){if(S.inst==='piano'||!OPEN.length)return[];
+  const set=new Set(pcs),N=OPEN.length,opt=set.size>=4&&root!=null?(root+7)%12:null,need=[...set].filter(p=>p!==opt);
+  const found=[];   // fr low string first, -1 = muted
+  for(let lo=0;lo<=Math.min(12,FRETS-3);lo++){
+    const opts=[];for(let i=0;i<N;i++){const st=N-1-i,o=[-1];if(lo<=3&&set.has(OPEN[st]%12))o.push(0);for(let f=Math.max(1,lo);f<=lo+3&&f<=FRETS;f++)if(set.has((OPEN[st]+f)%12))o.push(f);opts.push(o)}
+    const fr=Array(N);
+    const go=i=>{if(i===N){const snd=fr.map((f,j)=>f<0?null:j).filter(x=>x!==null);if(snd.length<Math.min(3,N))return;
+        if(snd[snd.length-1]-snd[0]+1!==snd.length)return;   // no muted strings in the middle
+        const ms=snd.map(j=>OPEN[N-1-j]+fr[j]),low=Math.min(...ms);if(low%12!==bass)return;
+        const have=new Set(ms.map(m=>m%12));if(!need.every(p=>have.has(p)))return;
+        const fd=snd.map(j=>fr[j]).filter(f=>f>0);if(fd.length){const mn=Math.min(...fd),mx=Math.max(...fd);if(mx-mn>3)return;
+          const atMin=fd.filter(f=>f===mn).length,fingers=fd.length-(atMin>=2&&mn>0?atMin-1:0);if(fingers>4)return;
+          if(lo>0&&mn!==lo)return}else if(lo>0)return;
+        const mn=fd.length?Math.min(...fd):0,sp=fd.length?Math.max(...fd)-mn:0,atM=fd.filter(f=>f===mn).length,fing=fd.length-(atM>=2&&mn>0?atM-1:0),opens=snd.filter(j=>fr[j]===0).length,barreRoot=mn>0&&fr[snd[0]]===mn&&atM>=2;
+        const sc=snd.length*1.2+(barreRoot?1.5:0)+(have.size===set.size?1.5:0)-mn*0.3-sp*0.4-Math.max(0,fing-3)*0.8+(lo<=3?opens*0.3:0)+(snd[snd.length-1]===N-1?0.4:0);
+        found.push({fr:fr.slice(),sc,lo:fd.length?Math.min(...fd):0,ms});return}
+      for(const f of opts[i]){fr[i]=f;go(i+1)}};
+    go(0)}
+  found.sort((a,b)=>b.sc-a.sc);const out=[],seen=new Set();
+  for(const v of found){const k=v.fr.join();if(seen.has(k))continue;if(out.some(o=>Math.abs(o.lo-v.lo)<3))continue;seen.add(k);out.push(v);if(out.length>=max)break}
+  return out}
+const tabOf=fr=>stdTab(fr);
+function tabLine(pcs,bass,root,typed){const v=voicings(pcs,bass,root,3).filter(x=>!typed||x.fr.join()!==typed.join());if(!v.length)return '';
+  return `<div class="dectabs"><span>${typed?'Other ways to play it':'Play it'}:</span>${v.slice(0,typed?2:3).map(x=>`<button class="chip decname" data-x="${tabOf(x.fr)}">${tabOf(x.fr)}</button>`).join('')}<small>low string first</small></div>`}
+
+/* ---------- the whole song: chords (and a melody) in order -> the key, the numbers, how each leads to the next ---------- */
+const SONG={chords:[],mel:[],bad:[]};
+function songParse(){const raw=$('song-in').value.trim(),toks=raw?raw.split(/[\s,|]+/).filter(Boolean):[],out=[],bad=[];
+  toks.forEach(t=>{let c=null;
+    if(/^[x\d]{4,}$/i.test(t)){const f=parseTab(t);if(f){const ms=[];f.forEach((x,st)=>{if(x!==null)ms.push(OPEN[st]+x)});ms.sort((a,b)=>a-b);const pcs=ms.map(m=>m%12),nm=csName(pcs,pcs[0])[0];if(nm)c={tok:t,cs:nm,pcs:[...new Set(pcs)],bass:pcs[0],fr:f.slice().reverse().map(x=>x===null?-1:x)}}}
+    else{const p=csParse(t);if(p){const nm=csName(p.pcs,p.bass),cs=(p.over&&nm.find(x=>x.root===p.root&&x.over))||nm.find(x=>x.root===p.root&&!x.over)||nm.find(x=>x.root===p.root)||nm[0];if(cs)c={tok:t,cs,pcs:[...new Set(p.pcs)],bass:p.bass}}}
+    if(c)out.push(c);else bad.push(t)});
+  SONG.chords=out;SONG.bad=bad;SONG.mel=$('song-mel').value.trim().split(/[\s,|\-]+/).filter(Boolean).map(parseNote).filter(x=>x!==null)}
+function songKeys(){const C=SONG.chords,M=SONG.mel,res=[];
+  for(let k=0;k<12;k++){const sc=new Set(DIATONIC.map(d=>(k+d)%12));let s=0;
+    C.forEach(c=>{const o=c.pcs.filter(p=>!sc.has(p)).length;s+=o?-1.5*o:2});M.forEach(p=>{s+=sc.has(p)?0.5:-0.7});
+    [0,9].forEach(h=>{const hp=(k+h)%12,isH=c=>c&&c.cs.root===hp&&(h===9?c.cs.third==='m':c.cs.third!=='m');let b=h===9?-0.2:0;
+      if(isH(C[0]))b+=1.2;if(isH(C[C.length-1]))b+=1.5;C.forEach(c=>{if(isH(c))b+=0.3});if(M.length&&M[M.length-1]===hp)b+=0.8;
+      res.push({k,h,s:s+b})})}
+  return res.sort((a,b)=>b.s-a.s)}
+const keyLabel=x=>`${NAMES[(x.k+x.h)%12]} ${x.h?'minor':'major'}`;
+const ROOTMOVE={0:'same root',5:'root up a 4th (down a 5th): the strongest pull',7:'root up a 5th',2:'root up a step',10:'root down a step',1:'root up a half step',11:'root down a half step',3:'root up a minor 3rd',9:'root down a minor 3rd',4:'root up a major 3rd',8:'root down a major 3rd',6:'root moves a tritone'};
+function songLink(a,b){const n=p=>DEG[degOfPc(p)].n,keep=b.pcs.filter(p=>a.pcs.includes(p)),mv=[];
+  b.pcs.filter(p=>!a.pcs.includes(p)).forEach(p=>{let best=null;a.pcs.forEach(q=>{const d=Math.min((p-q+12)%12,(q-p+12)%12);if(d<=2&&(!best||d<best.d))best={q,d}});if(best)mv.push(`${n(best.q)}→${n(p)}`)});
+  const ra=degOfPc(a.cs.root),rb=degOfPc(b.cs.root),iv=(b.cs.root-a.cs.root+12)%12;
+  let tag='';if(rb===S.home&&(ra-S.home+12)%12===7)tag=' The 5 going home: the strongest pull there is.';else if(rb===S.home&&(ra-S.home+12)%12===5)tag=' 4 back to home: the soft "amen" ending.';
+  return `<li><b>${csMap(a.cs)} → ${csMap(b.cs)}</b>: ${keep.length?`keeps ${keep.map(n).join(', ')}`:'no notes in common'}${mv.length?`; moves ${mv.join(', ')}`:''} · ${ROOTMOVE[iv]}.${tag}</li>`}
+function songRender(){const C=SONG.chords,M=SONG.mel,o=$('song-out');
+  try{S.songTxt=$('song-in').value;S.songMel=$('song-mel').value;persist()}catch(e){}
+  if(!C.length&&!M.length){o.innerHTML=SONG.bad.length?`<p class="decnote warn">I couldn't read ${SONG.bad.map(esc).join(', ')}. Use chord names like G, D/F#, Em7, or tabs like 320003.</p>`:'';if(S.decKey&&S.decKey.auto){S.decKey=null;persist();if(DEC.res)decode()}return}
+  const ks=songKeys(),best=ks[0],pick=S.decKey&&!S.decKey.auto?S.decKey:null,use=pick||{k:best.k,h:best.h};
+  if(!pick&&(C.length+M.length>=2)&&(!S.decKey||S.decKey.k!==use.k||S.decKey.h!==use.h)){S.decKey={k:use.k,h:use.h,auto:true};persist()}
+  if(S.key!==use.k||S.home!==use.h){if(!DEC.prev)DEC.prev={key:S.key,home:S.home};S.key=use.k;S.home=use.h;syncSettings();warmCache()}
+  const sc=new Set(DIATONIC.map(d=>(use.k+d)%12)),alts=[];ks.forEach(x=>{if(alts.length<3&&!(x.k===use.k&&x.h===use.h)&&x.s>=best.s-3&&!alts.some(a=>a.k===x.k&&a.h===x.h))alts.push(x)});
+  const outN=C.reduce((n,c)=>n+c.pcs.filter(p=>!sc.has(p)).length,0);
+  let h=`<div class="songkey">Key: <b>${keyLabel(use)}</b>, so <b>${NAMES[(use.k+use.h)%12]} = ${DEG[use.h].n}</b>${pick?' (your pick)':''}. ${outN?'Most chords fit; the red ones borrow a note from outside.':'Every chord fits its seven notes.'}${alts.length?` Could also be: ${alts.map(x=>`<button class="chip songkeyb" data-k="${x.k}" data-h="${x.h}">${keyLabel(x)}</button>`).join(' ')}`:''}${pick?` <button class="chip songkeyb" data-k="auto">Best guess</button>`:''}</div>`;
+  if(C.length)h+=`<div class="songrow">${C.map((c,i)=>{const out=c.pcs.some(p=>!sc.has(p)),v=c.fr?{fr:c.fr}:voicings(c.pcs,c.bass,c.cs.root,1)[0];return `<button class="songch${out?' out':''}${c.cs.root===(use.k+use.h)%12?' home':''}" data-i="${i}"><span class="nm">${esc(c.cs.name)}</span><span class="n">${csMap(c.cs)}</span>${v?`<span class="tb">${tabOf(v.fr)}</span>`:''}</button>`}).join('')}</div>`;
+  if(M.length)h+=`<div><small class="hint">Melody on the map</small><div class="songmeln">${M.map(p=>`<span class="${sc.has(p)?'':'o'}">${DEG[degOfPc(p)].n}</span>`).join(' ')}</div></div>`;
+  if(C.length>1)h+=`<ul class="songlinks">${C.slice(1).map((c,i)=>songLink(C[i],c)).join('')}</ul>`;
+  if(SONG.bad.length)h+=`<p class="decnote warn">Skipped ${SONG.bad.map(esc).join(', ')}: I couldn't read ${SONG.bad.length>1?'those':'that'}.</p>`;
+  if(C.length)h+=`<div class="actions"><button class="btn" id="song-play">▶ Play the chords</button></div>`;
+  o.innerHTML=h;if(DEC.res)decode();renderPad()}
+function songUpdate(){songParse();songRender()}
+$('song-in').value=S.songTxt||'';$('song-mel').value=S.songMel||'';
+let songT=0;['song-in','song-mel'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(songT);songT=setTimeout(songUpdate,350)}));
+$('song-add').addEventListener('click',()=>{const R=DEC.res;if(!R)return toast('Decode a chord first');const all=csName(R.inp.pcs,R.inp.bass),cs=(R.inp.root!=null&&all.find(c=>c.root===R.inp.root))||all[0];
+  const tok=R.inp.src==='tab'?stdTab(R.inp.frets.slice().reverse().map(x=>x===null?-1:x)).replace(/ /g,''):(cs?cs.name:'');if(!tok)return;
+  const tk=/\s/.test(tok)||(R.inp.src==='tab'&&R.inp.frets.some(x=>x>9))?(cs?cs.name:tok):tok;
+  $('song-in').value=($('song-in').value.trim()+'  '+tk).trim();songUpdate()});
+$('song-out').addEventListener('click',e=>{const k=e.target.closest('.songkeyb');if(k){S.decKey=k.dataset.k==='auto'?null:{k:+k.dataset.k,h:+k.dataset.h};persist();songRender();return}
+  if(e.target.closest('#song-play')){stopAll();ensure();let t=ctx.currentTime+0.05;SONG.chords.forEach((c,i)=>{const v=c.fr?null:voicings(c.pcs,c.bass,c.cs.root,1)[0],ms=c.fr?c.fr.map((f,j)=>f<0?null:OPEN[OPEN.length-1-j]+f).filter(x=>x!=null):v?v.ms:c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.03,1.6,0.38));t+=1.3*PACE()});return}
+  const ch=e.target.closest('.songch');if(ch){const c=SONG.chords[+ch.dataset.i];$('dec-in').value=c.tok;decode();$('dec-in').scrollIntoView({behavior:'smooth',block:'center'})}});
 function decRender(){if($('dec-in').value.trim())decode();else{$('dec-out').innerHTML='';$('dec-acts').hidden=true}}
 function decFret(s,f){DEC.frets[s]=DEC.frets[s]===f?null:f;
   const typed=DEC.frets.slice().reverse().map(x=>x===null?'x':String(x));$('dec-in').value=typed.some(x=>x.length>1)?typed.join(' '):typed.join('');
