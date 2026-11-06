@@ -1296,7 +1296,6 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="actions">
       <details class="more"><summary>Options</summary>
         <div class="actions" style="margin-top:8px">
-          <label class="check"><input type="checkbox" id="opt-ref"> Play home first</label>
           <label class="check"><input type="checkbox" id="opt-retry"> Allow a second try</label>
           <label class="check"><input type="checkbox" id="deg-auto"> Auto-next</label>
           <label class="check"><input type="checkbox" id="opt-adapt"> Ask my weak numbers more</label>
@@ -2151,7 +2150,7 @@ function setPrompt(t){$('deg-prompt').textContent=t}
 function playQuestion(withCad){
   const t=ctx.currentTime+0.05;let d=0;
   if(withCad){d=cadence(t);setPrompt(`Cadence in ${homeName()}…`)}
-  if(S.ref){pluck(H()-12,t+d,0.9*PK(),0.5);d+=0.95*PACE()}  // reference home sits an octave below the test range, so a home answer is never the same note twice
+  {pluck(H()-12,t+d,0.9*PK(),0.5);d+=0.95*PACE()}  // the 1 always sounds first (not optional); reference home sits an octave below the test range, so a home answer is never the same note twice
   Q.at=performance.now()+(t+d-ctx.currentTime)*1000;pluck(Q.m,t+d,1.7*PK(),0.55);unlightAt(d*1000);
   later(d*1000,()=>setPrompt('Sing it, then tap its number on the map or the neck.'))}
 function nextDeg(){
@@ -3018,7 +3017,7 @@ $('lib-import').addEventListener('change',async e=>{const f=e.target.files[0];if
 function syncSettings(){
   $('key').innerHTML=NAMES.map((n,i)=>`<option value="${i}">${NAMES[(i+S.home)%12]}${S.home===9?'m':''}</option>`).join('');
   $('key').value=S.key;$('home-sel').value=String(S.home);$('every').value=S.every;$('vol').value=S.vol;$('deg-auto').checked=S.auto;$('plen').value=S.plen;
-  $('opt-ref').checked=S.ref;$('opt-retry').checked=S.retry;
+  $('opt-retry').checked=S.retry;
   const segs={labels:v=>v===S.labels,pmode:v=>v===S.pmode,range:v=>v===S.range};
   Object.entries(segs).forEach(([id,f])=>document.querySelectorAll(`#${id} button`).forEach(b=>b.setAttribute('aria-pressed',f(b.dataset.v))));
   $('pend').innerHTML=`<option value="home">Home (${lab(S.home)})</option>`+DIATONIC.map(o=>`<option value="${o}">World ${DEG[o].n}</option>`).join('');$('pend').value=S.pend;
@@ -3070,7 +3069,6 @@ $('drone').addEventListener('click',e=>{const on=e.currentTarget.getAttribute('a
 $('tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b){closeMenu();showTab(b.dataset.t)}});
 $('deg-next').addEventListener('click',nextDeg);$('deg-replay').addEventListener('click',replayDeg);$('deg-cad').addEventListener('click',cadOnly);
 $('deg-compare').addEventListener('click',()=>{if(Q&&Q.guess!==null)compareDeg()});
-$('opt-ref').addEventListener('change',e=>{S.ref=e.target.checked;persist()});
 $('opt-retry').addEventListener('change',e=>{S.retry=e.target.checked;persist()});
 $('deg-auto').addEventListener('change',e=>{S.auto=e.target.checked;persist()});
 $('opt-adapt').checked=S.adapt;$('opt-adapt').addEventListener('change',e=>{S.adapt=e.target.checked;persist()});

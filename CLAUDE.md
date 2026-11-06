@@ -22,6 +22,7 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Every note is a number relative to the key's home: major home is 1, minor home is 6. The seven "worlds" are the scale started from each number, and the distances never change.
 - Don't mention Jojo anywhere in the app.
 - Notes the app asks for must fit the playable neck (`fitPlay`).
+- In Name the number, the 1 (home note) always sounds before each note. It is not an option, even when the cadence is skipped.
 
 ## Design rules
 - Dark "Late Set" look (midnight and brass). Clean and spacious, with a slower, airy sound. The Ethereal voice is the default.
