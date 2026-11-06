@@ -1745,7 +1745,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         <div class="seg" id="range"><button data-v="one">1 octave</button><button data-v="two">2 octaves</button></div></div>
       <div class="field"><span>Labels</span>
         <div class="seg" id="labels"><button data-v="num">1 2 3</button><button data-v="sol">do re mi</button><button data-v="both">Both</button></div></div>
-      <label class="field"><span>Set the key with</span><select id="ctxmode"><option value="cad">Cadence (the key chords)</option><option value="bloom">Drone bloom (1, then a brighter 3)</option><option value="both">Bloom, then cadence</option></select></label>
+      <label class="field"><span>Set the key with</span><select id="ctxmode"><option value="tune">Home chord, then a little tune</option><option value="cad">Cadence (the key chords)</option><option value="bloom">Drone bloom (1, then a brighter 3)</option><option value="both">Bloom, then cadence</option></select></label>
       <label class="field"><span>How often to set the key</span><select id="every">
         <option value="1">Before every question</option><option value="3">Every 3rd question</option><option value="5">Every 5th question</option><option value="10">Every 10th question</option><option value="9999">Only when I press Cadence</option></select></label>
       <label class="check big"><input type="checkbox" id="opt-autopace"> Speed up as I get better (within each game; a miss slows it back down)</label>
@@ -1812,12 +1812,13 @@ const $=id=>document.getElementById(id);
 /* ---------- storage ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v?Object.assign(d,JSON.parse(v)):d}catch(e){return d}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'cad',scr:'home',pace:1.3,autoPace:true,findMode:'home',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'notes',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
+const S=load('tmt-settings',{key:7,home:0,labels:'num',every:1,vol:0.8,pool:[0,4,7],tab:'deg',auto:true,plen:4,pend:'home',pmode:'imagine',hold:4,range:'one',ref:true,retry:false,micSens:6,micOct:false,micSing:false,micNext:true,micAuto:false,micPhones:false,handsFree:false,showCircle:true,ctxMode:'tune',scr:'home',pace:1.3,autoPace:true,findMode:'home',voxMap:false,shRoot:'6',shChord:0,droneIdle:30,droneFifth:true,beatBpm:90,beatStyle:'click',beatMeter:4,beatSub:1,beatVol:0.8,beatAccent:true,beatClimb:false,duelMode:'notes',duelShow:false,inst:'guitar',tuning:'g-std',unlockAll:false,daily:15,stageMode:{},theme:'night',adapt:true,week:1,bpm:76,jamBars:1,jamStyle:'strum',jamClick:false,jamProg:'1 5 6m 4',melProg:'1 4 5 1',vqAsk:'notes',vxStr:'all',pgSet:'basic',pgLen:4,pgHome:true,cc7:false,showMap:true,showNeck:true,tones:true,voice:'ether',room:'small',win:0,fbNums:'all',findAsk:'number',findSeq:'seq',findShow:'home',voxMode:'explore',voxChord:3,voxSet:'basic'});
 const STATS=load('tmt-stats',{});
 const ANCH=load('tmt-anchors',{});
 if(!S.v3){S.v3=true;S.showCircle=true;S.showNeck=false}
 if(!S.v10){S.v10=true;S.showMap=true;S.showCircle=false;S.showNeck=false}
 if(!S.v11){S.v11=true;S.showCircle=false;S.showMap=true}
+if(!S.v12){S.v12=true;S.ctxMode='tune'}   // the home chord, then a little tune that lands on 1
 if(!S.v9){S.v9=true;S.cc7=false;S.csz='3';if(S.voxMode==='shell')S.voxMode='explore'}
 if(S.csz==='sh')S.csz='4';if(S.scr==='songs')S.scr='tools';
 if(!S.v4){S.v4=true;S.voice='ether'}
@@ -1992,7 +1993,13 @@ function showChordNow(){if(!chordNow&&S.tab==='dec'&&gameReady&&DEC.cur)chordNow
 const CAD={0:[[0,[0,4,7]],[5,[5,9,0]],[7,[7,11,2]],[0,[0,4,7]]],9:[[9,[9,0,4]],[2,[2,5,9]],[4,[4,8,11]],[9,[9,0,4]]]};
 Object.assign(CAD,{2:[[2,[2,5,9]],[7,[7,11,2]],[2,[2,5,9]],[7,[7,11,2]],[2,[2,5,9]]],4:[[4,[4,7,11]],[5,[5,9,0]],[2,[2,5,9]],[4,[4,7,11]]],
   5:[[5,[5,9,0]],[7,[7,11,2]],[5,[5,9,0]],[7,[7,11,2]],[5,[5,9,0]]],7:[[7,[7,11,2]],[5,[5,9,0]],[0,[0,4,7]],[7,[7,11,2]]],11:[[11,[11,2,5]],[0,[0,4,7]],[11,[11,2,5]],[4,[4,7,11]],[11,[11,2,5]]]});
-function cadence(t){if(S.ctxMode==='bloom')return bloom(t);if(S.ctxMode==='both'){const d=bloom(t);return d+cadChords(t+d)}return cadChords(t)}
+function cadence(t){if(S.ctxMode==='tune')return homeTune(t);if(S.ctxMode==='bloom')return bloom(t);if(S.ctxMode==='both'){const d=bloom(t);return d+cadChords(t+d)}return cadChords(t)}
+// The home chord, then a short tune in this world that always lands on its home note
+const TUNES=[[0,1,2,1,0],[4,3,2,1,0],[2,1,0],[0,2,4,2,0],[4,2,3,1,0],[0,1,2,3,4,2,0]];let lastTune=-1;
+function homeTune(t){const k=PACE(),kk=PK(),i=DIATONIC.indexOf(S.home);chord(S.home,homeTriad(),t,1.6*kk);let d=1.0*k;
+  let n;do{n=Math.floor(Math.random()*TUNES.length)}while(n===lastTune&&TUNES.length>1);lastTune=n;const p=TUNES[n];
+  p.forEach((st,j)=>{const last=j===p.length-1,o=DIATONIC[(i+st)%7],m=H()+((o-S.home+12)%12);pluck(m,t+d,(last?1.3:0.55)*kk,0.42);d+=(last?1.0:0.36)*k});
+  return d+0.25*k}
 function cadChords(t){const st=0.6*PACE(),L=CAD[S.home]||CAD[0];L.forEach((c,i)=>chord(c[0],c[1],t+i*st,(i===L.length-1?1.5:0.9)*PK()));return L.length*st+0.45*PACE()+0.4*Math.max(0,PACE()-1)}
 
 // A held tone that swells in and dies away slowly (used by the bloom and the drone)
@@ -4287,7 +4294,7 @@ const WHYTXT={'deg': 'Why: this is the core skill. Hearing any note as a number 
 Object.keys(WHYTXT).forEach(t=>{const L=LESSONS[t];const first=['#game-title',WHYTXT[t]+' Let’s play one.',{}];
   if(typeof L==='function')LESSONS[t]=()=>[first,...L()];else if(L)LESSONS[t]=[first,...L]});
 /* settings: "Set the key with" says what each option is, and lets you hear it */
-const CTXDESC={cad:'Four chords that walk home (for example 1 – 4 – 5 – 1). The clearest way to say "this is the key".',
+const CTXDESC={tune:'The home chord, then a short tune that lands on 1. Quick, musical, and it ends on home.',cad:'Four chords that walk home (for example 1 – 4 – 5 – 1). The clearest way to say "this is the key".',
   bloom:'A low home note swells, a brighter 3 joins and fades. Softer and slower; you feel home before you think it.',
   both:'The bloom first, then the chords. The strongest sense of home, and the slowest.'};
 function ctxDesc(){let d=$('ctxdesc');if(!d){d=document.createElement('p');d.id='ctxdesc';d.className='ctxdesc';$('ctxmode').closest('.field').appendChild(d);

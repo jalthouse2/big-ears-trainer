@@ -23,6 +23,7 @@ Several Claude chats work on this app, sometimes on the same day. These rules ke
 - Don't mention Jojo anywhere in the app.
 - Notes the app asks for must fit the playable neck (`fitPlay`).
 - In Name the number, the 1 (home note) always sounds before each note. It is not an option, even when the cadence is skipped.
+- The key is set by default with the home chord, then a little tune in that world that lands on home (`homeTune`, `TUNES`, Settings → Hearing the key → "Set the key with"). Cadence and bloom are still options.
 
 ## Design rules
 - Dark "Late Set" look (midnight and brass). Clean and spacious, with a slower, airy sound. The Ethereal voice is the default.
