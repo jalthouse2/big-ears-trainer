@@ -1770,6 +1770,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
         
         <input type="checkbox" id="mic-phones" hidden>
         <label class="check"><input type="checkbox" id="mic-oct"> Strict octave: count a note only in the same octave the app played it (normally any octave counts)</label>
+        <label class="check"><input type="checkbox" id="mic-voice"> Count singing as an answer (normally only a plucked note answers, so you can sing freely to find it)</label>
         <label class="check"><input type="checkbox" id="mic-sing"> Singing check (show cents)</label>
         
         <span class="hint">The mic pauses while the app plays, so it only hears you. For chord questions, play the chord's root.</span>
@@ -2931,6 +2932,8 @@ function micNext(){const t=S.tab;toast('Next');
   if(t==='deg'&&(!Q||Q.done))nextDeg();else if(t==='chord'&&(!CQ||CQ.done))nextChord();else if(t==='phr'&&(!P||P.done||P.revealed))newPhrase();
   else if(t==='find'&&(!FQ||FQ.done))nextFind();else if(t==='prog'&&(!PG||PG.done))nextProg();else if(t==='vox'&&S.voxMode==='quiz'&&(!VQ||VQ.done))nextVQ()}
 function rootChord(m,set){const r=offOf(m);return set.find(c=>c[0]===r&&VCH.includes(c))||set.find(c=>c[0]===r)||null}
+function micAnsTab(){const t=S.tab;return (t==='deg'&&Q&&!Q.done)||(t==='chord'&&CQ&&!CQ.done)||(t==='phr'&&P&&!P.done&&S.pmode==='hear')}
+function micVoiceHint(){const txt='Singing: pluck the note to answer';const el=$('mic-heard');if(el)el.textContent=txt;const h2=$('hf-heard');if(h2)h2.textContent=txt}
 function micNote(m,cents){
   micHeard(m,cents);lastAct=Date.now();const t=S.tab;
   if(t==='duel'){if(!DUEL.listen)return;if(S.duelMode==='chords'){const c=rootChord(m,duelChordSet());if(c)return duelInput(c[1]);return}return duelInput(offOf(m))}
@@ -2965,10 +2968,18 @@ function micFrame(){
     if(!(loud&&r.clarity>0.9)){MIC.hits=MIC.hits.filter(h=>now-h<1.0);MIC.hits.push(now);MIC.hitAt=0;strumShow(MIC.hits.length);clearTimeout(MIC.hitT);MIC.hitT=setTimeout(()=>{const n=MIC.hits.length;MIC.hits=[];if(n>=3)micReplay();else if(n===2)micNext();strumShow(0)},650)}else MIC.hitAt=0}
   if(!loud||r.clarity<0.72||r.freq<70||r.freq>1400){if(!loud)MIC.cur=null;return}
   const mf=69+12*Math.log2(r.freq/440),strong=r.clarity>=0.88;
-  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=jump||(MIC.cur===null&&MIC.quietAt!=null&&now-MIC.quietAt<0.25&&now-MIC.quietAt>=0&&MIC.quietAt>busyUntil+0.15);MIC.cur=Math.round(mf);MIC.since=now;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
+  if(MIC.cur===null||Math.abs(mf-MIC.cur)>0.65||(jump&&r.clarity>0.9)){MIC.onset=jump||(MIC.cur===null&&MIC.quietAt!=null&&now-MIC.quietAt<0.25&&now-MIC.quietAt>=0&&MIC.quietAt>busyUntil+0.15);MIC.cur=Math.round(mf);MIC.since=now;MIC.pk=r.rms;MIC.pkE=r.rms;MIC.vHint=false;MIC.emitted=false;MIC.strong=strong;MIC.gRms=null}
   if(strong)MIC.strong=true;
   if(S.micSing)micHeard(MIC.cur,(mf-MIC.cur)*100);
   if(S.tab==='key'&&MIC.emitted&&!busy)kfHold(MIC.cur,0.03);
+  if(!MIC.emitted&&!busy&&micAnsTab()){   // answering a question: a plucked note answers; singing only helps you find it (unless "Count singing" is on)
+    const age=now-MIC.since;MIC.pk=Math.max(MIC.pk||0,r.rms);if(age<=0.1)MIC.pkE=Math.max(MIC.pkE||0,r.rms);
+    if(MIC.since<MIC.gate||(echoOf(MIC.cur,now)&&!MIC.onset))return;
+    const plucked=MIC.pkE>=0.8*MIC.pk&&r.rms<=0.72*MIC.pk;   // loudest at the start, then dying away
+    if(age>0.18&&plucked){MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100);return}
+    if(S.micVoice&&age>0.4){MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100);return}   // a held sung note, once it has settled
+    if(!S.micVoice&&age>0.5&&!MIC.vHint){MIC.vHint=true;micVoiceHint()}
+    return}
   if(!MIC.emitted&&now-MIC.since>(MIC.strong?0.08:0.22)&&!busy){
     const echo=echoOf(MIC.cur,now);
     if(MIC.since>=MIC.gate){if(echo&&!MIC.onset)return;MIC.emitted=true;micNote(MIC.cur,(mf-MIC.cur)*100)}
@@ -2980,7 +2991,7 @@ function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Micr
   b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
   $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn();
   const hf=$('hfbar');if(hf){hf.hidden=!(on&&!['tune','dec','key'].includes(S.tab));if(!hf.hidden)$('mic-pill').hidden=true;$('hf-g').textContent=S.micNext?'2 muted strums: next · 3: replay':'';$('hf-strums').hidden=!S.micNext;
-    $('hf-txt').textContent={sing:'Sing or play the number',deg:'Play or sing the note',chord:'Play or sing the top note',phr:'Play or sing the notes in order',prog:'Play each chord\u2019s root',find:'Play each spot on the neck',duel:'Play the notes back',mel:'Play notes to write them',vox:'Play the chord\u2019s root'}[S.tab]||'Play or sing your answer'}}
+    $('hf-txt').textContent={sing:'Sing or play the number',deg:S.micVoice?'Play or sing the note':'Sing to find it, pluck it to answer',chord:S.micVoice?'Play or sing the top note':'Sing to find it, pluck the top note',phr:S.micVoice?'Play or sing the notes in order':'Pluck the notes in order',prog:'Play each chord\u2019s root',find:'Play each spot on the neck',duel:'Play the notes back',mel:'Play notes to write them',vox:'Play the chord\u2019s root'}[S.tab]||'Play or sing your answer'}}
 async function micStart(){ensure();
   const live=MIC.stream&&MIC.stream.getAudioTracks().some(t=>t.readyState==='live');
   if(!live){try{MIC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:false,autoGainControl:false}})}
@@ -3006,7 +3017,7 @@ $('mic-sens').value=S.micSens;const sensTxt=()=>{const v=S.micSens;$('mic-sens-t
 $('mic-sens').addEventListener('input',e=>{S.micSens=Number(e.target.value);persist();sensTxt()});
 $('hands-free').checked=S.handsFree;$('hands-free').addEventListener('change',e=>{S.handsFree=e.target.checked;if(S.handsFree){S.micNext=true;S.auto=true;$('mic-next').checked=true;$('deg-auto').checked=true;persist();micEnable();toast('Hands-free on: play to answer')}else{S.micNext=false;$('mic-next').checked=false;persist();micLabel()}});
 $('mic-phones').checked=S.micPhones;$('mic-phones').addEventListener('change',e=>{S.micPhones=e.target.checked;persist();const was=MIC.on;micPause();micRelease();if(was)setTimeout(micSync,100)});
-[['mic-oct','micOct'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
+[['mic-oct','micOct'],['mic-voice','micVoice'],['mic-sing','micSing'],['mic-next','micNext']].forEach(([id,k])=>{$(id).checked=S[k];$(id).addEventListener('change',e=>{S[k]=e.target.checked;persist()})});
 
 $('lib-export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'tonal-map-trainer',version:1,songs:LIB.cache.songs,melodies:LIB.cache.melodies},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tonal-map-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove()});
@@ -3389,11 +3400,22 @@ const roleOf=(i,suf)=>suf==='°7'&&i===9?'7th':(suf==='sus2'&&i===2)?'2nd':(suf=
 const nameOfPc=a=>NAMES[((a%12)+12)%12];
 const degOfPc=a=>((a-S.key)%12+12)%12;          // pitch class -> map degree (0 = 1)
 function parseNote(t){const m=t.match(/^([A-Ga-g])([#♯b♭]?)$/);return m?(LET[m[1].toUpperCase()]+accOf(m[2])+12)%12:null}
-function parseTab(str){let toks=str.trim().split(/[\s,\-|/]+/).filter(Boolean);
-  const N=OPEN.length;if(toks.length===1&&new RegExp(`^[x\\dX]{${N}}$`).test(toks[0]))toks=toks[0].split('');
-  if(toks.length!==N||!toks.every(x=>/^(x|X|\d{1,2})$/.test(x)))return null;
-  const frets=toks.map(x=>/x/i.test(x)?null:Number(x));if(frets.every(f=>f===null)||frets.some(f=>f!==null&&f>24))return null;
-  return frets.slice().reverse()}   // typed low E first; stored high E first
+function parseTab(str){   // frets low string first: "10 10 9 x x x", "10,10,9,x,x,x", "10109xxx", "x32010", spaces optional
+  const N=OPEN.length,parts=str.trim().toLowerCase().split(/[\s,\-|/.]+/).filter(Boolean);
+  if(!parts.length||!parts.every(x=>/^[x\d]+$/.test(x)))return null;
+  const outs=[];   // every way to read each chunk as x / 0-24, keeping chunk breaks
+  const go=(pi,ci,acc)=>{if(outs.length>200||acc.length>N+4)return;if(pi===parts.length){outs.push(acc.slice());return}
+    const w=parts[pi];if(ci===w.length)return go(pi+1,0,acc);
+    if(w[ci]==='x'){acc.push(null);go(pi,ci+1,acc);acc.pop();return}
+    acc.push(Number(w[ci]));go(pi,ci+1,acc);acc.pop();
+    if(ci+1<w.length&&w[ci]!=='0'&&/\d/.test(w[ci+1])&&Number(w.slice(ci,ci+2))<=24){acc.push(Number(w.slice(ci,ci+2)));go(pi,ci+2,acc);acc.pop()}};
+  go(0,0,[]);
+  const trim=f=>{f=f.slice();while(f.length>N&&f[f.length-1]===null)f.pop();return f};   // extra x's at the end don't matter
+  const ok=outs.map(trim).filter(f=>f.length===N&&f.some(x=>x!==null));
+  if(!ok.length)return null;
+  const big=f=>f.filter(x=>x!==null&&x>9).length,span=f=>{const v=f.filter(x=>x!==null&&x>0);return v.length?Math.max(...v)-Math.min(...v):0};
+  ok.sort((x,y)=>span(x)-span(y)||big(x)-big(y));   // the playable reading: frets close together
+  return ok[0].slice().reverse()}   // typed low E first; stored high E first
 function parseInput(str,mode){str=str.trim();if(!str)return null;
   const toks=str.split(/[\s,]+/).filter(Boolean);
   const tryTab=()=>{const f=parseTab(str);if(!f)return null;const ms=[];f.forEach((x,s)=>{if(x!==null)ms.push(OPEN[s]+x)});ms.sort((a,b)=>a-b);return {src:'tab',frets:f,pcs:ms.map(m=>m%12),bass:ms[0]%12,ms}};
@@ -3406,7 +3428,7 @@ function parseInput(str,mode){str=str.trim();if(!str)return null;
   if(mode==='tab')return tryTab();if(mode==='notes')return tryNotes();if(mode==='nums')return tryNums();if(mode==='name')return tryName();
   // auto: compact six characters or six frets with an x or a 0 or repeats -> tab
   const compact=new RegExp(`^[x\\dX]{${OPEN.length}}$`).test(str);
-  if(compact)return tryTab();
+  if(compact||(/[xX]/.test(str)&&/^[\dxX\s,\-|/.]+$/.test(str))){const t=tryTab();if(t)return t}
   if(toks.length===OPEN.length&&toks.every(x=>/^(x|X|\d{1,2})$/.test(x))&&(toks.some(x=>/x/i.test(x)||x==='0'||Number(x)>7)||new Set(toks).size<toks.length))return tryTab();
   return tryNums()||tryName()||tryNotes()||tryTab()}
 function identify(pcsIn,bass){const set=[...new Set(pcsIn)];if(!set.length)return [];
