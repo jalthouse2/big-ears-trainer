@@ -3898,7 +3898,7 @@ function tuneSetup(){if(!$('tune-set'))return;
   const btn=i=>`<button class="sbtn" data-i="${i}" aria-label="String ${n-i}: ${NAMES[ms[i]%12]}">${NAMES[ms[i]%12].replace('♭','b')}</button>`;
   hs.innerHTML=`<div class="hscol">${left.map(btn).join('')}</div>${headstockSVG(n)}<div class="hscol">${right.map(btn).join('')}</div>`;
   tuneMark()}
-function tuneMark(){if(typeof tuneExplain==='function'&&$('tune-msg'))setTimeout(tuneExplain,0);document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=Number(b.dataset.i);b.classList.toggle('act',i===TUNE.sel);b.classList.toggle('ok',TUNE.done.has(i))});
+function tuneMark(){if(typeof tuneExplain==='function'&&$('tune-msg'))setTimeout(tuneExplain,0);document.querySelectorAll('#hs .sbtn').forEach(b=>{const i=Number(b.dataset.i);b.classList.toggle('act',i===TUNE.sel);b.classList.toggle('ok',i===TUNE.sel&&TUNE.done.has(i))});
   document.querySelectorAll('#hs .str').forEach(l=>{const k=Number(l.dataset.k);l.classList.toggle('act',k===TUNE.sel)})}
 $('hs').addEventListener('click',e=>{const b=e.target.closest('.sbtn');if(!b)return;TUNE.sel=Number(b.dataset.i);TUNE.auto=false;$('tune-auto').setAttribute('aria-pressed','false');tuneMark();
   const m=tuning()[1][TUNE.sel];$('tune-note').innerHTML=noteLbl(m);
