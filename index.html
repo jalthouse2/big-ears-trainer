@@ -829,6 +829,12 @@ body.paused .circgo{opacity:.5}
 .fc.sname{display:grid;place-items:center;font:600 11px var(--font-mono);color:var(--muted);background:var(--bg);border-right:2px solid var(--fret)}
 .dot.pip{width:11px!important;height:11px!important;font-size:0!important;border-width:1px}
 .dot.pip.vox{width:15px!important;height:15px!important}
+.dot.up{background:var(--good-soft);border:2px solid var(--good);color:var(--fg)}
+.dot.dn{background:var(--bad-soft);border:2px solid var(--bad);color:var(--fg)}
+.stepinfo{display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.45}
+.stepinfo p{margin:0}
+.stepinfo .k{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:baseline}
+.stepinfo small{color:var(--muted)}
 .dot.pool.pip{background:transparent;border-color:var(--muted);opacity:.7}
 @media (max-width:620px){.fb,.fnums{grid-template-columns:20px repeat(var(--n,15),minmax(19px,1fr))}.fb.zoom,.fnums.zoom{grid-template-columns:22px repeat(var(--n,5),minmax(0,1fr))}.fb.zoom .fc{height:32px}.fb.zoom .dot{width:24px;height:24px;font-size:11px}}
 
@@ -1200,6 +1206,7 @@ details.lvw>summary::-webkit-details-marker{display:none}
 <button class="card" data-open="vox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16M3 9.3h18M3 14.7h18"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="6" cy="17.3" r="1.8" fill="currentColor" stroke="none"/></svg><span><span class="t">Chords on the neck</span><span class="s">Shapes, inversions and triads</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="dec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/><path d="M14 11.5h5M16.5 9v5" /><circle cx="6" cy="9" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/></svg><span><span class="t">Chord decoder</span><span class="s">Tab, notes, numbers or a name: what chord is it?</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14 9l2 2"/></svg><span><span class="t">Key finder</span><span class="s">Paste a tab, type notes or play along: what key is it?</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+<button class="card" data-open="step"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h5v-5h5V9h5V4h3"/></svg><span><span class="t">Steps on the neck</span><span class="s">Half and whole steps, along the string and across</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="free"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg><span><span class="t">Free play</span><span class="s">Tap any number and feel it against home</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M21 12h-3M12 21v-3M3 12h3"/><path d="M8 14.5L12 7l4 7.5z"/></svg><span><span class="t">Chord chart</span><span class="s">Every chord in the key and its numbers</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
 <button class="card" data-open="jam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span><span class="t">Jam</span><span class="s">Loop a progression and play over it</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -1482,6 +1489,20 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="actions"><button class="btn primary" id="pk-go">Start</button><span class="score" id="pk-count"></span></div>
   </section>
 
+  <section class="stage" id="panel-step" hidden>
+    <div class="seg keep voxmode" id="step-mode"><button data-v="see">Explore</button><button data-v="find">Find it</button><button data-v="walk">Walk</button></div>
+    <p class="eyebrow">Steps on the neck</p>
+    <div class="howto"><p class="why"><b>Why:</b> melodies move mostly by steps. Knowing where the next half or whole step is, on this string or the next, lets your hand follow your ear without leaving its spot.</p><p>Same note, one string over: 5 frets away (4 between G and B).</p><p>A half step is 1 fret, a whole step 2. Across a string, add or take away from that 5.</p><p>Explore: tap any note to see its neighbours. Find it: the app names a step, you find it on the next string. Walk: hear a short line and play it in one position.</p></div>
+    <div class="field" id="step-size-f"><div class="seg" id="step-size"><button data-v="0">Same note</button><button data-v="1">Half step</button><button data-v="2">Whole step</button></div></div>
+    <div class="stepinfo keep" id="step-info"></div>
+    <div class="actions" id="step-row"><p class="prompt" id="step-prompt">Press ▶ to start.</p></div>
+    <p class="feedback" id="step-fb"></p>
+    <div class="actions">
+      <button class="btn primary" id="step-next">Start</button>
+      <button class="btn" id="step-hear">Hear it</button>
+      <span class="score" id="step-score"></span>
+    </div>
+  </section>
   <section class="stage" id="panel-free" hidden>
     <p class="eyebrow">Free play</p>
     <div class="howto"><p class="why"><b>Why:</b> each number has its own feeling against home. Getting to know them by ear is what makes them easy to name later.</p><p>The drone holds home. Tap any number on the map or the neck.</p><p>Listen: which ones feel settled? Which want to move, and where to?</p></div>
@@ -1827,7 +1848,7 @@ const two=()=>S.range==='two';
 const padKeys=()=>{const rows=two()?[0,1]:[0],out=[];rows.forEach(r=>[...ALL,12].forEach(o=>out.push({k:idOfDeg(o)+12*r,o,r})));return out};
 var gameReady=false;let AUTOF=1;const PACE=()=>['deg','chord','phr','prog','find','vox','duel'].includes(S.tab)?Math.max(0.5,S.pace*AUTOF):1;const PK=()=>Math.max(1,PACE());
 const DIGIT={1:0,2:2,3:4,4:5,5:7,6:9,7:11,8:12};
-const TABNAME={today:'Today',sing:'Sing it',pocket:'Pocket practice',free:'Free play',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'My songs',anc:'Interval anchors',dec:'Chord decoder',pairs:'Chord pairs',paths:'Melody paths',key:'Key finder',tune:'Tuner',duel:'Duel',beat:'Rhythm'};
+const TABNAME={today:'Today',sing:'Sing it',pocket:'Pocket practice',free:'Free play',deg:'Name the number',chord:'Note over chord',phr:'Phrases',find:'Find it',vox:'Chords on the neck',cc:'Chord chart',prog:'Progressions',jam:'Jam',mel:'Write a melody',songs:'My songs',anc:'Interval anchors',dec:'Chord decoder',pairs:'Chord pairs',paths:'Melody paths',key:'Key finder',tune:'Tuner',duel:'Duel',beat:'Rhythm',step:'Steps on the neck'};
 const $=id=>document.getElementById(id);
 
 /* ---------- storage ---------- */
@@ -2382,7 +2403,7 @@ let OPEN=[64,59,55,50,45,40],FRETS=15;        // high string on top, as in tab
 const INST={guitar:{open:[64,59,55,50,45,40],frets:15,str:['e','B','G','D','A','E']},uke:{open:[69,64,60,67],frets:12,str:['A','E','C','G']}};
 const WINDOWS=[{lo:0,hi:15,name:'Whole neck'},{lo:0,hi:4,name:'Frets 0–4'},{lo:2,hi:5,name:'Frets 2–5'},{lo:4,hi:8,name:'Frets 4–8'},{lo:7,hi:10,name:'Frets 7–10'},{lo:9,hi:13,name:'Frets 9–13'},{lo:12,hi:15,name:'Frets 12–15'}];
 let cellMarks={},cellNow=null,FRETLIST=[];
-const curWin=()=>{if(S.tab==='key')return WINDOWS[0];if(S.tab==='find'&&S.findMode==='home'&&typeof IQ!=='undefined'&&IQ){const lo=Math.max(0,IQ.hf-2),hi=Math.min(FRETS,Math.max(lo+6,IQ.hf+5));return {lo,hi,name:'around home'}}return WINDOWS[(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ)?BQ.w:(S.tab==='find'&&FQ)?FQ.w:S.win]};
+const curWin=()=>{if(S.tab==='step')return stepWin();if(S.tab==='key')return WINDOWS[0];if(S.tab==='find'&&S.findMode==='home'&&typeof IQ!=='undefined'&&IQ){const lo=Math.max(0,IQ.hf-2),hi=Math.min(FRETS,Math.max(lo+6,IQ.hf+5));return {lo,hi,name:'around home'}}return WINDOWS[(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ)?BQ.w:(S.tab==='find'&&FQ)?FQ.w:S.win]};
 const inWin=(f,W)=>f>=W.lo&&f<=W.hi;
 function renderFB(){
   if(S.inst==='piano')return renderKB();
@@ -2391,7 +2412,7 @@ function renderFB(){
   FRETLIST=zoom?Array.from({length:W.hi-W.lo+1},(_,i)=>W.lo+i):Array.from({length:FRETS+1},(_,i)=>i);
   const hasNut=FRETLIST[0]===0,nf=FRETLIST.length-(hasNut?1:0);
   [el,$('fnums')].forEach(x=>{x.style.setProperty('--n',nf);x.classList.toggle('zoom',zoom)});
-  const show=S.tab==='find'?(S.findMode==='home'?'none':S.findShow):S.tab==='vox'?'none':S.tab==='dec'||S.tab==='key'?'home':S.fbNums;
+  const show=S.tab==='find'?(S.findMode==='home'?'none':S.findShow):S.tab==='vox'?'none':S.tab==='dec'||S.tab==='key'||S.tab==='step'?'home':S.fbNums;
   const markPc={};Object.entries(marks).forEach(([k,v])=>{const p=pc(Number(k));if(!markPc[p]||v==='ok')markPc[p]=v});
   const trailPc=new Set([...trail].map(k=>pc(k))),nowPc=nowKey==null?null:pc(nowKey);
   const ch=VCH[S.voxChord],shape=VX.shapes[VX.i];const shapeIds=new Set(S.tab==='vox'&&S.voxMode==='explore'&&shape?shape.ids:S.tab==='vox'&&S.voxMode==='shell'&&typeof SHL!=='undefined'&&SHL.ids?SHL.ids:[]);
@@ -2400,8 +2421,8 @@ function renderFB(){
   for(let s=0;s<OPEN.length;s++)for(const f of FRETLIST){
     const m=OPEN[s]+f,o=offOf(m),id=s+'-'+f,iw=inWin(f,W);
     let st=cellMarks[id]||'';
-    if(!st&&iw&&S.tab!=='find'&&S.tab!=='vox'&&S.tab!=='dec'&&S.tab!=='key'){st=markPc[o]||(trailPc.has(o)?'trail':'')}
-    let now=cellNow===id||(iw&&nowPc===o&&S.tab!=='find'&&S.tab!=='vox');
+    if(!st&&iw&&S.tab!=='find'&&S.tab!=='vox'&&S.tab!=='dec'&&S.tab!=='key'&&S.tab!=='step'){st=markPc[o]||(trailPc.has(o)?'trail':'')}
+    let now=cellNow===id||(iw&&nowPc===o&&S.tab!=='find'&&S.tab!=='vox'&&S.tab!=='step');
     let vis=!!st||now,label=lab(o),extra='';
     if(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ){const ix=BQ.cells.indexOf(id);if(ix>=0){vis=true;if(ix<BQ.i||BQ.done)extra='ok';else if(ix===BQ.i){extra='vox';label='?'}else extra='pool pip'}}
     if(S.tab==='key'&&KF&&!st){const ap=m%12,inK=DIATONIC.includes(o);if(KF.cells.has(id)||KF.ms.has(m)){vis=true;extra=inK?'vox':'no'}else if(KF.w[ap]>0){vis=true;extra=(inK?'tone':'no')+' pip'}}
@@ -2412,6 +2433,7 @@ function renderFB(){
       if(S.voxMode==='shell'&&shapeIds.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='std'&&typeof STD!=='undefined'&&STD.ids.has(id)){vis=true;extra='vox'}
       if(S.voxMode==='quiz'&&quizIds.has(id)){const named=VQ.named&&VQ.named.has(id);vis=VQ.done||named;extra=st?'':'vox'}}
+    if(S.tab==='step'&&typeof STEP!=='undefined'&&STEP.cells[id]){vis=true;extra=STEP.cells[id]}
     if(!vis){if(show==='all'&&S.pool.includes(o)){vis=true;if(o!==S.home)extra='pool pip'}else if(show==='home'&&o===S.home)vis=true}
     const cls=['dot',vis?'':'ghost',o===S.home&&!st&&!extra&&(vis||S.tab!=='vox')?'home':'',st,extra,now?'now':''].filter(Boolean).join(' ');
     if(f===FRETLIST[0]&&f>0)h+=`<span class="fc sname">${STR[s]}</span>`;
@@ -2420,6 +2442,7 @@ function renderFB(){
   $('fnums').innerHTML=(FRETLIST[0]>0?'<span></span>':'')+FRETLIST.map(f=>`<span>${zoom?(f||''):([3,5,7,9,12,15].includes(f)?f:'')}</span>`).join('')}
 $('fb').addEventListener('click',e=>{const b=e.target.closest('.fc');if(!b)return;const [s,f]=b.dataset.c.split('-').map(Number);fbPress(s,f)});
 function fbPress(s,f){
+  if(S.tab==='step')return stepTap(s,f);
   if(S.tab==='find'&&S.findMode==='home'&&IQ&&!IQ.done)return answerIQ(s,f);
   if(S.tab==='find'&&S.findMode==='box'){const c=BQ&&!BQ.done&&boxCur();if(c&&c.s===s&&c.f===f)boxSound();return}
   if(S.tab==='dec'&&SONG.rec){stopAll();ensure();pluck(OPEN[s]+f,ctx.currentTime+0.03,1.2,0.45);cellNow=s+'-'+f;renderFB();setTimeout(()=>{cellNow=null;renderFB()},500);return melAdd((OPEN[s]+f)%12)}
@@ -2607,7 +2630,7 @@ function syncFB(){
   document.querySelectorAll('#find-ask button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findAsk));
   document.querySelectorAll('#find-seq button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findSeq));
   document.querySelectorAll('#find-show button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.findShow));
-  $('fb-nums-f').hidden=S.tab==='find'||S.tab==='vox'}
+  $('fb-nums-f').hidden=S.tab==='find'||S.tab==='vox'||S.tab==='step'}
 const segBind=(id,key,after)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.v;persist();syncFB();if(after)after();renderFB()});
 segBind('fb-nums','fbNums');segBind('find-ask','findAsk',()=>{FQ=null;$('find-next').textContent='Start'});segBind('find-seq','findSeq');segBind('find-show','findShow');
 $('fb-win').addEventListener('change',e=>{S.win=Number(e.target.value);persist();FQ=null;$('find-next').textContent='Start';refreshShapes();renderFB()});
@@ -2970,6 +2993,7 @@ function micNote(m,cents){
   if(t==='dec')return SONG.rec?melAdd(m%12):decAddMidi(m);
   if(t==='sing')return singIn(m);
   if(t==='key')return kfMic(m);
+  if(t==='step')return stepMic(m);
   if(t==='paths')return pathMic(m);
   if(t==='deg'&&Q&&!Q.done)return padPress(micKey(m,Q.m));
   if(t==='chord'&&CQ&&!CQ.done)return padPress(micKey(m,CQ.m));
@@ -3016,7 +3040,7 @@ function micFrame(){
     else if(!echo){ // began while the app was playing, and it isn't the app's own note: a voice singing along
       if(MIC.gRms==null&&now>=MIC.gate)MIC.gRms=r.rms;
       if(MIC.gRms!=null&&now-MIC.gate>0.45){MIC.emitted=true;if(r.rms>=0.75*MIC.gRms)micNote(MIC.cur,(mf-MIC.cur)*100)}}}}
-const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec','key','paths','sing'];
+const LISTEN_TABS=['deg','chord','phr','find','prog','vox','mel','tune','duel','dec','key','paths','sing','step'];
 function micLabel(){const b=$('mic-toggle');const on=MIC.on,lab=!S.micAuto?'Microphone off: tap to turn on':on?'Listening: tap to turn the mic off':'Microphone on';
   b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('muted',S.micAuto&&MIC.muted);b.setAttribute('aria-label',lab);b.title=lab;
   $('mic-pill').hidden=!on;if(typeof tuneMicBtn==='function')tuneMicBtn();
@@ -3072,9 +3096,9 @@ function resetKeyContext(){resetQuestions();if(S.tab==='dec'&&gameReady)setTimeo
   if(droneNodes)setDrone(true);persist();warmCache();syncSettings();renderPad();renderLoop();renderAnchors();FQ=null;VQ=null;refreshShapes()}
 function applyDock(){const t=S.tab;
   $('dock').hidden=['anc','songs','tune','beat','today','pocket'].includes(t);
-  const neckGame=['find','vox'].includes(t);$('mapwrap').hidden=false;const toolNeck=t==='dec'||t==='key',neckOn=toolNeck?S.toolNeck!==false:S.showNeck;$('fbwrap').hidden=!neckOn&&!neckGame;$('circwrap').hidden=true;
+  const neckGame=['find','vox','step'].includes(t);$('mapwrap').hidden=false;const toolNeck=t==='dec'||t==='key',neckOn=toolNeck?S.toolNeck!==false:S.showNeck;$('fbwrap').hidden=!neckOn&&!neckGame;$('circwrap').hidden=true;
   document.querySelector('#dock-show button[data-v="neck"]').hidden=neckGame;
-  $('fb-win-f').hidden=!neckOn||toolNeck;
+  $('fb-win-f').hidden=!neckOn||toolNeck||t==='step';
   document.querySelectorAll('#dock-show button').forEach(b=>b.setAttribute('aria-pressed',neckOn));
   }
 $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
@@ -3082,9 +3106,9 @@ $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');i
 function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(S.tab==='dec'&&t!=='dec'&&typeof DEC!=='undefined'&&DEC.prev){S.key=DEC.prev.key;S.home=DEC.prev.home;DEC.prev=null;if(gameReady){syncSettings();renderPad()}}if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='dec'&&(S.songTxt||S.songMel))setTimeout(()=>{if(S.tab==='dec')songUpdate()},0);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths','step'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='dec'&&(S.songTxt||S.songMel))setTimeout(()=>{if(S.tab==='dec')songUpdate()},0);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
-  if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();
+  if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();if(t==='step'&&typeof stepSync==='function')stepSync(true);
   applyDock();
   FQ=null;VQ=null;$('find-next').textContent='Start';$('vq-next').textContent='Start';$('find-reveal').hidden=true;findCount();
   syncFB();clearMarks();if(t==='vox'){syncVox();refreshShapes()}applyStage();renderRun();if(gameReady&&typeof syncSongSeg==='function')syncSongSeg()}
@@ -3974,8 +3998,8 @@ function applyInst(){const g=S.inst==='uke'?INST.uke:INST.guitar;OPEN=g.open;FRE
   const piano=S.inst==='piano';$('kb').hidden=!piano;document.querySelector('#fbwrap .fbscroll').hidden=piano;
   const nb=document.querySelector('#dock-show button[data-v="neck"]');if(nb)nb.textContent=piano?'Piano':S.inst==='uke'?'Ukulele':'Guitar';
   // games that only make sense on a fretboard
-  ['find','vox'].forEach(t=>{document.querySelectorAll(`[data-open="${t}"],#tabs [data-t="${t}"]`).forEach(b=>b.hidden=piano)});
-  if(piano&&['find','vox'].includes(S.tab))S.tab='deg';
+  ['find','vox','step'].forEach(t=>{document.querySelectorAll(`[data-open="${t}"],#tabs [data-t="${t}"]`).forEach(b=>b.hidden=piano)});
+  if(piano&&['find','vox','step'].includes(S.tab))S.tab='deg';
   const vs=$('vx-strings');if(vs){const n=OPEN.length;vs.innerHTML='<option value="all">All string groups</option>'+Array.from({length:n-2},(_,i)=>`<option value="${i}">${STR[i+2]} ${STR[i+1]} ${STR[i]}${i===0?' (top three)':i===n-3?' (bottom three)':''}</option>`).join('');
     if(Number(S.vxStr)>n-3)S.vxStr='all';vs.value=S.vxStr}
   document.querySelectorAll('#inst button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.inst));$('inst-sel').value=S.inst;
@@ -4706,6 +4730,114 @@ function guideSync(t){const g=GUIDE[t];if(!g||!g.el)return;const show=!g.only||g
   const notStarted=on.length===1&&on[0]===0;g.el.hidden=notStarted;startCue(t,notStarted);if(notStarted)return;
   g.el.querySelectorAll('li').forEach(li=>{const i=+li.dataset.i;li.classList.toggle('on',on.includes(i));li.classList.toggle('done',i<first);
     li.querySelector('small').textContent=i===Math.max(...on)&&first>0?txt:''})}
+/* ---------- tool: steps on the neck (half and whole steps, along the string and across) ---------- */
+var STEP={from:null,opts:[],cells:{},q:null,w:null,n:0,c:0,streak:0};
+if(S.stepMode==null)S.stepMode='see';if(S.stepSize==null)S.stepSize='1';
+function stepStr(s){const n=STR[s];return (S.inst==='guitar'?(s===0?'high e':s===OPEN.length-1?'low E':n):n)+' string'}
+function stepWin(){if(S.stepMode==='walk'&&STEP.w)return {lo:STEP.w.lo,hi:STEP.w.lo+4,name:'one position'};
+  if(S.stepMode==='find'&&STEP.q){const lo=Math.max(0,Math.min(STEP.q.f-5,FRETS-10));return {lo,hi:Math.min(FRETS,lo+10),name:'around the note'}}return WINDOWS[0]}
+// the note's neighbours within reach: this string, and one string either side
+function stepCells(s,f,d){const m=OPEN[s]+f,out=[];
+  const add=(s2,dm,dir)=>{const f2=m+dm-OPEN[s2];if(f2<0||f2>FRETS)return;if(s2!==s&&Math.abs(f2-f)>(d?4:5))return;out.push({s:s2,f:f2,dir,m:m+dm})};
+  for(const s2 of [s-1,s,s+1]){if(s2<0||s2>=OPEN.length)continue;if(d===0){if(s2!==s)add(s2,0,0)}else{add(s2,d,1);add(s2,-d,-1)}}
+  return out}
+const stepCls=c=>c.dir>0?'up':c.dir<0?'dn':'tone';
+const stepAway=(c,f)=>{const df=c.f-f;return df===0?'same fret':`${Math.abs(df)} fret${Math.abs(df)>1?'s':''} ${df<0?'back':'up'}`};
+function stepSync(enter){if(enter){STEP.from=null;STEP.opts=[];STEP.cells={};STEP.q=null;STEP.w=null}
+  const md=S.stepMode;document.querySelectorAll('#step-mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===md));
+  document.querySelectorAll('#step-size button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(S.stepSize)));
+  $('step-size-f').hidden=md==='walk';$('step-info').hidden=md!=='see';
+  const row=$('step-next').closest('.actions');row.hidden=md==='see';$('step-row').hidden=md==='see';$('step-fb').hidden=md==='see';
+  if(md==='see')stepInfo();
+  else if(!(md==='find'?STEP.q:STEP.w)){$('step-next').textContent='Start';$('step-prompt').textContent='Press ▶ to start.';$('step-fb').textContent=''}
+  stepScore();renderFB()}
+function stepScore(){$('step-score').textContent=STEP.n?`${STEP.c}/${STEP.n} first try · streak ${STEP.streak}`:''}
+function stepFlash(id){cellNow=id;renderFB();setTimeout(()=>{if(cellNow===id){cellNow=null;renderFB()}},900)}
+
+/* Explore: tap a note, see where its neighbours are */
+function stepSee(s,f){STEP.from={s,f};const d=+S.stepSize;STEP.opts=stepCells(s,f,d);STEP.cells={[s+'-'+f]:'vox'};
+  STEP.opts.forEach(c=>STEP.cells[c.s+'-'+c.f]=stepCls(c));renderFB();stepInfo()}
+function stepInfo(){const el=$('step-info'),fr=STEP.from,d=+S.stepSize,sz=d===1?'half step':'whole step';
+  const key=`<p><small><span class="k" style="background:var(--brass)"></span>your note · <span class="k" style="background:var(--good)"></span>up · <span class="k" style="background:var(--bad)"></span>down${d===0?' · <span class="k" style="background:var(--brass-soft);border:1px solid var(--brass)"></span>same note':''}</small></p>`;
+  if(!fr){el.innerHTML=`<p>Tap any note on the neck.</p>${key}`;return}
+  const m=OPEN[fr.s]+fr.f,where=c=>c.s===fr.s?`fret ${c.f} here`:`fret ${c.f} on the ${STR[c.s]} string <small>(${stepAway(c,fr.f)})</small>`;
+  const list=dir=>STEP.opts.filter(c=>c.dir===dir).sort((a,b)=>(a.s===fr.s?-1:0)-(b.s===fr.s?-1:0)).map(where).join(' · ')||'<small>out of reach here</small>';
+  let h=`<p><b>${lab(offOf(m))}</b> (${NAMES[m%12]}) on the ${stepStr(fr.s)}, fret ${fr.f}.</p>`;
+  if(d===0)h+=`<p>Same note: ${list(0)}.</p>`;
+  else{const up=STEP.opts.find(c=>c.dir>0),dn=STEP.opts.find(c=>c.dir<0);
+    h+=`<p>Up a ${sz}${up?` to <b>${lab(offOf(up.m))}</b>`:''}: ${list(1)}.</p><p>Down a ${sz}${dn?` to <b>${lab(offOf(dn.m))}</b>`:''}: ${list(-1)}.</p>`}
+  h+=`<p><small>Tap a coloured dot to hear the step. Tap any other note to move there.</small></p>`+key;el.innerHTML=h}
+
+/* Find it: the app names a step, you find it on the next string */
+const stepAsk=q=>q.d0===0?'Same note, on the next string.':`${q.dir>0?'Up':'Down'} a ${q.d0===1?'half':'whole'} step, on the next string.`;
+function stepFindNext(){stopAll();ensure();const d0=+S.stepSize,last=STEP.q;let q,n=0;
+  do{const s=Math.floor(Math.random()*OPEN.length),f=1+Math.floor(Math.random()*Math.min(11,FRETS-1)),dir=d0?(Math.random()<0.5?1:-1):0;
+    const ans=stepCells(s,f,d0).filter(c=>c.s!==s&&c.dir===dir);q={s,f,m:OPEN[s]+f,d:d0*dir,d0,dir,ans,tries:0,done:false}}
+  while((!q.ans.length||(last&&last.s===q.s&&last.f===q.f))&&++n<80);
+  STEP.q=q;STEP.cells={[q.s+'-'+q.f]:'vox'};renderFB();
+  $('step-prompt').textContent=stepAsk(q);$('step-fb').textContent='';$('step-next').textContent='Next';
+  pluck(q.m,ctx.currentTime+0.05,1.4,0.45)}
+function stepFindRight(s,f,heard){const q=STEP.q;q.done=true;const first=q.tries===0;STEP.n++;if(first){STEP.c++;STEP.streak++}else STEP.streak=0;addXP(1);
+  stepCells(q.s,q.f,q.d0).forEach(c=>{if(c.dir===q.dir)STEP.cells[c.s+'-'+c.f]=stepCls(c)});STEP.cells[s+'-'+f]='ok';renderFB();
+  stopAll();const t=ctx.currentTime+(heard?0.4:0.03);pluck(q.m,t,0.9,0.45);pluck(OPEN[s]+f,t+0.6,1.3,0.45);
+  const others=q.ans.filter(c=>!(c.s===s&&c.f===f)),alt=others.length?` Or fret ${others[0].f} on the ${STR[others[0].s]} string.`:'';
+  $('step-fb').innerHTML=`<span class="tag ok">${lab(offOf(q.m+q.d))}</span> <b class="cheer">${first?cheer(STEP.streak):'Got it.'}</b> Fret ${f} on the ${STR[s]} string, ${stepAway({f},q.f)}.${alt}`;
+  $('step-prompt').textContent='Play it on your guitar: the gold note, then the step. Sing it too.';stepScore()}
+function stepFindAns(s,f,m){const q=STEP.q;stopAll();if(!q||q.done){pluck(m,ctx.currentTime+0.02,1.1,0.45);return stepFlash(s+'-'+f)}
+  const id=s+'-'+f,target=q.m+q.d;
+  if(s===q.s&&f===q.f){pluck(m,ctx.currentTime+0.02,1.2,0.45);return stepFlash(id)}
+  if(m===target&&s!==q.s)return stepFindRight(s,f);
+  pluck(m,ctx.currentTime+0.02,0.9,0.4);
+  if(m===target){$('step-fb').innerHTML=`<span class="tag no">Same string</span> Right note. Now find it on the next string.`;return stepFlash(id)}
+  q.tries++;STEP.cells[id]='no';renderFB();setTimeout(()=>{if(STEP.cells[id]==='no'){delete STEP.cells[id];renderFB()}},900);
+  const dd=m-q.m;$('step-fb').innerHTML=`<span class="tag no">Not that one</span> ${dd===0?'That\'s the same note.':`That's ${Math.abs(dd)} half step${Math.abs(dd)>1?'s':''} ${dd>0?'up':'down'}.`} Try again.`}
+
+/* Walk: hear a short line of steps, play it in one position */
+function stepWalkNext(){stopAll();ensure();const lo=1+Math.floor(Math.random()*Math.min(9,FRETS-5)),C=[];
+  for(let s=0;s<OPEN.length;s++)for(let f=lo;f<=lo+4;f++){const m=OPEN[s]+f;if(DIATONIC.includes(offOf(m)))C.push({s,f,m})}
+  const P=[...new Set(C.map(c=>c.m))].sort((a,b)=>a-b),len=4+Math.floor(Math.random()*2);
+  let i=Math.floor(Math.random()*P.length),dir=Math.random()<0.5?1:-1;const seq=[i];
+  while(seq.length<len){if(i+dir<0||i+dir>=P.length){dir=-dir;continue}if(seq.length>2&&Math.random()<0.2)dir=-dir;if(i+dir<0||i+dir>=P.length)continue;i+=dir;seq.push(i)}
+  const line=seq.map(j=>P[j]),sc=C.filter(c=>c.m===line[0]),st=sc[Math.floor(Math.random()*sc.length)];
+  STEP.w={lo,line,got:1,tries:0,done:false};STEP.cells={[st.s+'-'+st.f]:'vox'};renderFB();
+  $('step-prompt').textContent=`Play these ${line.length} notes inside the bright frets, starting on the gold ${lab(offOf(line[0]))}. Tap each one.`;
+  $('step-fb').textContent='';$('step-next').textContent='Next';stepWalkPlay(true)}
+function stepWalkPlay(withKey){const w=STEP.w;if(!w)return;stopAll();ensure();let t=ctx.currentTime+0.05;if(withKey)t+=cadence(t)+0.3;
+  w.line.forEach((m,j)=>pluck(m,t+j*0.62,j===w.line.length-1?1.4:0.7,0.45))}
+function stepWalkAns(m,id,heard){const w=STEP.w;if(!heard){stopAll();pluck(m,ctx.currentTime+0.02,0.9,0.45)}
+  if(!w||w.done){if(id)stepFlash(id);return}
+  if(m===w.line[w.got-1]){if(id)stepFlash(id);return}            // the note you're on: no harm
+  if(m===w.line[w.got]){if(id)STEP.cells[id]='ok';w.got++;if(w.got>=w.line.length)return stepWalkDone();renderFB();
+    $('step-fb').innerHTML=`<span class="tag ok">${w.got} of ${w.line.length}</span>`;return}
+  if(heard)return;
+  w.tries++;if(id){STEP.cells[id]='no';renderFB();setTimeout(()=>{if(STEP.cells[id]==='no'){delete STEP.cells[id];renderFB()}},900)}
+  const up=w.line[w.got]>w.line[w.got-1];
+  $('step-fb').innerHTML=`<span class="tag no">Not that one</span> ${w.tries>=2?`Hint: the next note is one step ${up?'up':'down'}. `:''}Press ↻ to hear the line again.`}
+function stepWalkDone(){const w=STEP.w;w.done=true;const first=w.tries===0;STEP.n++;if(first){STEP.c++;STEP.streak++}else STEP.streak=0;addXP(1);renderFB();
+  const parts=[];w.line.forEach((m,j)=>{if(j)parts.push(`<small>${Math.abs(m-w.line[j-1])===1?'half':'whole'}</small>`);parts.push(`<b>${lab(offOf(m))}</b>`)});
+  $('step-fb').innerHTML=`<b class="cheer">${first?cheer(STEP.streak):'Got it.'}</b> <span class="path">${parts.join(' ')}</span>`;
+  $('step-prompt').textContent='Play it again, singing the numbers. Then press → for the next one.';stepScore();
+  setTimeout(()=>{if(STEP.w===w&&S.tab==='step')stepWalkPlay(false)},700)}
+
+function stepTap(s,f){const id=s+'-'+f,m=OPEN[s]+f;ensure();
+  if(S.stepMode==='find')return stepFindAns(s,f,m);
+  if(S.stepMode==='walk')return stepWalkAns(m,id,false);
+  const fr=STEP.from,hit=fr&&STEP.opts.find(c=>c.s===s&&c.f===f);stopAll();const t=ctx.currentTime+0.03;
+  if(hit){pluck(OPEN[fr.s]+fr.f,t,0.9,0.45);pluck(m,t+0.6,1.3,0.45);return stepFlash(id)}
+  pluck(m,t,1.2,0.45);stepSee(s,f)}
+function stepMic(m){
+  if(S.stepMode==='find'){const q=STEP.q;if(!q||q.done)return;if(m===q.m+q.d){const c=q.ans[0];return stepFindRight(c.s,c.f,true)}
+    if(m!==q.m)$('step-fb').innerHTML=`<span class="tag no">That's ${lab(offOf(m))}</span> Not the step asked for.`;return}
+  if(S.stepMode==='walk'){const w=STEP.w;if(!w||w.done)return;let id=null;
+    for(let s=0;s<OPEN.length;s++){const f=m-OPEN[s];if(f>=w.lo&&f<=w.lo+4){id=s+'-'+f;break}}return stepWalkAns(m,id,true)}}
+$('step-mode').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.stepMode=b.dataset.v;persist();stopAll();stepSync(true)});
+$('step-size').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.stepSize=b.dataset.v;persist();
+  if(S.stepMode==='see'){if(STEP.from)stepSee(STEP.from.s,STEP.from.f);stepSync(false)}else{STEP.q=null;STEP.cells={};stepSync(false)}});
+$('step-next').addEventListener('click',()=>S.stepMode==='walk'?stepWalkNext():stepFindNext());
+$('step-hear').addEventListener('click',()=>{ensure();if(S.stepMode==='walk')return STEP.w?stepWalkPlay(false):stepWalkNext();
+  if(!STEP.q)return stepFindNext();stopAll();pluck(STEP.q.m,ctx.currentTime+0.03,1.4,0.45)});
+GUIDE.step={prompt:'step-prompt',only:()=>S.stepMode!=='see',lines:['Press ▶ to start.','Listen, and look at the gold note.','Play the next note on your guitar, then tap where you found it.','Press → for the next one.'],
+  cur:()=>{const q=S.stepMode==='walk'?STEP.w:STEP.q;return !q?[0]:q.done?[3]:[1,2]}};
 Object.keys(GUIDE).forEach(guideBuild);
 document.addEventListener('click',()=>setTimeout(()=>{const t=S.tab;if(GUIDE[t])guideSync(t)},80));
 setInterval(()=>{const t=S.tab;if(GUIDE[t]&&document.body.dataset.screen==='game')guideSync(t)},700);
