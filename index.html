@@ -906,7 +906,8 @@ body.paused .circgo{opacity:.5}
 .decex button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font:500 12px var(--font-mono);color:var(--fg)}
 .decout:empty{display:none}
 .decsong{display:flex;flex-direction:column;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
-.songmel{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 14px var(--font-mono)}
+.songrec{display:flex;gap:8px;flex-wrap:wrap}#song-rec[aria-pressed="true"]{background:var(--brass);color:var(--on-brass);border-color:var(--brass)}
+.songmel{resize:vertical;width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 14px var(--font-mono)}
 #song-out:empty{display:none}
 #song-out{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
 .songkey{font-size:14px;line-height:1.5}.songkey b{color:var(--brass)}
@@ -1633,7 +1634,8 @@ details.lvw>summary::-webkit-details-marker{display:none}
       <p class="eyebrow">The whole song</p>
       <p class="hint">Put the chords in order, and a melody if you have one. It finds the key and shows how each chord leads to the next.</p>
       <div class="decin"><input id="song-in" placeholder="G  D/F#  Em  C" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chords in order"><button class="btn" id="song-add" title="Add the chord above">+ Add</button></div>
-      <input id="song-mel" class="songmel" placeholder="Melody notes (optional): B A G A B B B" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Melody notes">
+      <textarea id="song-mel" class="songmel" rows="2" placeholder="Melody (optional): notes like B A G A B, or paste a tab" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Melody: notes or a pasted tab"></textarea>
+      <div class="songrec"><button class="chip" id="song-rec" aria-pressed="false">✎ Add melody from the neck, map or mic</button><button class="chip" id="song-undo" aria-label="Remove the last melody note">⌫</button></div>
       <div id="song-out" aria-live="polite"></div>
     </div>
   </section>
@@ -2095,6 +2097,7 @@ function lightAt(ms,o,extra){later(ms,()=>{nowKey=o;if(extra)extra();renderPad()
 function unlightAt(ms){later(ms,()=>{nowKey=null;renderPad()})}
 function preview(o){if(!JAM.on)stopAll();ensure();const t=ctx.currentTime+0.02;pluck(H()+o,t,1.2,0.5);lightAt(0,o);unlightAt(600)}
 function padPress(o){
+  if(S.tab==='dec'&&SONG.rec){preview(o);return melAdd((S.key+pc(o))%12)}
   if(S.tab==='chord'&&S.chMode==='explore')return exPick(pc(o));
   if(S.tab==='find'&&S.findMode==='box'&&typeof BQ!=='undefined'&&BQ&&!BQ.done)return boxAnswer(pc(o));
   if(S.tab==='key')return kfTapDeg(pc(o));
@@ -2419,6 +2422,7 @@ $('fb').addEventListener('click',e=>{const b=e.target.closest('.fc');if(!b)retur
 function fbPress(s,f){
   if(S.tab==='find'&&S.findMode==='home'&&IQ&&!IQ.done)return answerIQ(s,f);
   if(S.tab==='find'&&S.findMode==='box'){const c=BQ&&!BQ.done&&boxCur();if(c&&c.s===s&&c.f===f)boxSound();return}
+  if(S.tab==='dec'&&SONG.rec){stopAll();ensure();pluck(OPEN[s]+f,ctx.currentTime+0.03,1.2,0.45);cellNow=s+'-'+f;renderFB();setTimeout(()=>{cellNow=null;renderFB()},500);return melAdd((OPEN[s]+f)%12)}
   if(S.tab==='dec')return decFret(s,f);
   if(S.tab==='key'){cellNow=s+'-'+f;setTimeout(()=>{if(cellNow===s+'-'+f){cellNow=null;renderFB()}},600);return kfTapMidi(OPEN[s]+f,s+'-'+f)}
   if(S.tab==='find'&&FQ&&!FQ.done)return answerFind(s,f);
@@ -2963,7 +2967,7 @@ function micVoiceHint(){const txt='Singing: pluck the note to answer';const el=$
 function micNote(m,cents){
   micHeard(m,cents);lastAct=Date.now();const t=S.tab;
   if(t==='duel'){if(!DUEL.listen)return;if(S.duelMode==='chords'){const c=rootChord(m,duelChordSet());if(c)return duelInput(c[1]);return}return duelInput(offOf(m))}
-  if(t==='dec')return decAddMidi(m);
+  if(t==='dec')return SONG.rec?melAdd(m%12):decAddMidi(m);
   if(t==='sing')return singIn(m);
   if(t==='key')return kfMic(m);
   if(t==='paths')return pathMic(m);
@@ -3710,7 +3714,13 @@ function songParse(){const raw=$('song-in').value.trim(),toks=raw?raw.split(/[\s
     if(/^[x\d]{4,}$/i.test(t)){const f=parseTab(t);if(f){const ms=[];f.forEach((x,st)=>{if(x!==null)ms.push(OPEN[st]+x)});ms.sort((a,b)=>a-b);const pcs=ms.map(m=>m%12),nm=csName(pcs,pcs[0])[0];if(nm)c={tok:t,cs:nm,pcs:[...new Set(pcs)],bass:pcs[0],fr:f.slice().reverse().map(x=>x===null?-1:x)}}}
     else{const p=csParse(t);if(p){const nm=csName(p.pcs,p.bass),cs=(p.over&&nm.find(x=>x.root===p.root&&x.over))||nm.find(x=>x.root===p.root&&!x.over)||nm.find(x=>x.root===p.root)||nm[0];if(cs)c={tok:t,cs,pcs:[...new Set(p.pcs)],bass:p.bass}}}
     if(c)out.push(c);else bad.push(t)});
-  SONG.chords=out;SONG.bad=bad;SONG.mel=$('song-mel').value.trim().split(/[\s,|\-]+/).filter(Boolean).map(parseNote).filter(x=>x!==null)}
+  SONG.chords=out;SONG.bad=bad;SONG.mel=melParse($('song-mel').value)}
+// a melody as notes ("B A G") or as a pasted tab, one line per string, high e on top ("e|--3--5--")
+function melParse(txt){const lines=txt.split(/\n/).filter(l=>/^\s*[eEBGDAa]?\s*\|?[-\d|hpbr\/\\~x ]*-[-\d|hpbr\/\\~x ]*$/.test(l)&&/-/.test(l));
+  if(lines.length>=2){const N=Math.min(lines.length,OPEN.length),ev=[];
+    for(let i=0;i<N;i++){const l=lines[i].replace(/^\s*[eEBGDAa]?\s*\|?/,''),re=/\d{1,2}/g;let m;while((m=re.exec(l))){ev.push({x:m.index,m:OPEN[i]+Number(m[0])})}}
+    return ev.sort((a,b)=>a.x-b.x||b.m-a.m).map(e=>e.m%12)}
+  return txt.trim().split(/[\s,|\-]+/).filter(Boolean).map(parseNote).filter(x=>x!==null)}
 function songKeys(){const C=SONG.chords,M=SONG.mel,res=[];
   for(let k=0;k<12;k++){const sc=new Set(DIATONIC.map(d=>(k+d)%12));let s=0;
     C.forEach(c=>{const o=c.pcs.filter(p=>!sc.has(p)).length;s+=o?-1.5*o:2});M.forEach(p=>{s+=sc.has(p)?0.5:-0.7});
@@ -3748,6 +3758,9 @@ $('song-add').addEventListener('click',()=>{const R=DEC.res;if(!R)return toast('
   const tk=R.inp.src==='tab'?R.inp.frets.slice().reverse().map(x=>x===null?'x':String(x)).join(''):tok;
   $('song-in').value=($('song-in').value.trim()+'  '+tk).trim();songUpdate()});
 $('dec-next').addEventListener('click',()=>{if(!DEC.res)return;$('song-add').click();const n=SONG.chords.length;$('dec-clear').click();toast(n===1?'Chord 1 saved. Now the next one.':`Chord ${n} saved. Keep going, or see the song below.`)});
+SONG.rec=false;function melAdd(p){const el=$('song-mel');if(el.value.includes('\n'))el.value='';el.value=(el.value.trim()+' '+NAMES[p]).trim();clearTimeout(songT);songT=setTimeout(songUpdate,250)}
+$('song-rec').addEventListener('click',()=>{SONG.rec=!SONG.rec;const b=$('song-rec');b.setAttribute('aria-pressed',SONG.rec);b.textContent=SONG.rec?'● Adding melody: tap the neck or map, play or sing. Tap to stop':'✎ Add melody from the neck, map or mic';if(SONG.rec&&!MIC.on&&S.micAuto)micStart()});
+$('song-undo').addEventListener('click',()=>{const el=$('song-mel');const t=el.value.trim().split(/\s+/);t.pop();el.value=t.join(' ');songUpdate()});
 $('song-out').addEventListener('click',e=>{const k=e.target.closest('.songkeyb');if(k){S.decKey=k.dataset.k==='auto'?null:{k:+k.dataset.k,h:+k.dataset.h};persist();songRender();return}
   if(e.target.closest('#song-play')){stopAll();ensure();let t=ctx.currentTime+0.05;SONG.chords.forEach((c,i)=>{const v=c.fr?null:voicings(c.pcs,c.bass,c.cs.root,1)[0],ms=c.fr?c.fr.map((f,j)=>f<0?null:OPEN[OPEN.length-1-j]+f).filter(x=>x!=null):v?v.ms:c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.03,1.6,0.38));t+=1.3*PACE()});return}
   const ch=e.target.closest('.songch');if(ch){const c=SONG.chords[+ch.dataset.i];$('dec-in').value=c.tok;decode();$('dec-in').scrollIntoView({behavior:'smooth',block:'center'})}});
@@ -3992,6 +4005,7 @@ function renderKB(){const el=$('kb');if(!el||!instReady)return;const c0=H()-(((H
   el.innerHTML=h}
 function kbPress(m){
   if(S.tab==='key'){kbNow=m;setTimeout(()=>{if(kbNow===m){kbNow=null;renderKB()}},600);return kfTapMidi(m)}
+  if(S.tab==='dec'&&SONG.rec){melAdd(m%12);return}
   if(S.tab==='dec'){DEC.kb=DEC.kb||new Set();DEC.kb.has(m)?DEC.kb.delete(m):DEC.kb.add(m);const ms=[...DEC.kb].sort((a,b)=>a-b);$('dec-in').value=ms.map(x=>NAMES[x%12]).join(' ');
     stopAll();ensure();pluck(m,ctx.currentTime+0.02,1.2,0.5);if(!ms.length){$('dec-out').innerHTML='';$('dec-acts').hidden=true;DEC.cur=null;renderPad();return}decode();return}
   const waiting=(S.tab==='duel'&&DUEL.listen&&S.duelMode!=='chords')||S.tab==='mel'||(S.tab==='deg'&&Q&&!Q.done)||(S.tab==='chord'&&CQ&&!CQ.done)||(S.tab==='phr'&&S.pmode==='hear'&&P&&!P.done);
