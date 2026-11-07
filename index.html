@@ -924,6 +924,8 @@ body.paused .circgo{opacity:.5}
 .songlinks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:var(--muted)}.songlinks b{color:var(--fg)}
 .songmeln{font:500 14px var(--font-mono);letter-spacing:.04em}.songmeln .o{color:var(--bad,#e07a6a)}
 .dectabs{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}.dectabs .chip{font-family:var(--font-mono)}
+.tabch{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;height:auto}.tabch b{font-weight:600;color:var(--fg)}.tabch small{font:500 11px var(--font-mono);color:var(--brass);letter-spacing:.04em}.tabch.mine{border-color:var(--brass)}.dectabs>small{flex-basis:100%}
+.songch .tn{font:500 10px var(--font-mono);color:var(--brass);letter-spacing:.03em}
 .decres{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
 .dechead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
 .dechead .nm{font:800 44px/1 var(--font-display);letter-spacing:.03em}
@@ -959,6 +961,9 @@ body.paused .circgo{opacity:.5}
 .cgrid .lk .hold{display:block;height:2px;background:var(--brass);margin:0 4px}
 #pa-line b{display:inline-block;min-width:22px;text-align:center;font:800 22px var(--font-display);color:var(--brass)}
 #pa-line b.ok{color:var(--good)} #pa-line b.no{color:var(--bad)}
+.paear{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}#pa-ear:empty{display:none}#pa-ear{display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5}
+.paopt{font:700 16px var(--font-mono);letter-spacing:.08em}.paopt.ok{border-color:var(--good);color:var(--good)}.paopt.no{border-color:var(--bad);color:var(--bad)}
+.paverd{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}.paverd li.cur{color:var(--fg)}.paverd li{color:var(--muted)}.paverd b{color:var(--brass)}
 #panel-chord[data-mode="explore"]>:not(#ch-mode):not(#ch-ex){display:none!important}
 .exgrid{display:grid;grid-template-columns:28px repeat(7,minmax(0,1fr));gap:3px;text-align:center;align-items:center}
 .exgrid .ch{font:600 12px var(--font-mono);color:var(--muted)}
@@ -1531,6 +1536,11 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <p class="prompt keep" id="pa-line"></p>
     <ol class="pglist keep" id="pa-steps"><li data-i="1"><b>1</b><span>Hear the path over the chords.</span></li><li data-i="2"><b>2</b><span>Chords only: sing the path. With the mic on, each landing turns green.</span></li><li data-i="3"><b>3</b><span>Play it on the guitar, landing on beat 1 of each chord.</span></li><li data-i="4"><b>4</b><span>Fill between the landings with neighbour notes. Then jam over it.</span></li></ol>
     <div class="actions"><button class="btn primary" id="pa-hear">▶ Hear the path</button><button class="btn" id="pa-sing">Chords only</button><button class="btn" id="pa-jam">Jam over it</button></div>
+    <div class="paear">
+      <p class="eyebrow">By ear</p>
+      <div class="actions"><button class="btn" id="pa-quiz">Hidden path</button><button class="btn" id="pa-holdb">Hold one note</button></div>
+      <div id="pa-ear" aria-live="polite"></div>
+    </div>
   </section>
 
   <section class="stage" id="panel-prog" hidden>
@@ -3431,9 +3441,9 @@ $('drone-fifth').checked=S.droneFifth;$('drone-fifth').addEventListener('change'
 
 
 /* chord size pill: triads or 7th chords, for the chord chart, note over chord and progressions */
-const CSIZE_TABS=['cc','chord','prog'];
+const CSIZE_TABS=['cc','chord','prog','paths'];
 function syncCsize(){$('csize').value=S.csz||(S.cc7?'4':'3');$('csize-pill').hidden=!CSIZE_TABS.includes(S.tab)}
-$('csize').addEventListener('change',e=>{S.csz=e.target.value;S.cc7=e.target.value!=='3';ccShellNote();$('cc-7').checked=S.cc7;persist();renderCC();if(S.tab==='prog'){PG=null;pgSlots();syncProg()}if(S.tab==='chord'){CQ=null;$('ch-next').textContent='Start'}});
+$('csize').addEventListener('change',e=>{S.csz=e.target.value;S.cc7=e.target.value!=='3';ccShellNote();$('cc-7').checked=S.cc7;persist();renderCC();if(S.tab==='prog'){PG=null;pgSlots();syncProg()}if(S.tab==='chord'){CQ=null;$('ch-next').textContent='Start'}if(S.tab==='paths'){stopAll();PA.start=null;PA.hits=[];PA.q=null;PA.hold=null;pathsRender()}});
 leanMark();
 gameReady=true;applyStage();renderHomeStats();renderRun();renderLvlBtn();
 
@@ -3678,7 +3688,7 @@ function decode(){if(S.tab!=='dec')return;const mode='auto',inp=parseInput($('de
   if(cs&&uniq.length>1){const alts=csAlts(csAll,cs);
     notes+=`<details class="decstep" open><summary><b>1</b> On its own</summary><ol>${csSteps(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol>${alts.length?`<p class="decalt">Same notes, other names: ${alts.map(c=>`<button class="chip decname" data-x="${c.name}">${c.name}</button>`).join(' ')}. Pick the one that makes most sense in the music.</p>`:''}</details>`;
     notes+=`<details class="decstep" open><summary><b>2</b> On the tonal map</summary><ol>${csKey(cs,csSet).map(l=>`<li>${l}</li>`).join('')}</ol></details>`}
-  const tabs=uniq.length>1?tabLine(uniq,inp.bass,cs?cs.root:null,inp.src==='tab'?DEC.frets.slice().reverse().map(x=>x===null?-1:x):null):'';
+  const tabs=uniq.length>1?tabLine(uniq,inp.bass,cs?cs.root:null,inp.src==='tab'?DEC.frets.slice().reverse().map(x=>x===null?-1:x):null,cs):'';
   $('dec-out').innerHTML=`<div class="decres">${csKeyLine(cs,csSet)}${head}${tabs}${cells}${notes}</div>`;$('dec-acts').hidden=false;
   const tones=order.map(degOfPc);DEC.cur=cs&&uniq.length>1?{root:degOfPc(cs.root),tones,name:csMap(cs),tok:-1}:uniq.length?{root:degs[0],tones:degs,name:DEG[degs[0]].n,tok:-1}:null;
   if(!chordNow||chordNow.tok===-1)chordNow=DEC.cur;
@@ -3728,8 +3738,11 @@ function voicingSearch(pcs,bass,root,max=2){if(S.inst==='piano'||!OPEN.length)re
   for(const v of found){const k=v.fr.join();if(seen.has(k))continue;if(out.some(o=>Math.abs(o.lo-v.lo)<3))continue;seen.add(k);out.push(v);if(out.length>=max)break}
   return out}
 const tabOf=fr=>stdTab(fr);
-function tabLine(pcs,bass,root,typed){const v=voicings(pcs,bass,root,3).filter(x=>!typed||x.fr.join()!==typed.join());if(!v.length)return '';
-  return `<div class="dectabs"><span>${typed?'Other ways to play it':'Play it'}:</span>${v.slice(0,typed?2:3).map(x=>`<button class="chip decname" data-x="${tabOf(x.fr)}">${tabOf(x.fr)}</button>`).join('')}<small>low string first</small></div>`}
+// each string's note as a number on the tonal map, low string to high ("2 6 1 4 6 2")
+function tabNums(fr,cs){const N=OPEN.length;return fr.map((f,j)=>f<0?null:(OPEN[N-1-j]+f)%12).filter(x=>x!=null).map(p=>cs?csNumOf(cs,p):DEG[degOfPc(p)].n).join(' ')}
+function tabChip(fr,cs,mine){return `<button class="chip decname tabch${mine?' mine':''}" data-x="${tabOf(fr)}"><b>${tabOf(fr)}</b><small>${tabNums(fr,cs)}</small></button>`}
+function tabLine(pcs,bass,root,typed,cs){const v=voicings(pcs,bass,root,3).filter(x=>!typed||x.fr.join()!==typed.join());if(!v.length&&!typed)return '';
+  return `<div class="dectabs"><span>${typed?'Your shape, and other ways to play it':'Play it'}:</span>${typed?tabChip(typed,cs,true):''}${v.slice(0,typed?2:3).map(x=>tabChip(x.fr,cs)).join('')}<small>Low string first. Under each shape: its notes on the map, string by string.</small></div>`}
 
 /* ---------- the whole song: chords (and a melody) in order -> the key, the numbers, how each leads to the next ---------- */
 const SONG={chords:[],mel:[],bad:[]};
@@ -3768,7 +3781,7 @@ function songRender(){const C=SONG.chords,M=SONG.mel,o=$('song-out');
   const sc=new Set(DIATONIC.map(d=>(use.k+d)%12)),alts=[];ks.forEach(x=>{if(alts.length<3&&!(x.k===use.k&&x.h===use.h)&&x.s>=best.s-3&&!alts.some(a=>a.k===x.k&&a.h===x.h))alts.push(x)});
   const outN=C.reduce((n,c)=>n+c.pcs.filter(p=>!sc.has(p)).length,0);
   let h=`<div class="songkey">Key: <b>${keyLabel(use)}</b>, so <b>${NAMES[(use.k+use.h)%12]} = ${DEG[use.h].n}</b>${pick?' (your pick)':''}. ${outN?'Most chords fit; the red ones borrow a note from outside.':'Every chord fits its seven notes.'}${alts.length?` Could also be: ${alts.map(x=>`<button class="chip songkeyb" data-k="${x.k}" data-h="${x.h}">${keyLabel(x)}</button>`).join(' ')}`:''}${pick?` <button class="chip songkeyb" data-k="auto">Best guess</button>`:''}</div>`;
-  if(C.length)h+=`<div class="songrow">${C.map((c,i)=>{const out=c.pcs.some(p=>!sc.has(p)),v=c.fr?{fr:c.fr}:voicings(c.pcs,c.bass,c.cs.root,1)[0];return `<button class="songch${out?' out':''}${c.cs.root===(use.k+use.h)%12?' home':''}" data-i="${i}"><span class="nm">${esc(c.cs.name)}</span><span class="n">${csMap(c.cs)}</span>${v?`<span class="tb">${tabOf(v.fr)}</span>`:''}</button>`}).join('')}</div>`;
+  if(C.length)h+=`<div class="songrow">${C.map((c,i)=>{const out=c.pcs.some(p=>!sc.has(p)),v=c.fr?{fr:c.fr}:voicings(c.pcs,c.bass,c.cs.root,1)[0];return `<button class="songch${out?' out':''}${c.cs.root===(use.k+use.h)%12?' home':''}" data-i="${i}"><span class="nm">${esc(c.cs.name)}</span><span class="n">${csMap(c.cs)}</span>${v?`<span class="tb">${tabOf(v.fr)}</span><span class="tn">${tabNums(v.fr,c.cs)}</span>`:''}</button>`}).join('')}</div>`;
   if(M.length)h+=`<div><small class="hint">Melody on the map</small><div class="songmeln">${M.map(p=>`<span class="${sc.has(p)?'':'o'}">${DEG[degOfPc(p)].n}</span>`).join(' ')}</div></div>`;
   if(C.length>1)h+=`<ul class="songlinks">${C.slice(1).map((c,i)=>songLink(C[i],c)).join('')}</ul>`;
   if(SONG.bad.length)h+=`<p class="decnote warn">Skipped ${SONG.bad.map(esc).join(', ')}: I couldn't read ${SONG.bad.length>1?'those':'that'}.</p>`;
@@ -4974,19 +4987,52 @@ function pairAns(n){const q=PRG.q;if(PRG.stage!==4||!q)return;PRG.pick.push(n);
   if(ok&&typeof cheer==='function')$('pr-prompt').textContent=cheer(PRG.c)+' Press → for the next pair.';
   pairStage()}
 /* Melody paths */
-const PATHPROGS=['6m 4 1 5','1 5 6m 4','1 6m 4 5','4 5 3m 6m','2m 5 1 6m','1 4 5 1'];
+const PATHPROGS=['6m 4 1 5','1 5 6m 4','1 6m 4 5','4 5 3m 6m','2m 5 1 6m','1 4 5 1','2m 5 1 4'];
 const PA={prog:0,start:null,loop:false,i:-1,hits:[],path:[]};
-function pathChords(){return PATHPROGS[PA.prog].split(' ').map(vch)}
+function pathChords(){const sev=(S.csz||(S.cc7?'4':'3'))==='4';return PATHPROGS[PA.prog].split(' ').map(n=>{const c=vch(n);return sev?SEV[VCH.indexOf(c)]:c})}   // 1 3 5 or 1 3 5 7, from the top pill
 function pathFrom(st){const cs=pathChords(),p=[st];for(let i=1;i<cs.length;i++){const prev=p[i-1];p.push(cs[i][2].slice().sort((a,b)=>Math.abs(semi(prev,a))-Math.abs(semi(prev,b))||semi(prev,a)-semi(prev,b))[0])}return p}
 function pathsRender(){const cs=pathChords();if(PA.start==null||!cs[0][2].includes(PA.start))PA.start=cs[0][2][0];PA.path=pathFrom(PA.start);
   $('pa-progs').innerHTML=PATHPROGS.map((p,i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===PA.prog}">${p}</button>`).join('');
   $('pa-starts').innerHTML=`<span class="hint">Start on</span>`+cs[0][2].map(o=>`<button class="chip" data-o="${o}" aria-pressed="${o===PA.start}">${lab(o)}</button>`).join('');
-  $('pa-grid').innerHTML=cgGrid(cs.map((c,i)=>({c,path:PA.path[i]})),{cur:PA.i});
-  $('pa-line').innerHTML=`Path: ${PA.path.map((o,i)=>`<b class="${PA.hits[i]===true?'ok':PA.hits[i]===false?'no':''}">${lab(o)}</b>`).join(' ')}`}
+  const hide=PA.q&&PA.q.pick==null;   // don't give the hidden path away
+  $('pa-grid').innerHTML=cgGrid(cs.map((c,i)=>({c,path:hide?null:PA.hold!=null&&PA.hold>=0?PA.hold:PA.path[i]})),{cur:PA.i});
+  $('pa-line').hidden=hide;$('pa-line').innerHTML=`Path: ${PA.path.map((o,i)=>`<b class="${PA.hits[i]===true?'ok':PA.hits[i]===false?'no':''}">${lab(o)}</b>`).join(' ')}`}
 function pathPlay(withVoice,loops){stopAll();ensure();PA.hits=[];const cs=pathChords(),d=2*PK(),t0=ctx.currentTime+0.1,tok=++chordTok;PA.loop=true;
   for(let k=0;k<loops;k++)cs.forEach((c,i)=>{const t=t0+(k*cs.length+i)*d;chord(c[0],c[2],t,d*0.95,0.2);if(withVoice)pluck(cgMel(PA.path[i]),t+0.05,d*0.9,0.5);
     later((t-ctx.currentTime)*1000,()=>{PA.i=i;if(i===0&&!withVoice)PA.hits=[];cgShow(c,tok);pathsRender()})});
   later((t0-ctx.currentTime+loops*cs.length*d)*1000,()=>{PA.loop=false;PA.i=-1;cgShow(null);pathsRender()})}
+/* By ear 1: a path hides in the chords as their quiet top voice; which one was it? */
+function paOptions(){const cs=pathChords(),seen=new Set(),ps=[];cs[0][2].forEach(o=>{const p=pathFrom(o),k=p.join();if(!seen.has(k)){seen.add(k);ps.push(p)}});return ps}
+function paHidden(path,loops=1,vol=0.2){stopAll();ensure();const cs=pathChords(),d=2*PK(),t0=ctx.currentTime+0.1,tok=++chordTok;
+  for(let k=0;k<loops;k++)cs.forEach((c,i)=>{const t=t0+(k*cs.length+i)*d;chord(c[0],c[2],t,d*0.95,0.2);if(path)pluck(cgMel(path[i]),t+0.03,d*0.9,vol);
+    later((t-ctx.currentTime)*1000,()=>{cgShow(c,tok)})});
+  later((t0-ctx.currentTime+loops*cs.length*d)*1000,()=>cgShow(null))}
+function paQuiz(){PA.hold=null;const ops=paOptions().sort(()=>Math.random()-0.5).slice(0,3);PA.q={ops,ans:Math.floor(Math.random()*ops.length),pick:null};paEar();pathsRender();paHidden(PA.q.ops[PA.q.ans],1)}
+function paEar(){const el=$('pa-ear'),q=PA.q;
+  if(PA.hold!=null){const cs=pathChords(),n=PA.hold;
+    el.innerHTML=`<div class="chips cgchips"><span class="hint">Hold</span>${CG_ROWS.slice().reverse().map(o=>`<button class="chip paholdn" data-o="${o}" aria-pressed="${o===n}">${lab(o)}</button>`).join('')}</div>`+
+      (n<0?'<p class="hint">Pick a number. It holds while the chords change. Listen for where it sits inside a chord and where it rubs.</p>':
+      `<ul class="paverd">${cs.map((c,i)=>{const r=c[2].includes(n)?'inside the chord, it rests':c[2].some(t=>Math.abs(semi(n,t))===1)?'a rub: tension, a half step from a chord note':'colour: not in the chord, no clash';return `<li data-i="${i}"><b>${lab(n)}</b> over <b>${c[1]}</b>: ${r}</li>`}).join('')}</ul><div class="actions"><button class="btn" id="pa-holdplay">↻ Again</button></div>`);return}
+  if(!q){el.innerHTML='';return}
+  const nm=p=>p.map(lab).join(' ');
+  el.innerHTML=`<p>The chords play. One path hides on top, quietly. <b>Which one was it?</b></p><div class="chips cgchips">${q.ops.map((p,i)=>`<button class="chip paopt${q.pick==null?'':i===q.ans?' ok':i===q.pick?' no':''}" data-i="${i}">${nm(p)}</button>`).join('')}</div>`+
+    (q.pick==null?`<div class="actions"><button class="btn" id="pa-qagain">↻ Hear it again</button></div>`:
+    `<p>${q.pick===q.ans?esc(cheer(++PA.streak)):'Not quite. Hear the two side by side.'}</p>${slotRow('You',q.ops[q.pick].map((o,i)=>[lab(o),o===q.ops[q.ans][i]?'ok':'no']),'pa-you')}${slotRow('Answer',q.ops[q.ans].map(o=>[lab(o),'ok']),'pa-ans')}<div class="actions"><button class="btn primary" id="pa-qnext">→ Next</button></div>`)}
+function paHold(n){PA.q=null;PA.hold=n;paEar();if(n<0)return;stopAll();ensure();const cs=pathChords(),d=2*PK(),t0=ctx.currentTime+0.1,tok=++chordTok;
+  pluck(cgMel(n),t0,cs.length*d*2,0.32);
+  for(let k=0;k<2;k++)cs.forEach((c,i)=>{const t=t0+(k*cs.length+i)*d;chord(c[0],c[2],t,d*0.95,0.2);if(k||i)pluck(cgMel(n),t+0.02,d*0.95,0.16);
+    later((t-ctx.currentTime)*1000,()=>{cgShow(c,tok);$('pa-grid').innerHTML=cgGrid(cs.map(x=>({c:x,path:n})),{cur:i});document.querySelectorAll('.paverd li').forEach(li=>li.classList.toggle('cur',+li.dataset.i===i))})});
+  later((t0-ctx.currentTime+2*cs.length*d)*1000,()=>{cgShow(null);pathsRender()})}
+PA.streak=0;
+$('pa-quiz').addEventListener('click',paQuiz);
+$('pa-holdb').addEventListener('click',()=>{stopAll();PA.q=null;PA.hold=-1;paEar()});
+$('pa-ear').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.classList.contains('paholdn'))return paHold(+b.dataset.o);
+  if(b.id==='pa-holdplay')return paHold(PA.hold);
+  if(b.id==='pa-qagain')return paHidden(PA.q.ops[PA.q.ans],1);
+  if(b.id==='pa-qnext')return paQuiz();
+  if(b.classList.contains('paopt')&&PA.q&&PA.q.pick==null){PA.q.pick=+b.dataset.i;if(PA.q.pick!==PA.q.ans)PA.streak=0;paEar();pathsRender();return}
+  const r=b.closest('.rowplay');if(r&&PA.q){const p=r.dataset.act==='pa-you'?PA.q.ops[PA.q.pick]:PA.q.ops[PA.q.ans];paHidden(p,1,0.5)}});   // the row buttons play the path louder, so you can compare
 function pathMic(m){if(!PA.loop||PA.i<0)return;const want=PA.path[PA.i];PA.hits[PA.i]=offOf(m)===want;pathsRender()}
 
 /* Note over chord · Explore: one note over every chord, rated by you */
@@ -5012,7 +5058,7 @@ $('pr-replay').addEventListener('click',()=>{if(PRG.stage)pairStage()});
 $('pr-ans').addEventListener('click',e=>{const b=e.target.closest('button');if(b)pairAns(b.dataset.n)});
 $('pr-rows').addEventListener('click',e=>{const b=e.target.closest('.rowplay');if(!b||!PRG.q)return;
   if(b.dataset.act==='pr-you'){const [a,c]=PRG.pick.map(vch);if(a&&c)pairPlay([a,c],null,1)}else pairPlay([PRG.q.A,PRG.q.B],null,1)});
-$('pa-progs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PA.prog=+b.dataset.i;PA.start=null;PA.hits=[];stopAll();pathsRender()});
+$('pa-progs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PA.prog=+b.dataset.i;PA.start=null;PA.hits=[];stopAll();pathsRender();if(PA.q)paQuiz();else if(PA.hold!=null)paEar()});
 $('pa-starts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.o==null)return;PA.start=+b.dataset.o;PA.hits=[];pathsRender();pathPlay(true,1)});
 $('pa-hear').addEventListener('click',()=>pathPlay(true,2));
 $('pa-sing').addEventListener('click',()=>pathPlay(false,4));
