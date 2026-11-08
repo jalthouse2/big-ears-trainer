@@ -918,6 +918,21 @@ body.paused .circgo{opacity:.5}
 #song-out{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:16px;background:var(--sunk);border:1px solid var(--line)}
 .songkey{font-size:14px;line-height:1.5}.songkey b{color:var(--brass)}
 .songrow{display:flex;flex-wrap:wrap;gap:8px}
+#song-slots{display:flex;flex-direction:column;gap:10px}
+.sslot{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+.sslot.empty{border-style:dashed;background:transparent}
+.sshead{display:flex;align-items:center;gap:10px}.ssn{font:700 13px var(--font-mono);color:var(--muted);min-width:18px}
+.ssin{flex:1;min-width:0;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);color:var(--fg);font:500 16px var(--font-mono)}
+.ssx{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--muted);font-size:18px;cursor:pointer;flex:none}
+.ssbody:empty{display:none}.ssbody{display:flex;flex-direction:column;gap:10px}
+.sstop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.sstop .nm{font:600 20px var(--font-display,inherit);color:var(--fg)}.sstop .num{font:800 22px var(--font-display,inherit);color:var(--brass)}.sstop .num.out{color:var(--bad,#e07a6a)}.sstop small{color:var(--muted)}
+.sstones{display:grid;grid-template-columns:auto repeat(var(--n),1fr);gap:2px 8px;font-size:13px;align-items:center;text-align:center}
+.sstones .h{text-align:left;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}.sstones .l{font-weight:700;color:var(--fg)}.sstones .r{color:var(--muted)}.sstones .m{font:800 18px var(--font-display,inherit);color:var(--brass)}
+.sstabs{display:flex;flex-wrap:wrap;gap:6px}
+#song-pads:empty{display:none}#song-pads{display:flex;flex-direction:column;gap:8px}.songpads{display:grid;grid-template-columns:repeat(var(--c,4),1fr);gap:8px}
+.songpad{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:96px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .08s,background .15s}
+.songpad .n{font:800 28px var(--font-display,inherit)}.songpad .nm{font-size:13px;color:var(--muted)}.songpad .tb{font:500 10px var(--font-mono);color:var(--muted)}
+.songpad.out .n{color:var(--bad,#e07a6a)}.songpad.home{border-color:var(--home)}.songpad.hit{transform:scale(.96);background:var(--brass);color:var(--on-brass)}.songpad.hit .nm,.songpad.hit .tb{color:var(--on-brass)}
 .songch{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:64px;padding:8px 10px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;cursor:pointer}
 .songch .nm{font-size:13px;color:var(--muted)}.songch .n{font:600 22px var(--font-display,inherit);color:var(--fg)}.songch .tb{font:500 11px var(--font-mono);color:var(--muted);letter-spacing:.02em}
 .songch.out .n{color:var(--bad,#e07a6a)}.songch.home{border-color:var(--home)}
@@ -1663,8 +1678,9 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div class="actions" id="dec-acts" hidden><button class="btn" id="dec-play">Play</button><button class="btn" id="dec-arp">One by one</button><button class="btn" id="dec-clear">Clear</button><button class="btn primary" id="dec-next">+ Next chord</button></div>
     <div class="decsong">
       <p class="eyebrow">The whole song</p>
-      <p class="hint">Put the chords in order, and a melody if you have one. It finds the key and shows how each chord leads to the next.</p>
-      <div class="decin"><input id="song-in" placeholder="G  D/F#  Em  C" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chords in order"><button class="btn" id="song-add" title="Add the chord above">+ Add</button></div>
+      <p class="hint">One chord per box, in order: a name (G, Em7, D/F#), notes, or frets (320003). A new box opens below each one.</p>
+      <div id="song-slots"></div>
+      <div id="song-pads"></div>
       <textarea id="song-mel" class="songmel" rows="2" placeholder="Melody (optional): notes like B A G A B, or paste a tab" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Melody: notes or a pasted tab"></textarea>
       <div class="songrec"><button class="chip" id="song-rec" aria-pressed="false">✎ Add melody from the neck, map or mic</button><button class="chip" id="song-undo" aria-label="Remove the last melody note">⌫</button></div>
       <div id="song-out" aria-live="polite"></div>
@@ -3116,7 +3132,7 @@ $('dock-show').addEventListener('click',e=>{const b=e.target.closest('button');i
 function showTab(t){if(S.tab==='key'&&t!=='key'&&typeof kfLeave==='function')kfLeave();if(S.tab==='dec'&&t!=='dec'&&typeof DEC!=='undefined'&&DEC.prev){S.key=DEC.prev.key;S.home=DEC.prev.home;DEC.prev=null;if(gameReady){syncSettings();renderPad()}}if(gameReady){closeOpts(true);if(CHAL.on&&t!=='deg')chalStop()}AUTOF=1;S.tab=t;persist();stopAll();
   document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('game-name').textContent=TABNAME[t]||'';
   if(t!=='jam')jamStop();
-  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths','step'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='dec'&&(S.songTxt||S.songMel))setTimeout(()=>{if(S.tab==='dec')songUpdate()},0);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
+  ['today','deg','chord','phr','find','vox','cc','prog','jam','mel','songs','anc','dec','key','tune','duel','beat','sing','pocket','free','pairs','paths','step'].forEach(k=>$('panel-'+k).hidden=k!==t);if(t==='dec'&&((S.songSlots&&S.songSlots.length)||S.songMel))setTimeout(()=>{if(S.tab==='dec')songUpdate()},0);if(t==='key')setTimeout(kfEnter,0);if(gameReady){if(t==='beat')beatSync();else beatStop();if(t!=='tune'&&typeof tuneDroneOff==='function'){tuneDroneOff()}}if(gameReady&&t==='duel')duelSync();tuneEnter(t==='tune');if(t==='dec'){decRender()}else if(gameReady&&DEC.cur){DEC.cur=null}
   if(t==='today')renderToday();if(t==='jam')syncJam();if(t==='mel')syncMel();if(t==='songs'){renderSongs();if(!SF.id)$('sf-tonic').value=String(S.key)}
   if(t==='cc'){renderCC();renderOut()}if(t==='prog')syncProg();if(t==='step'&&typeof stepSync==='function')stepSync(true);
   applyDock();
@@ -3745,13 +3761,41 @@ function tabLine(pcs,bass,root,typed,cs){const v=voicings(pcs,bass,root,3).filte
   return `<div class="dectabs"><span>${typed?'Your shape, and other ways to play it':'Play it'}:</span>${typed?tabChip(typed,cs,true):''}${v.slice(0,typed?2:3).map(x=>tabChip(x.fr,cs)).join('')}<small>Low string first. Under each shape: its notes on the map, string by string.</small></div>`}
 
 /* ---------- the whole song: chords (and a melody) in order -> the key, the numbers, how each leads to the next ---------- */
-const SONG={chords:[],mel:[],bad:[]};
-function songParse(){const raw=$('song-in').value.trim(),toks=raw?raw.split(/[\s,|]+/).filter(Boolean):[],out=[],bad=[];
-  toks.forEach(t=>{let c=null;
-    if(/^[x\d]{4,}$/i.test(t)){const f=parseTab(t);if(f){const ms=[];f.forEach((x,st)=>{if(x!==null)ms.push(OPEN[st]+x)});ms.sort((a,b)=>a-b);const pcs=ms.map(m=>m%12),nm=csName(pcs,pcs[0])[0];if(nm)c={tok:t,cs:nm,pcs:[...new Set(pcs)],bass:pcs[0],fr:f.slice().reverse().map(x=>x===null?-1:x)}}}
-    else{const p=csParse(t);if(p){const nm=csName(p.pcs,p.bass),cs=(p.over&&nm.find(x=>x.root===p.root&&x.over))||nm.find(x=>x.root===p.root&&!x.over)||nm.find(x=>x.root===p.root)||nm[0];if(cs)c={tok:t,cs,pcs:[...new Set(p.pcs)],bass:p.bass}}}
-    if(c)out.push(c);else bad.push(t)});
+const SONG={chords:[],mel:[],bad:[],slots:[],pick:{}};
+if(!S.songSlots){S.songSlots=(S.songTxt||'').trim()?S.songTxt.trim().split(/\s{2,}|\s+(?=[A-G])/).filter(Boolean):[]}
+SONG.slots=S.songSlots.map(x=>x||'');
+// one box = one chord: a name, notes or frets, read the same way the decoder reads them
+function slotParse(raw,i){const inp=parseInput(raw,'auto');if(!inp)return null;const pcs=[...new Set(inp.pcs)];if(pcs.length<2)return null;
+  const all=csName(inp.pcs,inp.bass),cs=(inp.root!=null&&(all.find(c=>c.root===inp.root&&!c.over)||all.find(c=>c.root===inp.root)))||all[0];if(!cs)return null;
+  const fr=inp.src==='tab'?inp.frets.slice().reverse().map(x=>x===null?-1:x):null;return {tok:raw,cs,pcs,bass:inp.bass,fr,slot:i}}
+function songParse(){const out=[],bad=[];SONG.slots.forEach((raw,i)=>{if(!raw.trim())return;const c=slotParse(raw,i);if(c)out.push(c);else bad.push(raw)});
   SONG.chords=out;SONG.bad=bad;SONG.mel=melParse($('song-mel').value)}
+function chordShape(c){const k=SONG.pick[c.slot];if(k)return k;if(c.fr)return c.fr;const v=voicings(c.pcs,c.bass,c.cs.root,1)[0];return v?v.fr:null}
+function strumChord(c){stopAll();ensure();const fr=chordShape(c),N=OPEN.length,t=ctx.currentTime+0.02;
+  const ms=fr?fr.map((f,j)=>f<0?null:OPEN[N-1-j]+f).filter(x=>x!=null):c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.025,1.8,0.38));
+  const d=p=>degOfPc(p);cgShow([d(c.cs.root),c.cs.name,c.pcs.map(d)]);clearTimeout(strumChord.t);strumChord.t=setTimeout(()=>cgShow(null),1800)}
+const SROLE={0:'root',1:'♭9',2:'9',3:'♭3',4:'3',5:'4',6:'♭5',7:'5',8:'♯5',9:'6',10:'♭7',11:'7'};
+function slotBody(c,sc){if(!c)return '';const L=csLetters(c.cs),ord=c.pcs.slice().sort((a,b)=>((a-c.cs.root+12)%12)-((b-c.cs.root+12)%12)),out=c.pcs.some(p=>!sc.has(p));
+  const role=p=>{const iv=(p-c.cs.root+12)%12;return iv===2&&!c.pcs.some(q=>[3,4].includes((q-c.cs.root+12)%12))?'2':iv===5&&!c.pcs.some(q=>[3,4].includes((q-c.cs.root+12)%12))?'4':iv===9&&c.pcs.some(q=>(q-c.cs.root+12)%12===10)?'13':iv===5?'11':SROLE[iv]};
+  const vs=c.fr?[{fr:c.fr}].concat(voicings(c.pcs,c.bass,c.cs.root,2).filter(v=>v.fr.join()!==c.fr.join()).slice(0,1)):voicings(c.pcs,c.bass,c.cs.root,2),cur=chordShape(c);
+  return `<div class="sstop"><span class="nm">${esc(c.cs.name)}</span><span class="num${out?' out':''}">${csMap(c.cs)}</span><small>${out?'borrows a note from outside the key':'fits the key'}</small></div>
+  <div class="sstones" style="--n:${ord.length}"><span class="h">Note</span>${ord.map(p=>`<span class="l">${L[p]||NAMES[p]}</span>`).join('')}<span class="h">In the chord</span>${ord.map(p=>`<span class="r">${role(p)}</span>`).join('')}<span class="h">Tonal map</span>${ord.map(p=>`<span class="m">${csNumOf(c.cs,p)}</span>`).join('')}</div>
+  ${vs.length?`<div class="sstabs">${vs.map(v=>tabChip(v.fr,c.cs,cur&&v.fr.join()===cur.join()).replace('decname ','ssshape ')).join('')}</div>`:''}`}
+function slotsRender(){const el=$('song-slots'),rows=SONG.slots.concat(['']);
+  el.innerHTML=rows.map((raw,i)=>{const last=i===rows.length-1;return `<div class="sslot${last?' empty':''}" data-i="${i}"><div class="sshead"><span class="ssn">${i+1}</span><input class="ssin" value="${esc(raw)}" placeholder="${last?(i?'Next chord':'First chord: G, Em7, x32010…'):''}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chord ${i+1}">${last?'':`<button class="ssx" aria-label="Remove chord ${i+1}">×</button>`}</div><div class="ssbody"></div></div>`}).join('')}
+function slotsFill(sc){document.querySelectorAll('#song-slots .sslot').forEach(d=>{const i=+d.dataset.i,c=SONG.chords.find(x=>x.slot===i);d.querySelector('.ssbody').innerHTML=c?slotBody(c,sc):(SONG.slots[i]&&SONG.slots[i].trim()?`<p class="decnote warn">I can't read that yet.</p>`:'')})}
+function slotsSave(){for(let i=0;i<SONG.slots.length;i++)if(SONG.slots[i]==null)SONG.slots[i]='';S.songSlots=SONG.slots.slice();while(S.songSlots.length&&!S.songSlots[S.songSlots.length-1].trim())S.songSlots.pop();persist()}
+let slotT=0;
+$('song-slots').addEventListener('input',e=>{const inp=e.target.closest('.ssin');if(!inp)return;const box=inp.closest('.sslot'),i=+box.dataset.i;
+  SONG.slots[i]=inp.value;clearTimeout(slotT);slotT=setTimeout(()=>{
+    const wasLast=box.classList.contains('empty');delete SONG.pick[i];slotsSave();songUpdate();
+    if(wasLast&&slotParse(inp.value,i)){box.classList.remove('empty');inp.placeholder='';box.querySelector('.sshead').insertAdjacentHTML('beforeend',`<button class="ssx" aria-label="Remove chord ${i+1}">×</button>`);
+      $('song-slots').insertAdjacentHTML('beforeend',`<div class="sslot empty" data-i="${i+1}"><div class="sshead"><span class="ssn">${i+2}</span><input class="ssin" placeholder="Next chord" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chord ${i+2}"></div><div class="ssbody"></div></div>`)}},450)});
+$('song-slots').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.closest('.ssin')){e.preventDefault();setTimeout(()=>{const n2=e.target.closest('.sslot').nextElementSibling;if(n2)n2.querySelector('.ssin').focus()},500)}});
+$('song-slots').addEventListener('click',e=>{const x=e.target.closest('.ssx');if(x){const i=+x.closest('.sslot').dataset.i;SONG.slots.splice(i,1);const pk={};Object.keys(SONG.pick).forEach(k=>{const n=+k;if(n<i)pk[n]=SONG.pick[k];else if(n>i)pk[n-1]=SONG.pick[k]});SONG.pick=pk;slotsSave();slotsRender();songUpdate();return}
+  const sh=e.target.closest('.ssshape');if(sh){e.preventDefault();const i=+sh.closest('.sslot').dataset.i,c=SONG.chords.find(x=>x.slot===i);if(!c)return;SONG.pick[i]=fromTab(sh.dataset.x.replace(/ /g,'').length===6?sh.dataset.x.replace(/ /g,''):sh.dataset.x);strumChord(c);songRender();return}
+  const top=e.target.closest('.sstop');if(top){const i=+top.closest('.sslot').dataset.i,c=SONG.chords.find(x=>x.slot===i);if(c)strumChord(c)}});
+function songAddTok(tok){if(!tok)return;while(SONG.slots.length&&!SONG.slots[SONG.slots.length-1].trim())SONG.slots.pop();SONG.slots.push(tok);slotsSave();slotsRender();songUpdate()}
 // a melody as notes ("B A G") or as a pasted tab, one line per string, high e on top ("e|--3--5--")
 function melParse(txt){const lines=txt.split(/\n/).filter(l=>/^\s*[eEBGDAa]?\s*\|?[-\d|hpbr\/\\~x ]*-[-\d|hpbr\/\\~x ]*$/.test(l)&&/-/.test(l));
   if(lines.length>=2){const N=Math.min(lines.length,OPEN.length),ev=[];
@@ -3773,34 +3817,33 @@ function songLink(a,b){const n=p=>DEG[degOfPc(p)].n,keep=b.pcs.filter(p=>a.pcs.i
   let tag='';if(rb===S.home&&(ra-S.home+12)%12===7)tag=' The 5 going home: the strongest pull there is.';else if(rb===S.home&&(ra-S.home+12)%12===5)tag=' 4 back to home: the soft "amen" ending.';
   return `<li><b>${csMap(a.cs)} → ${csMap(b.cs)}</b>: ${keep.length?`keeps ${keep.map(n).join(', ')}`:'no notes in common'}${mv.length?`; moves ${mv.join(', ')}`:''} · ${ROOTMOVE[iv]}.${tag}</li>`}
 function songRender(){const C=SONG.chords,M=SONG.mel,o=$('song-out');
-  try{S.songTxt=$('song-in').value;S.songMel=$('song-mel').value;persist()}catch(e){}
-  if(!C.length&&!M.length){o.innerHTML=SONG.bad.length?`<p class="decnote warn">I couldn't read ${SONG.bad.map(esc).join(', ')}. Use chord names like G, D/F#, Em7, or tabs like 320003.</p>`:'';if(S.decKey&&S.decKey.auto){S.decKey=null;persist();if(DEC.res)decode()}return}
+  try{S.songMel=$('song-mel').value;persist()}catch(e){}
+  if(!C.length&&!M.length){$('song-pads').innerHTML='';slotsFill(new Set(DIATONIC.map(d=>(S.key+d)%12)));o.innerHTML=SONG.bad.length?`<p class="decnote warn">I couldn't read ${SONG.bad.map(esc).join(', ')}. Use chord names like G, D/F#, Em7, or tabs like 320003.</p>`:'';if(S.decKey&&S.decKey.auto){S.decKey=null;persist();if(DEC.res)decode()}return}
   const ks=songKeys(),best=ks[0],pick=S.decKey&&!S.decKey.auto?S.decKey:null,use=pick||{k:best.k,h:best.h};
   if(!pick&&(C.length+M.length>=2)&&(!S.decKey||S.decKey.k!==use.k||S.decKey.h!==use.h)){S.decKey={k:use.k,h:use.h,auto:true};persist()}
   if(S.key!==use.k||S.home!==use.h){if(!DEC.prev)DEC.prev={key:S.key,home:S.home};S.key=use.k;S.home=use.h;syncSettings();warmCache()}
   const sc=new Set(DIATONIC.map(d=>(use.k+d)%12)),alts=[];ks.forEach(x=>{if(alts.length<3&&!(x.k===use.k&&x.h===use.h)&&x.s>=best.s-3&&!alts.some(a=>a.k===x.k&&a.h===x.h))alts.push(x)});
   const outN=C.reduce((n,c)=>n+c.pcs.filter(p=>!sc.has(p)).length,0);
   let h=`<div class="songkey">Key: <b>${keyLabel(use)}</b>, so <b>${NAMES[(use.k+use.h)%12]} = ${DEG[use.h].n}</b>${pick?' (your pick)':''}. ${outN?'Most chords fit; the red ones borrow a note from outside.':'Every chord fits its seven notes.'}${alts.length?` Could also be: ${alts.map(x=>`<button class="chip songkeyb" data-k="${x.k}" data-h="${x.h}">${keyLabel(x)}</button>`).join(' ')}`:''}${pick?` <button class="chip songkeyb" data-k="auto">Best guess</button>`:''}</div>`;
-  if(C.length)h+=`<div class="songrow">${C.map((c,i)=>{const out=c.pcs.some(p=>!sc.has(p)),v=c.fr?{fr:c.fr}:voicings(c.pcs,c.bass,c.cs.root,1)[0];return `<button class="songch${out?' out':''}${c.cs.root===(use.k+use.h)%12?' home':''}" data-i="${i}"><span class="nm">${esc(c.cs.name)}</span><span class="n">${csMap(c.cs)}</span>${v?`<span class="tb">${tabOf(v.fr)}</span><span class="tn">${tabNums(v.fr,c.cs)}</span>`:''}</button>`}).join('')}</div>`;
+  $('song-pads').innerHTML=!C.length?'':`<p class="hint">Tap to play. Strum along with your thumb.</p><div class="songpads" style="--c:${Math.min(4,C.length)}">${C.map((c,i)=>{const out=c.pcs.some(p=>!sc.has(p)),fr=chordShape(c);return `<button class="songpad${out?' out':''}${c.cs.root===(use.k+use.h)%12?' home':''}" data-i="${i}"><span class="n">${csMap(c.cs)}</span><span class="nm">${esc(c.cs.name)}</span>${fr?`<span class="tb">${tabOf(fr)}</span>`:''}</button>`}).join('')}</div>`;
   if(M.length)h+=`<div><small class="hint">Melody on the map</small><div class="songmeln">${M.map(p=>`<span class="${sc.has(p)?'':'o'}">${DEG[degOfPc(p)].n}</span>`).join(' ')}</div></div>`;
   if(C.length>1)h+=`<ul class="songlinks">${C.slice(1).map((c,i)=>songLink(C[i],c)).join('')}</ul>`;
   if(SONG.bad.length)h+=`<p class="decnote warn">Skipped ${SONG.bad.map(esc).join(', ')}: I couldn't read ${SONG.bad.length>1?'those':'that'}.</p>`;
   if(C.length)h+=`<div class="actions"><button class="btn" id="song-play">▶ Play the chords</button></div>`;
-  o.innerHTML=h;if(DEC.res)decode();renderPad()}
+  o.innerHTML=h;slotsFill(sc);if(DEC.res)decode();renderPad()}
 function songUpdate(){songParse();songRender()}
-$('song-in').value=S.songTxt||'';$('song-mel').value=S.songMel||'';
-let songT=0;['song-in','song-mel'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(songT);songT=setTimeout(songUpdate,350)}));
-$('song-add').addEventListener('click',()=>{const R=DEC.res;if(!R)return toast('Decode a chord first');const all=csName(R.inp.pcs,R.inp.bass),cs=(R.inp.root!=null&&all.find(c=>c.root===R.inp.root))||all[0];
-  const tok=R.inp.src==='tab'?stdTab(R.inp.frets.slice().reverse().map(x=>x===null?-1:x)).replace(/ /g,''):(cs?cs.name:'');if(!tok)return;
-  const tk=R.inp.src==='tab'?R.inp.frets.slice().reverse().map(x=>x===null?'x':String(x)).join(''):tok;
-  $('song-in').value=($('song-in').value.trim()+'  '+tk).trim();songUpdate()});
-$('dec-next').addEventListener('click',()=>{if(!DEC.res)return;$('song-add').click();const n=SONG.chords.length;$('dec-clear').click();toast(n===1?'Chord 1 saved. Now the next one.':`Chord ${n} saved. Keep going, or see the song below.`)});
+slotsRender();$('song-mel').value=S.songMel||'';
+let songT=0;['song-mel'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(songT);songT=setTimeout(songUpdate,350)}));
+function songAddCurrent(){const R=DEC.res;if(!R)return toast('Decode a chord first');const all=csName(R.inp.pcs,R.inp.bass),cs=(R.inp.root!=null&&all.find(c=>c.root===R.inp.root))||all[0];
+  const tk=R.inp.src==='tab'?R.inp.frets.slice().reverse().map(x=>x===null?'x':String(x)).join(' '):(cs?cs.name:'');songAddTok(tk)}
+$('dec-next').addEventListener('click',()=>{if(!DEC.res)return;songAddCurrent();const n=SONG.chords.length;$('dec-clear').click();toast(`Chord ${n} saved below. Now the next one.`)});
 SONG.rec=false;function melAdd(p){const el=$('song-mel');if(el.value.includes('\n'))el.value='';el.value=(el.value.trim()+' '+NAMES[p]).trim();clearTimeout(songT);songT=setTimeout(songUpdate,250)}
 $('song-rec').addEventListener('click',()=>{SONG.rec=!SONG.rec;const b=$('song-rec');b.setAttribute('aria-pressed',SONG.rec);b.textContent=SONG.rec?'● Adding melody: tap the neck or map, play or sing. Tap to stop':'✎ Add melody from the neck, map or mic';if(SONG.rec&&!MIC.on&&S.micAuto)micStart()});
 $('song-undo').addEventListener('click',()=>{const el=$('song-mel');const t=el.value.trim().split(/\s+/);t.pop();el.value=t.join(' ');songUpdate()});
 $('song-out').addEventListener('click',e=>{const k=e.target.closest('.songkeyb');if(k){S.decKey=k.dataset.k==='auto'?null:{k:+k.dataset.k,h:+k.dataset.h};persist();songRender();return}
-  if(e.target.closest('#song-play')){stopAll();ensure();let t=ctx.currentTime+0.05;SONG.chords.forEach((c,i)=>{const v=c.fr?null:voicings(c.pcs,c.bass,c.cs.root,1)[0],ms=c.fr?c.fr.map((f,j)=>f<0?null:OPEN[OPEN.length-1-j]+f).filter(x=>x!=null):v?v.ms:c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.03,1.6,0.38));t+=1.3*PACE()});return}
-  const ch=e.target.closest('.songch');if(ch){const c=SONG.chords[+ch.dataset.i];$('dec-in').value=c.tok;decode();$('dec-in').scrollIntoView({behavior:'smooth',block:'center'})}});
+  if(e.target.closest('#song-play')){stopAll();ensure();let t=ctx.currentTime+0.05;SONG.chords.forEach((c,i)=>{const fr=chordShape(c),ms=fr?fr.map((f,j)=>f<0?null:OPEN[OPEN.length-1-j]+f).filter(x=>x!=null):c.pcs.map(p=>48+p);ms.slice().sort((a,b)=>a-b).forEach((m,j)=>pluck(m,t+j*0.03,1.6,0.38));t+=1.3*PACE()});return}
+});
+$('song-pads').addEventListener('pointerdown',e=>{const b=e.target.closest('.songpad');if(!b)return;e.preventDefault();const c=SONG.chords[+b.dataset.i];if(!c)return;strumChord(c);b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),160)});
 function decRender(){if($('dec-in').value.trim())decode();else{$('dec-out').innerHTML='';$('dec-acts').hidden=true}}
 function decFret(s,f){DEC.frets[s]=DEC.frets[s]===f?null:f;
   const typed=DEC.frets.slice().reverse().map(x=>x===null?'x':String(x));$('dec-in').value=typed.some(x=>x.length>1)?typed.join(' '):typed.join('');
