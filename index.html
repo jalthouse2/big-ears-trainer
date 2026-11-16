@@ -1557,6 +1557,11 @@ details.lvw>summary::-webkit-details-marker{display:none}
     <div id="pl-fb" class="plfb" aria-live="polite"></div>
     <div class="seg" id="pl-show" aria-label="Neck"><button data-v="1">Show the notes</button><button data-v="0">Find them yourself</button></div>
     <div class="seg" id="pl-len" aria-label="Each chord"><button data-v="1">1 bar</button><button data-v="2">2 bars</button><button data-v="4">4 bars</button></div>
+    <div class="paear">
+      <p class="eyebrow">Same distance, same shape</p>
+      <div class="chips cgchips" id="pl-dist"></div>
+      <p class="plmoves" id="pl-dtxt"></p>
+    </div>
   </section>
   <section class="stage" id="panel-paths" hidden>
     <p class="eyebrow">Melody paths</p>
@@ -5081,7 +5086,9 @@ function poolsRender(){const cs=plChords(),c=cs[PL.i%cs.length],n=cs[(PL.i+1)%cs
   $('pl-play').textContent=PL.run?'■ Stop':'▶ Play';
   document.querySelectorAll('#pl-show button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===(S.plShow===false?'0':'1'))));
   document.querySelectorAll('#pl-len button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===(S.plBars||2))));
-  if(!PL.run&&S.tab==='pools'){chordNow={root:c[0],tones:c[2],name:c[1],tok:-1};showChordNow();renderPad()}renderFB()}
+  $('pl-dist').innerHTML=PLDIST.map(([a,b],i)=>`<button class="chip" data-i="${i}" aria-pressed="${i===PL.dist}">${lab(a)} → ${lab(b)}</button>`).join('');
+  const D=PL.dist!=null&&!PL.run?PLDIST[PL.dist]:null;$('pl-dtxt').innerHTML=D?plDistTxt(D[0],D[1]):'Tap a pair to see it on the neck.';if(D)PL.shared=[D[0]];
+  if(!PL.run&&S.tab==='pools'){chordNow=D?{root:D[0],tones:D,name:`${lab(D[0])} → ${lab(D[1])}`,tok:-1}:{root:c[0],tones:c[2],name:c[1],tok:-1};showChordNow();renderPad()}renderFB()}
 function plBar(){return 2.8*PK()}
 function plTick(tok){if(!PL.run||tok!==PL.tok)return;const cs=plChords(),c=cs[PL.i%cs.length],bars=S.plBars||2,bar=plBar();ensure();
   const t0=ctx.currentTime+0.05;for(let b=0;b<bars;b++)chord(c[0],c[2],t0+b*bar,bar*0.95,b?0.16:0.2);
@@ -5095,8 +5102,16 @@ function poolNote(m){const cs=plChords(),c=cs[PL.i%cs.length],o=offOf(m),inn=c[2
   if(inn){if(!msg){PL.inRow++;msg=PL.inRow>1&&PL.inRow%8===0?esc(cheer(PL.inRow)):`In the ${c[1]} chord. ${PL.inRow} in a row.`}}
   else{PL.inRow=0;msg=`Not in ${c[2].map(lab).join(' ')}. Nearest: ${c[2].filter(t=>Math.abs(semi(o,t))===Math.min(...c[2].map(u=>Math.abs(semi(o,u))))).map(lab).join(' or ')}.`}
   fb.className='plfb '+(inn?'ok':'no');fb.innerHTML=`<span class="big">${lab(o)}</span><span>${msg}</span>`;PL.last=o;if(typeof flashKey==='function')flashKey(o)}
+// Same distance, same shape: a pair of numbers, how it looks on the neck, and which other pairs share that look
+const PLDIST=[[0,4],[4,7],[5,9],[9,0],[7,0],[0,7]];
+function plDistTxt(a,b){const n=((b-a)%12+12)%12,nm={3:'a minor third',4:'a major third',5:'a fourth',7:'a fifth'}[n]||n+' half steps',
+  same=[];for(let k=0;k<7;k++){const x=DIATONIC[k],y=(x+n)%12;if(DIATONIC.includes(y)&&!(x===a&&y===b))same.push(`${lab(x)}–${lab(y)}`)}
+  const back=n-5,acr=back===0?'the same fret on the next string up':back<0?`the next string up, ${-back} fret${back===-1?'':'s'} back`:`the next string up, ${back} fret${back===1?'':'s'} on`,
+  gb=back+1===0?'the same fret':back+1<0?`${-(back+1)} fret${back+1===-1?'':'s'} back`:`${back+1} fret${back+1===1?'':'s'} on`;
+  return `<b>${lab(a)} up to ${lab(b)}</b> is ${nm}: ${n} frets along one string, or ${acr} (${gb} from the G string to the B). ${same.length?`Same shape: <b>${same.join(', ')}</b>. Same look, but a different place on the map, so it sounds different in the key.`:''}`}
+$('pl-dist').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const k=+b.dataset.i;PL.dist=PL.dist===k?null:k;if(PL.run)plStop();poolsRender()});
 $('pl-pairs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;PL.pair=+b.dataset.i;PL.i=0;PL.fresh=false;PL.last=null;$('pl-fb').innerHTML='';if(PL.run)plTick(++PL.tok);else poolsRender()});
-$('pl-play').addEventListener('click',()=>PL.run?plStop():plStart());
+$('pl-play').addEventListener('click',()=>{PL.dist=null;PL.run?plStop():plStart()});
 $('pl-show').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.plShow=b.dataset.v==='1';persist();poolsRender()});
 $('pl-len').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.plBars=+b.dataset.v;persist();poolsRender()});
 /* By ear 1: a path hides in the chords as their quiet top voice; which one was it? */
